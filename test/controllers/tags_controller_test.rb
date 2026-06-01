@@ -43,4 +43,29 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to new_session_url
   end
+
+  test "destroy removes a tag with no pages" do
+    empty = Tag.create!(name: "unused")
+    assert_difference("Tag.count", -1) do
+      delete tag_url(empty)
+    end
+    assert_redirected_to tags_url
+    assert_not Tag.exists?(empty.id)
+  end
+
+  test "destroy refuses a tag that has pages" do
+    assert_no_difference("Tag.count") do
+      delete tag_url(@tag)
+    end
+    assert Tag.exists?(@tag.id)
+  end
+
+  test "destroy requires login" do
+    empty = Tag.create!(name: "unused")
+    delete session_url
+    assert_no_difference("Tag.count") do
+      delete tag_url(empty)
+    end
+    assert_redirected_to new_session_url
+  end
 end

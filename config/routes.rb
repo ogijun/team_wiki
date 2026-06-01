@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       post :restore, on: :member
     end
   end
-  resources :tags, only: %i[index show create]
+  resources :tags, only: %i[index show create destroy]
   get "search", to: "search#index"
   resources :uploads, only: :create
   root "pages#index"
