@@ -26,6 +26,13 @@
   </head>
 
   <body>
+    <nav>
+      <%= link_to "ホーム", root_path %> |
+      <%= link_to "新規", new_page_path %> |
+      <%= link_to "タグ", tags_path %> |
+      <%= link_to "検索", search_path %>
+      <% if Current.user %> | <%= Current.user.name %> <%= button_to "ログアウト", session_path, method: :delete %><% end %>
+    </nav>
     <%= yield %>
   </body>
 </html>
