@@ -17,7 +17,7 @@
     <li>
       <%= link_to "##{t.name}", tag_path(t) %>
       <% if t.usage_count.zero? %>
-        <%= button_to "削除", tag_path(t), method: :delete, data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %>
+        <span class="btn-muted"><%= button_to "削除", tag_path(t), method: :delete, data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %></span>
       <% end %>
     </li>
   <% end %>

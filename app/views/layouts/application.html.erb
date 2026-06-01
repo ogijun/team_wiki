@@ -26,13 +26,19 @@
   </head>
 
   <body>
-    <nav>
-      <%= link_to "ホーム", root_path %> |
-      <%= link_to "新規", new_page_path %> |
-      <%= link_to "タグ", tags_path %> |
+    <nav class="site-nav">
+      <%= link_to "ホーム", root_path %>
+      <%= link_to "新規", new_page_path %>
+      <%= link_to "タグ", tags_path %>
       <%= link_to "検索", search_path %>
-      <% if Current.user %> | <%= Current.user.name %> <%= button_to "ログアウト", session_path, method: :delete %><% end %>
+      <span class="spacer"></span>
+      <% if Current.user %>
+        <span class="user"><%= Current.user.name %></span>
+        <span class="btn-muted"><%= button_to "ログアウト", session_path, method: :delete %></span>
+      <% end %>
     </nav>
-    <%= yield %>
+    <main>
+      <%= yield %>
+    </main>
   </body>
 </html>

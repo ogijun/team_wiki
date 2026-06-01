@@ -1,14 +1,115 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * Application-wide styles. Propshaft serves this file directly (no preprocessing).
+ * Minimal, classless-leaning base so plain ERB markup looks reasonable.
  */
 
+:root {
+  --fg: #1a1a1a;
+  --muted: #666;
+  --bg: #fff;
+  --border: #e2e2e2;
+  --accent: #2563eb;
+  --accent-fg: #fff;
+  --code-bg: #f5f5f5;
+  --maxw: 760px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--fg);
+  background: var(--bg);
+  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  line-height: 1.7;
+}
+
+main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+/* Navigation bar */
+nav.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+nav.site-nav a { color: var(--fg); text-decoration: none; font-weight: 500; }
+nav.site-nav a:hover { color: var(--accent); }
+nav.site-nav .spacer { flex: 1; }
+nav.site-nav .user { color: var(--muted); font-size: 0.9rem; }
+
+/* Typography */
+h1 { font-size: 1.6rem; margin: 0 0 1rem; }
+h2 { font-size: 1.3rem; margin: 1.5rem 0 0.75rem; }
+h3 { font-size: 1.1rem; margin: 1.25rem 0 0.5rem; }
+a { color: var(--accent); }
+
+/* Lists */
+ul, ol { padding-left: 1.25rem; }
+li { margin: 0.2rem 0; }
+
+/* Forms */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  margin: 0.25rem 0;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+label { font-weight: 500; display: inline-block; margin-top: 0.5rem; }
+
+/* Buttons (incl. button_to which renders a <form><button>) */
+button, input[type="submit"], input[type="button"] {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font: inherit;
+  cursor: pointer;
+}
+button:hover, input[type="submit"]:hover { filter: brightness(1.08); }
+form.button_to { display: inline; }
+
+/* A muted/secondary button variant */
+.btn-muted button, button.muted {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+/* Tables */
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); }
+
+/* Code */
+code { background: var(--code-bg); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+pre { background: var(--code-bg); padding: 0.9rem; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+
+/* Errors */
+.errors, .field_with_errors { color: #c00; }
+
+/* Existing app-specific styles */
 .diff ins { background: #d4f8d4; text-decoration: none; }
 .diff del { background: #f8d4d4; text-decoration: none; }
 .wikilink-new { color: #c00; }
