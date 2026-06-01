@@ -15,6 +15,15 @@ class RevisionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "li", minimum: 2
   end
 
+  test "index links each revision to a diff against the previous one" do
+    get page_revisions_url(@page)
+    assert_response :success
+    # @r2 (newer) gets a diff-vs-previous link pointing at @r1 as base
+    assert_select "a[href=?]", page_revision_path(@page, @r2, a: @r1.id), text: /前の版との差分/
+    # only the non-oldest revision has such a link (oldest @r1 has no predecessor)
+    assert_select "a", text: "前の版との差分", count: 1
+  end
+
   test "show with a and b shows a diff" do
     get page_revision_url(@page, @r2), params: { a: @r1.id }
     assert_response :success

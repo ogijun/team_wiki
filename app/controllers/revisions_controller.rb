@@ -2,7 +2,9 @@ class RevisionsController < ApplicationController
   before_action :set_page
 
   def index
-    @revisions = @page.revisions.order(created_at: :desc)
+    @revisions = @page.revisions.order(created_at: :desc).to_a
+    # newest-first list: each revision's predecessor is the next (older) one
+    @previous_of = @revisions.each_cons(2).to_h { |newer, older| [newer.id, older] }
   end
 
   def show
