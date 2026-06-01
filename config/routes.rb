@@ -2,6 +2,14 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   resource :registration, only: %i[new create]
+  resources :pages do
+    resources :revisions, only: %i[index show] do
+      post :restore, on: :member
+    end
+  end
+  resources :tags, only: %i[index show]
+  get "search", to: "search#index"
+  resources :uploads, only: :create
   root "pages#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
