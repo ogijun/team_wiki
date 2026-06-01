@@ -8,3 +8,7 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+.diff ins { background: #d4f8d4; text-decoration: none; }
+.diff del { background: #f8d4d4; text-decoration: none; }
+.wikilink-new { color: #c00; }
