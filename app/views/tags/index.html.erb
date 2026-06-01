@@ -1,4 +1,17 @@
 <h1>タグ一覧</h1>
+
+<%= form_with model: @tag, url: tags_path do |f| %>
+  <% if @tag.errors.any? %>
+    <ul>
+      <% @tag.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  <% end %>
+  <%= f.text_field :name, placeholder: "新しいタグ名" %>
+  <%= f.submit "作成" %>
+<% end %>
+
 <ul>
   <% @tags.each do |t| %>
     <li><%= link_to "##{t.name}", tag_path(t) %></li>

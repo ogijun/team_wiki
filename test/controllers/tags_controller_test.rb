@@ -20,4 +20,27 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a", text: /ruby/
   end
+
+  test "create makes a new tag" do
+    assert_difference("Tag.count", 1) do
+      post tags_url, params: { tag: { name: "rails" } }
+    end
+    assert_redirected_to tags_url
+    assert Tag.exists?(name: "rails")
+  end
+
+  test "create with blank name re-renders index" do
+    assert_no_difference("Tag.count") do
+      post tags_url, params: { tag: { name: "" } }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "create requires login" do
+    delete session_url
+    assert_no_difference("Tag.count") do
+      post tags_url, params: { tag: { name: "golang" } }
+    end
+    assert_redirected_to new_session_url
+  end
 end
