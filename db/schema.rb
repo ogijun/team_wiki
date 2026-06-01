@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_134510) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_134626) do
+  create_table "links", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "source_page_id", null: false
+    t.integer "target_page_id"
+    t.string "target_title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source_page_id", "target_title"], name: "index_links_on_source_page_id_and_target_title", unique: true
+    t.index ["source_page_id"], name: "index_links_on_source_page_id"
+    t.index ["target_page_id"], name: "index_links_on_target_page_id"
+    t.index ["target_title"], name: "index_links_on_target_title"
+  end
+
   create_table "pages", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
@@ -72,6 +84,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_134510) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "links", "pages", column: "source_page_id"
   add_foreign_key "pages", "users", column: "created_by_id"
   add_foreign_key "revisions", "pages"
   add_foreign_key "revisions", "users", column: "author_id"
