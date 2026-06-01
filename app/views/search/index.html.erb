@@ -1,0 +1,10 @@
+<h1>検索</h1>
+<%= form_with url: search_path, method: :get do |f| %>
+  <%= f.search_field :q, value: @q %>
+  <%= f.submit "検索" %>
+<% end %>
+<ul>
+  <% @pages.each do |page| %>
+    <li><%= link_to page.title, page %></li>
+  <% end %>
+</ul>
