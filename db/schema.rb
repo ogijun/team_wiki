@@ -10,7 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_134046) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_134313) do
+  create_table "pages", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "created_by_id", null: false
+    t.integer "current_revision_id"
+    t.string "slug", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_pages_on_created_by_id"
+    t.index ["slug"], name: "index_pages_on_slug", unique: true
+    t.index ["title"], name: "index_pages_on_title", unique: true
+  end
+
+  create_table "revisions", force: :cascade do |t|
+    t.integer "author_id", null: false
+    t.text "body", default: "", null: false
+    t.datetime "created_at", null: false
+    t.string "edit_summary"
+    t.integer "page_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_revisions_on_author_id"
+    t.index ["page_id"], name: "index_revisions_on_page_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -29,5 +52,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_134046) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "pages", "users", column: "created_by_id"
+  add_foreign_key "revisions", "pages"
+  add_foreign_key "revisions", "users", column: "author_id"
   add_foreign_key "sessions", "users"
 end
