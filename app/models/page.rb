@@ -2,6 +2,8 @@ class Page < ApplicationRecord
   belongs_to :created_by, class_name: "User"
   belongs_to :current_revision, class_name: "Revision", optional: true
   has_many :revisions, dependent: :destroy
+  has_many :taggings, as: :taggable, dependent: :destroy
+  has_many :tags, through: :taggings
 
   validates :title, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true

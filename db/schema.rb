@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_134313) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_134510) do
   create_table "pages", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
@@ -43,6 +43,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_134313) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "taggings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "tag_id", null: false
+    t.integer "taggable_id", null: false
+    t.string "taggable_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tag_id", "taggable_type", "taggable_id"], name: "index_taggings_uniqueness", unique: true
+    t.index ["tag_id"], name: "index_taggings_on_tag_id"
+    t.index ["taggable_type", "taggable_id"], name: "index_taggings_on_taggable"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
+    t.index ["slug"], name: "index_tags_on_slug", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -56,4 +76,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_134313) do
   add_foreign_key "revisions", "pages"
   add_foreign_key "revisions", "users", column: "author_id"
   add_foreign_key "sessions", "users"
+  add_foreign_key "taggings", "tags"
 end
