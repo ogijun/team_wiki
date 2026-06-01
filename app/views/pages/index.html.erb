@@ -1,0 +1,7 @@
+<h1>ページ一覧</h1>
+<p><%= link_to "新規作成", new_page_path %> | <%= link_to "検索", search_path %></p>
+<ul>
+  <% @pages.each do |page| %>
+    <li><%= link_to page.title, page %> <small><%= page.updated_at.to_date %></small></li>
+  <% end %>
+</ul>

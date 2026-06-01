@@ -1,0 +1,24 @@
+<article>
+  <h1><%= @page.title %></h1>
+  <p>
+    <%= link_to "編集", edit_page_path(@page) %> |
+    <%= link_to "履歴", page_revisions_path(@page) %> |
+    <%= button_to "削除", @page, method: :delete, data: { turbo_confirm: "削除しますか?" } %>
+  </p>
+  <% if @page.tags.any? %>
+    <p>タグ: <% @page.tags.each do |t| %><%= link_to "##{t.name}", tag_path(t) %> <% end %></p>
+  <% end %>
+  <div class="page-body">
+    <%= @renderer.render(@page.current_revision&.body.to_s) %>
+  </div>
+  <% if @backlinks.any? %>
+    <section class="backlinks">
+      <h2>バックリンク</h2>
+      <ul>
+        <% @backlinks.each do |link| %>
+          <li><%= link_to link.source_page.title, link.source_page %></li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+</article>
