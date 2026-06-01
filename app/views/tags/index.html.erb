@@ -16,7 +16,7 @@
   <% @tags.each do |t| %>
     <li>
       <%= link_to "##{t.name}", tag_path(t) %>
-      <% if t.pages_count.zero? %>
+      <% if t.usage_count.zero? %>
         <%= button_to "削除", tag_path(t), method: :delete, data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %>
       <% end %>
     </li>

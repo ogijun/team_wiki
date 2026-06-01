@@ -5,11 +5,11 @@ class Tag < ApplicationRecord
   validates :name, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true
 
-  scope :with_pages_count, -> {
-    joins("LEFT OUTER JOIN taggings ON taggings.tag_id = tags.id AND taggings.taggable_type = 'Page'")
-      .group("tags.id")
+  scope :with_usage_count, -> {
+    left_joins(:taggings)
+      .group(:id)
       .order(:name)
-      .select("tags.*, COUNT(taggings.id) AS pages_count")
+      .select("tags.*, COUNT(taggings.id) AS usage_count")
   }
 
   before_validation :assign_slug, on: :create

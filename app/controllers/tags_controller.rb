@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
   def index
-    @tags = Tag.with_pages_count
+    @tags = Tag.with_usage_count
     @tag = Tag.new
   end
 
@@ -9,7 +9,7 @@ class TagsController < ApplicationController
     if @tag.save
       redirect_to tags_url
     else
-      @tags = Tag.with_pages_count
+      @tags = Tag.with_usage_count
       render :index, status: :unprocessable_entity
     end
   end
@@ -21,7 +21,7 @@ class TagsController < ApplicationController
 
   def destroy
     tag = Tag.find_by!(slug: params[:id])
-    tag.destroy if tag.pages.none?
+    tag.destroy if tag.taggings.none?
     redirect_to tags_url
   end
 
