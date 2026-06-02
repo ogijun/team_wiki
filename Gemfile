@@ -40,6 +40,9 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Cloudflare R2 (S3-compatible) for Active Storage in production
+gem "aws-sdk-s3", "~> 1.224", require: false
+
 # Wiki content: GitHub-flavored Markdown rendering and revision diffs
 gem "commonmarker", "~> 2.0"
 gem "diffy", "~> 3.4"

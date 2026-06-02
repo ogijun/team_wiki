@@ -6,6 +6,19 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Cloudflare R2 (S3-compatible). Credentials are injected as ENV via Kamal (from 1Password).
+# request/response_checksum settings are required: aws-sdk-s3 >= 1.178 sends CRC32
+# integrity checksums by default, which R2 rejects.
+r2:
+  service: S3
+  endpoint: <%= ENV["R2_ENDPOINT"] %>
+  access_key_id: <%= ENV["R2_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["R2_SECRET_ACCESS_KEY"] %>
+  bucket: <%= ENV.fetch("R2_BUCKET", "team-wiki") %>
+  region: auto
+  request_checksum_calculation: when_required
+  response_checksum_validation: when_required
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3
