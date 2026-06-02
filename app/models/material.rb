@@ -26,6 +26,9 @@ class Material < ApplicationRecord
 
   attr_accessor :tag_names
 
+  before_validation :assign_slug, on: :create
+  validates :slug, presence: true, uniqueness: true
+
   def file? = file.attached?
   def link? = url.present?
 
@@ -36,6 +39,14 @@ class Material < ApplicationRecord
   end
 
   private
+
+  def assign_slug
+    return if slug.present?
+    self.slug = loop do
+      candidate = Slug.token
+      break candidate unless Material.exists?(slug: candidate)
+    end
+  end
 
   def exactly_one_source
     return if file.attached? ^ url.present?

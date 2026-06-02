@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_02_083625) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_02_132724) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -85,11 +85,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_02_083625) do
     t.integer "article_id"
     t.datetime "created_at", null: false
     t.text "description"
+    t.string "slug", null: false
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
     t.integer "user_id", null: false
     t.index ["article_id"], name: "index_materials_on_article_id"
+    t.index ["slug"], name: "index_materials_on_slug", unique: true
     t.index ["user_id"], name: "index_materials_on_user_id"
   end
 

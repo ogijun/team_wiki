@@ -70,4 +70,12 @@ class MaterialTest < ActiveSupport::TestCase
     m.tags << tag
     assert_includes tag.reload.materials, m
   end
+
+  test "assigns a unique token slug on create" do
+    a = attach_png(Material.new(user: @user))
+    a.save!
+    b = Material.create!(user: @user, url: "https://example.com/x")
+    assert_match(/\A[a-z0-9]{8}\z/, a.slug)
+    assert_not_equal a.slug, b.slug
+  end
 end
