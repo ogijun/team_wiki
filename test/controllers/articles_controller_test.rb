@@ -33,6 +33,25 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: "見出し"
   end
 
+  test "create with blank body does not persist an orphan article" do
+    login
+    assert_no_difference("Article.count") do
+      post articles_url, params: { article: { title: "本文なし", body: "", tag_names: "" } }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "update with blank body keeps previous revision and re-renders" do
+    login
+    article = Article.create!(title: "本文必須", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "元の本文", author: @user)
+    assert_no_difference("article.revisions.count") do
+      patch article_url(article), params: { article: { title: article.title, body: "", tag_names: "" } }
+    end
+    assert_response :unprocessable_entity
+    assert_equal "元の本文", article.reload.current_revision.body
+  end
+
   test "show displays fuzzy date and range when present" do
     login
     article = Article.create!(title: "出来事", created_by: @user,

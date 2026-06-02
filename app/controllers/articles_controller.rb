@@ -18,15 +18,20 @@ class ArticlesController < ApplicationController
   def create
     @article = Article.new(title: article_params[:title], created_by: Current.user)
     assign_fuzzy_dates(@article)
-    if @article.save
+    if article_params[:body].blank?
+      @article.errors.add(:body, "を入力してください")
+      return render :new, status: :unprocessable_entity
+    end
+    Article.transaction do
+      @article.save!
       ArticleRevisionCreator.call(article: @article, body: article_params[:body], author: Current.user,
                                   tag_names: split_tags(article_params[:tag_names]),
                                   edit_summary: article_params[:edit_summary])
-      ActivityRecorder.record(actor: Current.user, action: "article.created", subject: @article)
-      redirect_to @article
-    else
-      render :new, status: :unprocessable_entity
     end
+    ActivityRecorder.record(actor: Current.user, action: "article.created", subject: @article)
+    redirect_to @article
+  rescue ActiveRecord::RecordInvalid
+    render :new, status: :unprocessable_entity
   end
 
   def edit
@@ -37,12 +42,20 @@ class ArticlesController < ApplicationController
   def update
     @article.title = article_params[:title]
     assign_fuzzy_dates(@article)
-    @article.save!
-    ArticleRevisionCreator.call(article: @article, body: article_params[:body], author: Current.user,
-                                tag_names: split_tags(article_params[:tag_names]),
-                                edit_summary: article_params[:edit_summary])
+    if article_params[:body].blank?
+      @article.errors.add(:body, "を入力してください")
+      return rerender_edit
+    end
+    Article.transaction do
+      @article.save!
+      ArticleRevisionCreator.call(article: @article, body: article_params[:body], author: Current.user,
+                                  tag_names: split_tags(article_params[:tag_names]),
+                                  edit_summary: article_params[:edit_summary])
+    end
     ActivityRecorder.record(actor: Current.user, action: "article.edited", subject: @article)
     redirect_to @article
+  rescue ActiveRecord::RecordInvalid
+    rerender_edit
   end
 
   def destroy
@@ -53,6 +66,12 @@ class ArticlesController < ApplicationController
   end
 
   private
+
+  def rerender_edit
+    @body = article_params[:body]
+    @tag_names = article_params[:tag_names]
+    render :edit, status: :unprocessable_entity
+  end
 
   def set_article
     @article = Article.find_by!(slug: params[:id])
