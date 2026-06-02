@@ -1,5 +1,8 @@
 <article>
   <h1><%= @article.title %></h1>
+  <% if @article.starts %>
+    <p class="when">🗓 <%= @article.starts.label %><% if @article.ends %> 〜 <%= @article.ends.label %><% end %></p>
+  <% end %>
   <p>
     <%= link_to "編集", edit_article_path(@article) %> |
     <%= link_to "履歴", article_revisions_path(@article) %> |

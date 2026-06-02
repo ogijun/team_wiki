@@ -33,6 +33,26 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: "見出し"
   end
 
+  test "show displays fuzzy date and range when present" do
+    login
+    article = Article.create!(title: "出来事", created_by: @user,
+                              starts_at: Time.zone.local(1939, 9, 1), starts_precision: "day",
+                              ends_at: Time.zone.local(1945, 8, 1), ends_precision: "month")
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    get article_url(article)
+    assert_response :success
+    assert_select ".when", text: /1939年9月1日 〜 1945年8月/
+  end
+
+  test "show omits date line when no date" do
+    login
+    article = Article.create!(title: "日付なし", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    get article_url(article)
+    assert_response :success
+    assert_select ".when", count: 0
+  end
+
   test "update creates a new revision" do
     login
     article = Article.create!(title: "更新", created_by: @user)
