@@ -41,13 +41,9 @@ class Article < ApplicationRecord
 
   def assign_slug
     return if slug.present?
-    base = Slug.slugify(title)
-    candidate = base
-    n = 1
-    while Article.exists?(slug: candidate)
-      n += 1
-      candidate = "#{base}-#{n}"
+    self.slug = loop do
+      candidate = Slug.token
+      break candidate unless Article.exists?(slug: candidate)
     end
-    self.slug = candidate
   end
 end

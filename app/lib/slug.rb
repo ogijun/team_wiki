@@ -1,6 +1,11 @@
 module Slug
   module_function
 
+  # title 等に依存しない、安定したランダム URL トークン（小文字英数字）。
+  def token(length = 8)
+    SecureRandom.alphanumeric(length).downcase
+  end
+
   # URL 非安全文字を区切りに、Unicode の文字/数字は保持する。日本語を消さない。
   def slugify(string)
     s = string.to_s.strip.downcase

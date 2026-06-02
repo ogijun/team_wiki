@@ -9,15 +9,16 @@ class ArticleTest < ActiveSupport::TestCase
     assert article.errors[:title].any?
   end
 
-  test "auto-generates slug from title" do
-    article = Article.create!(title: "Hello World", created_by: @user)
-    assert_equal "hello-world", article.slug
+  test "slug is a random token not derived from title" do
+    article = Article.create!(title: "これはテストページです", created_by: @user)
+    assert_match(/\A[a-z0-9]{8}\z/, article.slug)
+    assert_not_includes article.slug, "テスト"
   end
 
-  test "slug uniqueness appends counter" do
-    Article.create!(title: "Dup", created_by: @user)
-    second = Article.create!(title: "Dup!", created_by: @user) # slugify -> "dup"
-    assert_equal "dup-2", second.slug
+  test "slug is unique across articles" do
+    a = Article.create!(title: "A", created_by: @user)
+    b = Article.create!(title: "B", created_by: @user)
+    assert_not_equal a.slug, b.slug
   end
 
   test "title uniqueness enforced" do
