@@ -9,6 +9,7 @@ class RegistrationsController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       start_new_session_for @user
+      ActivityRecorder.record(actor: @user, action: "user.joined", subject: @user)
       redirect_to root_url
     else
       render :new, status: :unprocessable_entity

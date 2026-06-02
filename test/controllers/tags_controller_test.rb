@@ -68,4 +68,23 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to new_session_url
   end
+
+  test "create records tag.created activity" do
+    assert_difference("Activity.where(action: 'tag.created').count", 1) do
+      post tags_url, params: { tag: { name: "rec-tag" } }
+    end
+  end
+
+  test "destroy records tag.deleted activity only when actually deleted" do
+    empty = Tag.create!(name: "unused-rec")
+    assert_difference("Activity.where(action: 'tag.deleted').count", 1) do
+      delete tag_url(empty)
+    end
+    assert_equal "unused-rec", Activity.where(action: "tag.deleted").order(:id).last.subject_label
+
+    # ページを持つタグは削除されない → 記録もされない
+    assert_no_difference("Activity.where(action: 'tag.deleted').count") do
+      delete tag_url(@tag)
+    end
+  end
 end

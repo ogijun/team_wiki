@@ -20,4 +20,17 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :unprocessable_entity
   end
+
+  test "successful registration records user.joined activity" do
+    assert_difference("Activity.where(action: 'user.joined').count", 1) do
+      post registration_url, params: { user: {
+        name: "新人", email_address: "join@example.com",
+        password: "password123", password_confirmation: "password123"
+      } }
+    end
+    a = Activity.where(action: "user.joined").order(:id).last
+    joined = User.find_by(email_address: "join@example.com")
+    assert_equal joined, a.user
+    assert_equal joined, a.subject
+  end
 end
