@@ -12,8 +12,18 @@
     <p>タグ: <% @article.tags.each do |t| %><%= link_to "##{t.name}", tag_path(t) %> <% end %></p>
   <% end %>
   <div class="page-body">
-    <%= @renderer.render(@article.current_revision&.body.to_s) %>
+    <%= @rendered.html %>
   </div>
+  <% if @rendered.references.any? %>
+    <section class="citations">
+      <h2>出典</h2>
+      <ol>
+        <% @rendered.references.each do |ref| %>
+          <li id="ref-<%= ref.number %>"><%= link_to ref.material.display_title, ref.material %></li>
+        <% end %>
+      </ol>
+    </section>
+  <% end %>
   <% if @backlinks.any? %>
     <section class="backlinks">
       <h2>バックリンク</h2>

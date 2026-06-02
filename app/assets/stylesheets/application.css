@@ -113,3 +113,9 @@ pre code { background: none; padding: 0; }
 .diff ins { background: #d4f8d4; text-decoration: none; }
 .diff del { background: #f8d4d4; text-decoration: none; }
 .wikilink-new { color: #c00; }
+
+/* Inline citations */
+.ref { font-size: 0.75em; vertical-align: super; }
+.ref a { text-decoration: none; }
+.ref-broken { color: #c00; }
+.citations ol { padding-left: 1.5rem; }

@@ -152,4 +152,25 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "month", article.reload.starts_precision
     assert_equal Time.zone.local(2000, 1, 1), article.starts_at
   end
+
+  test "show renders citations section linking to materials" do
+    login
+    material = Material.create!(user: @user, url: "https://example.com/src", title: "出典資料")
+    article = Article.create!(title: "引用あり", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "主張[[ref:#{material.slug}]]", author: @user)
+    get article_url(article)
+    assert_response :success
+    assert_select "sup.ref a", text: "[1]"
+    assert_select "section.citations ol li#ref-1 a", text: "出典資料"
+  end
+
+  test "show marks broken citation" do
+    login
+    article = Article.create!(title: "壊れ引用", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "主張[[ref:nosuch99]]", author: @user)
+    get article_url(article)
+    assert_response :success
+    assert_select "sup.ref-broken"
+    assert_select "section.citations", count: 0
+  end
 end
