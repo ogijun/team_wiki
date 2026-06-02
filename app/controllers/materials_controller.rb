@@ -19,6 +19,7 @@ class MaterialsController < ApplicationController
     @material = Material.new(material_params.merge(user: Current.user))
     if @material.save
       sync_tags(@material, params.dig(:material, :tag_names))
+      ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
       redirect_to @material
     else
       render :new, status: :unprocessable_entity
@@ -38,7 +39,9 @@ class MaterialsController < ApplicationController
   end
 
   def destroy
+    label = @material.display_title
     @material.destroy
+    ActivityRecorder.record(actor: Current.user, action: "material.deleted", subject_label: label)
     redirect_to materials_url
   end
 

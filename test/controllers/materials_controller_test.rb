@@ -52,6 +52,20 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to materials_url
   end
 
+  test "create records material.added activity" do
+    assert_difference("Activity.where(action: 'material.added').count", 1) do
+      post materials_url, params: link_params
+    end
+  end
+
+  test "destroy records material.deleted activity with label" do
+    m = Material.create!(user: @user, url: "https://example.com/a", title: "資料Z")
+    assert_difference("Activity.where(action: 'material.deleted').count", 1) do
+      delete material_url(m)
+    end
+    assert_equal "資料Z", Activity.where(action: "material.deleted").order(:id).last.subject_label
+  end
+
   test "page show lists its materials and add link" do
     page = Page.create!(title: "Docs", created_by: @user)
     PageRevisionCreator.call(page: page, body: "本文", author: @user)
