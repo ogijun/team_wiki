@@ -2,6 +2,8 @@ class Material < ApplicationRecord
   belongs_to :user
   belongs_to :page, optional: true
   has_one_attached :file
+  has_many :taggings, as: :taggable, dependent: :destroy
+  has_many :tags, through: :taggings
 
   ALLOWED_CONTENT_TYPES = %w[
     application/pdf
@@ -24,6 +26,12 @@ class Material < ApplicationRecord
 
   def file? = file.attached?
   def link? = url.present?
+
+  def display_title
+    return title if title.present?
+    return file.filename.to_s if file.attached?
+    url
+  end
 
   private
 
