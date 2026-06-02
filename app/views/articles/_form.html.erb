@@ -9,5 +9,26 @@
   </div>
   <div><%= f.label :tag_names, "タグ(カンマ区切り)" %><%= f.text_field :tag_names, value: tag_names_value %></div>
   <div><%= f.label :edit_summary, "編集メモ" %><%= f.text_field :edit_summary %></div>
+
+  <fieldset data-controller="chronicle-date">
+    <legend>日時（任意・年表に表示）</legend>
+    <div>
+      開始:
+      <%= f.number_field :start_year, value: article.starts_at&.year, placeholder: "年", data: { chronicle_date_target: "year", action: "input->chronicle-date#refresh" } %>
+      <%= f.number_field :start_month, in: 1..12, value: (%w[month day time].include?(article.starts_precision.to_s) ? article.starts_at&.month : nil), placeholder: "月", data: { chronicle_date_target: "month", action: "input->chronicle-date#refresh" } %>
+      <%= f.number_field :start_day, in: 1..31, value: (%w[day time].include?(article.starts_precision.to_s) ? article.starts_at&.day : nil), placeholder: "日", data: { chronicle_date_target: "day", action: "input->chronicle-date#refresh" } %>
+      <%= f.number_field :start_hour, in: 0..23, value: (article.starts_precision == "time" ? article.starts_at&.hour : nil), placeholder: "時", data: { chronicle_date_target: "hour", action: "input->chronicle-date#refresh" } %>
+      <%= f.number_field :start_minute, in: 0..59, value: (article.starts_precision == "time" ? article.starts_at&.min : nil), placeholder: "分", data: { chronicle_date_target: "minute" } %>
+    </div>
+    <div>
+      終了:
+      <%= f.number_field :end_year, value: article.ends_at&.year, placeholder: "年" %>
+      <%= f.number_field :end_month, in: 1..12, value: (%w[month day time].include?(article.ends_precision.to_s) ? article.ends_at&.month : nil), placeholder: "月" %>
+      <%= f.number_field :end_day, in: 1..31, value: (%w[day time].include?(article.ends_precision.to_s) ? article.ends_at&.day : nil), placeholder: "日" %>
+      <%= f.number_field :end_hour, in: 0..23, value: (article.ends_precision == "time" ? article.ends_at&.hour : nil), placeholder: "時" %>
+      <%= f.number_field :end_minute, in: 0..59, value: (article.ends_precision == "time" ? article.ends_at&.min : nil), placeholder: "分" %>
+    </div>
+  </fieldset>
+
   <%= f.submit %>
 <% end %>
