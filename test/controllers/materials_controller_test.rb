@@ -20,6 +20,22 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
+  test "index renders when logged in with a material" do
+    Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
+    get materials_url
+    assert_response :success
+    assert_select "a", text: "資料A"
+  end
+
+  test "index json returns slug and title" do
+    m = Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
+    get materials_url(format: :json)
+    assert_response :success
+    data = JSON.parse(@response.body)
+    entry = data.find { |e| e["slug"] == m.slug }
+    assert_equal "資料A", entry["title"]
+  end
+
   test "create makes a link material with tags" do
     assert_difference("Material.count", 1) do
       post materials_url, params: link_params

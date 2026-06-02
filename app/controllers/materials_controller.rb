@@ -2,9 +2,13 @@ class MaterialsController < ApplicationController
   before_action :set_material, only: %i[show edit update destroy]
 
   def index
-    @materials = Material.includes(:user, :page, :tags).order(created_at: :desc)
+    @materials = Material.includes(:user, :article, :tags).order(created_at: :desc)
     if params[:tag].present?
       @materials = @materials.joins(:tags).where(tags: { slug: params[:tag] })
+    end
+    respond_to do |format|
+      format.html
+      format.json { render json: @materials.map { |m| { slug: m.slug, title: m.display_title } } }
     end
   end
 
