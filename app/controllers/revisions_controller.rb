@@ -20,6 +20,7 @@ class RevisionsController < ApplicationController
     PageRevisionCreator.call(page: @page, body: old.body, author: Current.user,
                              edit_summary: "リビジョン##{old.id} を復元",
                              tag_names: @page.tags.pluck(:name))
+    ActivityRecorder.record(actor: Current.user, action: "page.edited", subject: @page)
     redirect_to @page
   end
 

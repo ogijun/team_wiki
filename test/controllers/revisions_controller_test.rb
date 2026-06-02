@@ -36,4 +36,10 @@ class RevisionsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_equal "一行目", @page.reload.current_revision.body
   end
+
+  test "restore records page.edited activity" do
+    assert_difference("Activity.where(action: 'page.edited').count", 1) do
+      post restore_page_revision_url(@page, @r1)
+    end
+  end
 end

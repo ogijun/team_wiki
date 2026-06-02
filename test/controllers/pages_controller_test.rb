@@ -42,4 +42,29 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
     assert_equal "新", page.reload.current_revision.body
   end
+
+  test "create records page.created activity" do
+    login
+    assert_difference("Activity.where(action: 'page.created').count", 1) do
+      post pages_url, params: { page: { title: "記録新規", body: "本文" } }
+    end
+  end
+
+  test "update records page.edited activity" do
+    login
+    page = Page.create!(title: "記録更新", created_by: @user)
+    PageRevisionCreator.call(page: page, body: "旧", author: @user)
+    assert_difference("Activity.where(action: 'page.edited').count", 1) do
+      patch page_url(page), params: { page: { title: page.title, body: "新" } }
+    end
+  end
+
+  test "destroy records page.deleted activity with label" do
+    login
+    page = Page.create!(title: "記録削除", created_by: @user)
+    assert_difference("Activity.where(action: 'page.deleted').count", 1) do
+      delete page_url(page)
+    end
+    assert_equal "記録削除", Activity.where(action: "page.deleted").order(:id).last.subject_label
+  end
 end

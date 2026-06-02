@@ -20,6 +20,7 @@ class PagesController < ApplicationController
       PageRevisionCreator.call(page: @page, body: page_params[:body], author: Current.user,
                                tag_names: split_tags(page_params[:tag_names]),
                                edit_summary: page_params[:edit_summary])
+      ActivityRecorder.record(actor: Current.user, action: "page.created", subject: @page)
       redirect_to @page
     else
       render :new, status: :unprocessable_entity
@@ -35,11 +36,14 @@ class PagesController < ApplicationController
     PageRevisionCreator.call(page: @page, body: page_params[:body], author: Current.user,
                              tag_names: split_tags(page_params[:tag_names]),
                              edit_summary: page_params[:edit_summary])
+    ActivityRecorder.record(actor: Current.user, action: "page.edited", subject: @page)
     redirect_to @page
   end
 
   def destroy
+    label = @page.title
     @page.destroy
+    ActivityRecorder.record(actor: Current.user, action: "page.deleted", subject_label: label)
     redirect_to pages_url
   end
 
