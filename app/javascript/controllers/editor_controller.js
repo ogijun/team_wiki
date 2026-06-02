@@ -57,23 +57,18 @@ export default class extends Controller {
     const button = document.createElement("button")
     button.type = "button"
     button.textContent = "出典"
-    button.style.margin = "0 6px"
+    button.className = "citation-btn"
 
     const popup = document.createElement("div")
-    popup.style.padding = "8px"
+    popup.className = "citation-picker"
 
     const search = document.createElement("input")
     search.type = "search"
     search.placeholder = "資料を絞り込み"
-    search.style.width = "100%"
-    search.style.marginBottom = "6px"
+    search.className = "citation-picker__search"
 
     const list = document.createElement("ul")
-    list.style.listStyle = "none"
-    list.style.margin = "0"
-    list.style.padding = "0"
-    list.style.maxHeight = "240px"
-    list.style.overflowY = "auto"
+    list.className = "citation-list"
 
     popup.append(search, list)
 
@@ -106,8 +101,7 @@ export default class extends Controller {
     if (items.length === 0) {
       const empty = document.createElement("li")
       empty.textContent = this.citations && this.citations.length ? "該当なし" : "資料がありません"
-      empty.style.color = "#666"
-      empty.style.padding = "4px"
+      empty.className = "citation-list__empty"
       this.citationList.append(empty)
       return
     }
@@ -117,10 +111,6 @@ export default class extends Controller {
       const link = document.createElement("button")
       link.type = "button"
       link.textContent = c.title
-      link.style.display = "block"
-      link.style.width = "100%"
-      link.style.textAlign = "left"
-      link.style.padding = "4px"
       link.addEventListener("click", () => this.insertCitation(c.slug))
       li.append(link)
       this.citationList.append(li)
