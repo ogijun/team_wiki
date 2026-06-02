@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_02_055255) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_02_070646) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -56,11 +56,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_02_055255) do
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
     t.integer "current_revision_id"
+    t.datetime "ends_at"
+    t.string "ends_precision"
     t.string "slug", null: false
+    t.datetime "starts_at"
+    t.string "starts_precision"
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["created_by_id"], name: "index_articles_on_created_by_id"
     t.index ["slug"], name: "index_articles_on_slug", unique: true
+    t.index ["starts_at"], name: "index_articles_on_starts_at"
     t.index ["title"], name: "index_articles_on_title", unique: true
   end
 
