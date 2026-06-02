@@ -30,4 +30,11 @@ class PageTest < ActiveSupport::TestCase
     page = Page.create!(title: "Param Me", created_by: @user)
     assert_equal page.slug, page.to_param
   end
+
+  test "destroying a page nullifies its materials" do
+    page = Page.create!(title: "NullifyMe", created_by: @user)
+    m = Material.create!(user: @user, url: "https://example.com/x", page: page)
+    page.destroy
+    assert_nil m.reload.page_id
+  end
 end

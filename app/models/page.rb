@@ -6,6 +6,7 @@ class Page < ApplicationRecord
   has_many :tags, through: :taggings
   has_many :outgoing_links, class_name: "Link", foreign_key: :source_page_id, dependent: :destroy
   has_many :inbound_links, class_name: "Link", foreign_key: :target_page_id, dependent: :nullify
+  has_many :materials, dependent: :nullify
 
   validates :title, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true

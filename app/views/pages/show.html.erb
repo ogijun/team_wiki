@@ -21,4 +21,13 @@
       </ul>
     </section>
   <% end %>
+  <section class="materials">
+    <h2>資料</h2>
+    <ul>
+      <% @page.materials.order(created_at: :desc).each do |m| %>
+        <li><%= m.link? ? "🔗" : "📄" %> <%= link_to m.display_title, material_path(m) %></li>
+      <% end %>
+    </ul>
+    <p><%= link_to "このページに資料を追加", new_material_path(page_id: @page.id) %></p>
+  </section>
 </article>

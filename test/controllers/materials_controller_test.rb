@@ -51,4 +51,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to materials_url
   end
+
+  test "page show lists its materials and add link" do
+    page = Page.create!(title: "Docs", created_by: @user)
+    PageRevisionCreator.call(page: page, body: "本文", author: @user)
+    Material.create!(user: @user, url: "https://example.com/d", title: "資料A", page: page)
+    get page_url(page)
+    assert_response :success
+    assert_select "a", text: "資料A"
+    assert_select "a[href=?]", new_material_path(page_id: page.id)
+  end
 end
