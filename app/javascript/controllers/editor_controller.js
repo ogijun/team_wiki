@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // toast-ui editor を textarea に重ねて初期化し、保存時に Markdown を textarea へ書き戻す。
+// ツールバーに「出典」ボタンを追加し、資料を選んで [[ref:slug]] を挿入できる。
 export default class extends Controller {
   static targets = ["source"]
 
@@ -21,6 +22,8 @@ export default class extends Controller {
         addImageBlobHook: (blob, callback) => this.upload(blob, callback)
       }
     })
+
+    this.addCitationButton()
 
     this.form = this.textarea.closest("form")
     this.onSubmit = () => { this.textarea.value = this.editor.getMarkdown() }
@@ -46,6 +49,90 @@ export default class extends Controller {
       callback(json.url, "uploaded")
     } else {
       alert("アップロードに失敗しました")
+    }
+  }
+
+  // ツールバーに「出典」ボタン + 資料ピッカーのポップアップを追加する。
+  addCitationButton() {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.textContent = "出典"
+    button.style.margin = "0 6px"
+
+    const popup = document.createElement("div")
+    popup.style.padding = "8px"
+
+    const search = document.createElement("input")
+    search.type = "search"
+    search.placeholder = "資料を絞り込み"
+    search.style.width = "100%"
+    search.style.marginBottom = "6px"
+
+    const list = document.createElement("ul")
+    list.style.listStyle = "none"
+    list.style.margin = "0"
+    list.style.padding = "0"
+    list.style.maxHeight = "240px"
+    list.style.overflowY = "auto"
+
+    popup.append(search, list)
+
+    this.editor.insertToolbarItem(
+      { groupIndex: 3, itemIndex: 0 },
+      { name: "ref", tooltip: "出典を挿入", el: button, popup: { body: popup, style: { width: "320px" } } }
+    )
+
+    this.citationList = list
+    this.citationSearch = search
+    search.addEventListener("input", () => this.renderCitations())
+    this.loadCitations()
+  }
+
+  async loadCitations() {
+    try {
+      const res = await fetch("/materials.json", { headers: { Accept: "application/json" } })
+      this.citations = res.ok ? await res.json() : []
+    } catch {
+      this.citations = []
+    }
+    this.renderCitations()
+  }
+
+  renderCitations() {
+    const q = (this.citationSearch.value || "").toLowerCase()
+    const items = (this.citations || []).filter((c) => c.title.toLowerCase().includes(q))
+    this.citationList.replaceChildren()
+
+    if (items.length === 0) {
+      const empty = document.createElement("li")
+      empty.textContent = this.citations && this.citations.length ? "該当なし" : "資料がありません"
+      empty.style.color = "#666"
+      empty.style.padding = "4px"
+      this.citationList.append(empty)
+      return
+    }
+
+    items.forEach((c) => {
+      const li = document.createElement("li")
+      const link = document.createElement("button")
+      link.type = "button"
+      link.textContent = c.title
+      link.style.display = "block"
+      link.style.width = "100%"
+      link.style.textAlign = "left"
+      link.style.padding = "4px"
+      link.addEventListener("click", () => this.insertCitation(c.slug))
+      li.append(link)
+      this.citationList.append(li)
+    })
+  }
+
+  insertCitation(slug) {
+    this.editor.insertText(`[[ref:${slug}]]`)
+    try {
+      this.editor.eventEmitter.emit("closePopup")
+    } catch {
+      // ポップアップを閉じる API が無い版では無視（ボタン再クリックで閉じる）
     }
   }
 }
