@@ -1,0 +1,17 @@
+<h1>年表</h1>
+
+<% @articles.group_by { |a| a.starts_at.year }.each do |year, articles| %>
+  <section class="chronicle-year">
+    <h2><%= year %>年</h2>
+    <ul>
+      <% articles.each do |a| %>
+        <li>
+          <span class="when">
+            <%= a.starts.label %><% if a.ends %> 〜 <%= a.ends.label %><% end %>
+          </span>
+          <%= link_to a.title, a %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
