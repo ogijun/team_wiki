@@ -35,6 +35,7 @@ class ArticlesController < ApplicationController
   end
 
   def update
+    @article.title = article_params[:title]
     assign_fuzzy_dates(@article)
     @article.save!
     ArticleRevisionCreator.call(article: @article, body: article_params[:body], author: Current.user,

@@ -43,6 +43,14 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "新", article.reload.current_revision.body
   end
 
+  test "update changes the title" do
+    login
+    article = Article.create!(title: "元タイトル", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    patch article_url(article), params: { article: { title: "新タイトル", body: "本文", tag_names: "" } }
+    assert_equal "新タイトル", article.reload.title
+  end
+
   test "create records article.created activity" do
     login
     assert_difference("Activity.where(action: 'article.created').count", 1) do
