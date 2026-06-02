@@ -3,6 +3,7 @@ class PagesController < ApplicationController
 
   def index
     @pages = Page.order(updated_at: :desc)
+    @recent_activities = Activity.includes(:user, :subject).order(created_at: :desc).limit(10)
   end
 
   def show

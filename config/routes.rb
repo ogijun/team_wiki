@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     end
   end
   resources :tags, only: %i[index show create destroy]
+  resources :activities, only: :index
   get "search", to: "search#index"
   resources :materials
   resources :uploads, only: :create
