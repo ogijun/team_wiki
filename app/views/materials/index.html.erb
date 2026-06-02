@@ -13,6 +13,7 @@
       <span class="muted">by <%= m.user.name %> / <%= m.created_at.to_fs(:short) %></span>
       <% if m.article %> — <%= link_to "📚#{m.article.title}", m.article %><% end %>
       <% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %>
+      <code class="muted">[[ref:<%= m.slug %>]]</code>
     </li>
   <% end %>
 </ul>

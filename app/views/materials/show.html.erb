@@ -1,4 +1,5 @@
 <h1><%= @material.display_title %></h1>
+<p class="muted">引用ハンドル: <code>[[ref:<%= @material.slug %>]]</code></p>
 <p class="muted">by <%= @material.user.name %> / <%= @material.created_at.to_fs(:short) %>
   <% if @material.article %> — <%= link_to "📚#{@material.article.title}", @material.article %><% end %>
 </p>
