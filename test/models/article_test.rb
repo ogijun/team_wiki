@@ -37,4 +37,47 @@ class ArticleTest < ActiveSupport::TestCase
     article.destroy
     assert_nil m.reload.article_id
   end
+
+  test "starts reader wraps stored columns into FuzzyDate" do
+    a = Article.create!(title: "年表記事", created_by: @user,
+                        starts_at: Time.zone.local(1979, 1, 1), starts_precision: "year")
+    assert_equal "1979年", a.starts.label
+    assert_nil a.ends
+  end
+
+  test "requires starts_at and starts_precision together" do
+    a = Article.new(title: "片方", created_by: @user, starts_at: Time.zone.local(1979))
+    assert_not a.valid?
+    assert a.errors[:starts_precision].any?
+  end
+
+  test "rejects invalid precision" do
+    a = Article.new(title: "不正精度", created_by: @user,
+                    starts_at: Time.zone.local(1979), starts_precision: "decade")
+    assert_not a.valid?
+  end
+
+  test "ends must not precede starts" do
+    a = Article.new(title: "逆転", created_by: @user,
+                    starts_at: Time.zone.local(1980), starts_precision: "year",
+                    ends_at: Time.zone.local(1979), ends_precision: "year")
+    assert_not a.valid?
+    assert a.errors[:ends_at].any?
+  end
+
+  test "ends requires starts" do
+    a = Article.new(title: "終わりだけ", created_by: @user,
+                    ends_at: Time.zone.local(1979), ends_precision: "year")
+    assert_not a.valid?
+    assert a.errors[:starts_at].any?
+  end
+
+  test "chronicled scope returns dated articles oldest first" do
+    Article.create!(title: "無日付", created_by: @user)
+    newer = Article.create!(title: "1990", created_by: @user,
+                            starts_at: Time.zone.local(1990), starts_precision: "year")
+    older = Article.create!(title: "1980", created_by: @user,
+                            starts_at: Time.zone.local(1980), starts_precision: "year")
+    assert_equal [older, newer], Article.chronicled.to_a
+  end
 end
