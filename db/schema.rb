@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_01_135837) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_02_011246) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -49,6 +49,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_135837) do
     t.index ["source_page_id"], name: "index_links_on_source_page_id"
     t.index ["target_page_id"], name: "index_links_on_target_page_id"
     t.index ["target_title"], name: "index_links_on_target_title"
+  end
+
+  create_table "materials", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.integer "page_id"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.integer "user_id", null: false
+    t.index ["page_id"], name: "index_materials_on_page_id"
+    t.index ["user_id"], name: "index_materials_on_user_id"
   end
 
   create_table "pages", force: :cascade do |t|
@@ -122,6 +134,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_01_135837) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "links", "pages", column: "source_page_id"
+  add_foreign_key "materials", "pages"
+  add_foreign_key "materials", "users"
   add_foreign_key "pages", "users", column: "created_by_id"
   add_foreign_key "revisions", "pages"
   add_foreign_key "revisions", "users", column: "author_id"
