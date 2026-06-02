@@ -12,21 +12,29 @@
 
   <fieldset data-controller="chronicle-date">
     <legend>日時（任意・年表に表示）</legend>
-    <div>
+
+    <div class="date-row">
       開始:
-      <%= f.number_field :start_year, value: article.starts_at&.year, placeholder: "年", data: { chronicle_date_target: "year", action: "input->chronicle-date#refresh" } %>
-      <%= f.number_field :start_month, in: 1..12, value: (%w[month day time].include?(article.starts_precision.to_s) ? article.starts_at&.month : nil), placeholder: "月", data: { chronicle_date_target: "month", action: "input->chronicle-date#refresh" } %>
-      <%= f.number_field :start_day, in: 1..31, value: (%w[day time].include?(article.starts_precision.to_s) ? article.starts_at&.day : nil), placeholder: "日", data: { chronicle_date_target: "day", action: "input->chronicle-date#refresh" } %>
-      <%= f.number_field :start_hour, in: 0..23, value: (article.starts_precision == "time" ? article.starts_at&.hour : nil), placeholder: "時", data: { chronicle_date_target: "hour", action: "input->chronicle-date#refresh" } %>
-      <%= f.number_field :start_minute, in: 0..59, value: (article.starts_precision == "time" ? article.starts_at&.min : nil), placeholder: "分", data: { chronicle_date_target: "minute" } %>
+      <%= f.number_field :start_year, value: article.starts_at&.year, placeholder: "年" %>
+      <%= f.number_field :start_month, in: 1..12, value: (%w[month day time].include?(article.starts_precision.to_s) ? article.starts_at&.month : nil), placeholder: "月" %>
+      <%= f.number_field :start_day, in: 1..31, value: (%w[day time].include?(article.starts_precision.to_s) ? article.starts_at&.day : nil), placeholder: "日" %>
+      <span data-chronicle-date-target="startTime" hidden>
+        <%= f.number_field :start_hour, in: 0..23, value: (article.starts_precision == "time" ? article.starts_at&.hour : nil), placeholder: "時", data: { chronicle_date_target: "startHour" } %>:<%= f.number_field :start_minute, in: 0..59, value: (article.starts_precision == "time" ? article.starts_at&.min : nil), placeholder: "分" %>
+      </span>
+      <a href="#" data-chronicle-date-target="startTimeLink" data-action="chronicle-date#addStartTime">時間を追加</a>
     </div>
-    <div>
+
+    <a href="#" data-chronicle-date-target="endLink" data-action="chronicle-date#addEnd">期間を指定</a>
+
+    <div class="date-row" data-chronicle-date-target="end" hidden>
       終了:
-      <%= f.number_field :end_year, value: article.ends_at&.year, placeholder: "年" %>
+      <%= f.number_field :end_year, value: article.ends_at&.year, placeholder: "年", data: { chronicle_date_target: "endYear" } %>
       <%= f.number_field :end_month, in: 1..12, value: (%w[month day time].include?(article.ends_precision.to_s) ? article.ends_at&.month : nil), placeholder: "月" %>
       <%= f.number_field :end_day, in: 1..31, value: (%w[day time].include?(article.ends_precision.to_s) ? article.ends_at&.day : nil), placeholder: "日" %>
-      <%= f.number_field :end_hour, in: 0..23, value: (article.ends_precision == "time" ? article.ends_at&.hour : nil), placeholder: "時" %>
-      <%= f.number_field :end_minute, in: 0..59, value: (article.ends_precision == "time" ? article.ends_at&.min : nil), placeholder: "分" %>
+      <span data-chronicle-date-target="endTime" hidden>
+        <%= f.number_field :end_hour, in: 0..23, value: (article.ends_precision == "time" ? article.ends_at&.hour : nil), placeholder: "時", data: { chronicle_date_target: "endHour" } %>:<%= f.number_field :end_minute, in: 0..59, value: (article.ends_precision == "time" ? article.ends_at&.min : nil), placeholder: "分" %>
+      </span>
+      <a href="#" data-chronicle-date-target="endTimeLink" data-action="chronicle-date#addEndTime">時間を追加</a>
     </div>
   </fieldset>
 

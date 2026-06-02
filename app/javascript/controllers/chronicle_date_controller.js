@@ -1,22 +1,29 @@
 import { Controller } from "@hotwired/stimulus"
 
-// 粗い項目が空なら細かい項目を disabled にする（開始フィールドの段階有効化）
+// Facebook のイベント風に、日時UIを段階的に開示する。
+// 初期は開始の年月日のみ。「時間を追加」で時刻欄、「期間を指定」で終了行を出す。
+// 編集時は値があるセクションを自動展開する。
 export default class extends Controller {
-  static targets = ["year", "month", "day", "hour", "minute"]
+  static targets = [
+    "startTime", "startTimeLink", "startHour",
+    "end", "endLink",
+    "endTime", "endTimeLink", "endYear", "endHour"
+  ]
 
-  connect() { this.refresh() }
-
-  refresh() {
-    const hasYear = this.has(this.yearTarget)
-    const hasMonth = hasYear && this.has(this.monthTarget)
-    const hasDay = hasMonth && this.has(this.dayTarget)
-    const hasHour = hasDay && this.has(this.hourTarget)
-
-    this.monthTarget.disabled = !hasYear
-    this.dayTarget.disabled = !hasMonth
-    this.hourTarget.disabled = !hasDay
-    this.minuteTarget.disabled = !hasHour
+  connect() {
+    if (this.hasValue(this.startHourTarget)) this.reveal(this.startTimeTarget, this.startTimeLinkTarget)
+    if (this.hasValue(this.endYearTarget)) this.reveal(this.endTarget, this.endLinkTarget)
+    if (this.hasValue(this.endHourTarget)) this.reveal(this.endTimeTarget, this.endTimeLinkTarget)
   }
 
-  has(el) { return el.value.toString().trim() !== "" }
+  addStartTime(event) { event.preventDefault(); this.reveal(this.startTimeTarget, this.startTimeLinkTarget) }
+  addEnd(event) { event.preventDefault(); this.reveal(this.endTarget, this.endLinkTarget) }
+  addEndTime(event) { event.preventDefault(); this.reveal(this.endTimeTarget, this.endTimeLinkTarget) }
+
+  reveal(section, link) {
+    section.hidden = false
+    if (link) link.hidden = true
+  }
+
+  hasValue(el) { return el && el.value.toString().trim() !== "" }
 }
