@@ -2,19 +2,12 @@
   <% if article.errors.any? %>
     <ul><% article.errors.full_messages.each do |m| %><li><%= m %></li><% end %></ul>
   <% end %>
-  <div><%= f.label :title, "タイトル" %><%= f.text_field :title %></div>
-  <div>
-    <%= f.label :body, "本文(Markdown)" %>
-    <%= f.text_area :body, value: body_value, data: { controller: "editor", editor_target: "source" } %>
-  </div>
-  <div><%= f.label :tag_names, "タグ(カンマ区切り)" %><%= f.text_field :tag_names, value: tag_names_value %></div>
-  <div><%= f.label :edit_summary, "編集メモ" %><%= f.text_field :edit_summary %></div>
 
   <fieldset data-controller="chronicle-date">
     <legend>日時（任意・年表に表示）</legend>
 
     <div class="date-row">
-      開始:
+      <span data-chronicle-date-target="startLabel" hidden>開始:</span>
       <%= f.number_field :start_year, value: article.starts_at&.year, placeholder: "年" %>
       <%= f.number_field :start_month, in: 1..12, value: (%w[month day time].include?(article.starts_precision.to_s) ? article.starts_at&.month : nil), placeholder: "月" %>
       <%= f.number_field :start_day, in: 1..31, value: (%w[day time].include?(article.starts_precision.to_s) ? article.starts_at&.day : nil), placeholder: "日" %>
@@ -35,8 +28,17 @@
         <%= f.number_field :end_hour, in: 0..23, value: (article.ends_precision == "time" ? article.ends_at&.hour : nil), placeholder: "時", data: { chronicle_date_target: "endHour" } %>:<%= f.number_field :end_minute, in: 0..59, value: (article.ends_precision == "time" ? article.ends_at&.min : nil), placeholder: "分" %>
       </span>
       <a href="#" data-chronicle-date-target="endTimeLink" data-action="chronicle-date#addEndTime">時間を追加</a>
+      <button type="button" class="date-clear" data-action="chronicle-date#removeEnd" aria-label="終了を消す" title="終了を消す">×</button>
     </div>
   </fieldset>
+
+  <div><%= f.label :title, "タイトル" %><%= f.text_field :title %></div>
+  <div>
+    <%= f.label :body, "本文(Markdown)" %>
+    <%= f.text_area :body, value: body_value, data: { controller: "editor", editor_target: "source" } %>
+  </div>
+  <div><%= f.label :tag_names, "タグ(カンマ区切り)" %><%= f.text_field :tag_names, value: tag_names_value %></div>
+  <div><%= f.label :edit_summary, "編集メモ" %><%= f.text_field :edit_summary %></div>
 
   <%= f.submit %>
 <% end %>

@@ -119,3 +119,29 @@ pre code { background: none; padding: 0; }
 .ref a { text-decoration: none; }
 .ref-broken { color: #c00; }
 .citations ol { padding-left: 1.5rem; }
+
+/* Chronicle date inputs */
+.date-clear {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+}
+.date-clear:hover { color: #c00; }
+.date-row input { font: inherit; }
+.date-row input[name$="_year]"] { width: 5em; }
+.date-row input[name$="_month]"],
+.date-row input[name$="_day]"],
+.date-row input[name$="_hour]"],
+.date-row input[name$="_minute]"] { width: 3.5em; }
+
+/* Citation picker (editor toolbar popup) */
+.citation-btn { margin: 0 6px; }
+.citation-picker { padding: 8px; }
+.citation-picker__search { width: 100%; margin-bottom: 6px; }
+.citation-list { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow-y: auto; }
+.citation-list__empty { color: var(--muted); padding: 4px; }
+.citation-list button { display: block; width: 100%; text-align: left; padding: 4px; }
