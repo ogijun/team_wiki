@@ -1,0 +1,18 @@
+<h1>資料</h1>
+<p><%= link_to "資料を追加", new_material_path %></p>
+
+<% if params[:tag].present? %>
+  <p>タグ <code>#<%= params[:tag] %></code> で絞り込み中 — <%= link_to "解除", materials_path %></p>
+<% end %>
+
+<ul>
+  <% @materials.each do |m| %>
+    <li>
+      <%= m.link? ? "🔗" : "📄" %>
+      <%= link_to m.display_title, material_path(m) %>
+      <span class="muted">by <%= m.user.name %> / <%= m.created_at.to_fs(:short) %></span>
+      <% if m.page %> — <%= link_to "📚#{m.page.title}", m.page %><% end %>
+      <% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %>
+    </li>
+  <% end %>
+</ul>

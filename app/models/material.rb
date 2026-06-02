@@ -24,6 +24,8 @@ class Material < ApplicationRecord
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
 
+  attr_accessor :tag_names
+
   def file? = file.attached?
   def link? = url.present?
 

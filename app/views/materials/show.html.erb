@@ -1,0 +1,32 @@
+<h1><%= @material.display_title %></h1>
+<p class="muted">by <%= @material.user.name %> / <%= @material.created_at.to_fs(:short) %>
+  <% if @material.page %> — <%= link_to "📚#{@material.page.title}", @material.page %><% end %>
+</p>
+
+<% if @material.description.present? %>
+  <p><%= simple_format @material.description %></p>
+<% end %>
+
+<% if @material.link? %>
+  <% if (src = MaterialEmbed.embed_src(@material.url)) %>
+    <div class="embed">
+      <iframe src="<%= src %>" width="640" height="360" frameborder="0" allowfullscreen></iframe>
+    </div>
+  <% end %>
+  <p><%= link_to @material.url, @material.url, target: "_blank", rel: "noopener" %></p>
+<% else %>
+  <p><%= link_to "⬇ #{@material.file.filename}", rails_blob_path(@material.file) %></p>
+  <% if @material.file.content_type.to_s.start_with?("image/") %>
+    <%= image_tag rails_blob_path(@material.file), style: "max-width:100%" %>
+  <% end %>
+<% end %>
+
+<% if @material.tags.any? %>
+  <p>タグ: <% @material.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
+<% end %>
+
+<p>
+  <%= link_to "編集", edit_material_path(@material) %> |
+  <%= button_to "削除", @material, method: :delete, data: { turbo_confirm: "削除しますか?" } %> |
+  <%= link_to "一覧へ", materials_path %>
+</p>
