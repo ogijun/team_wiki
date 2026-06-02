@@ -21,4 +21,34 @@ class MaterialTest < ActiveSupport::TestCase
     assert m.save
     assert_equal page, m.reload.page
   end
+
+  test "link-type material is valid" do
+    m = Material.new(user: @user, url: "https://youtu.be/abc123")
+    assert m.valid?, m.errors.full_messages.join(", ")
+  end
+
+  test "requires exactly one of file or url - neither is invalid" do
+    m = Material.new(user: @user, title: "空")
+    assert_not m.valid?
+    assert_includes m.errors[:base], "ファイルかURLのどちらか一方を指定してください"
+  end
+
+  test "requires exactly one of file or url - both is invalid" do
+    m = attach_png(Material.new(user: @user, url: "https://example.com/x"))
+    assert_not m.valid?
+    assert_includes m.errors[:base], "ファイルかURLのどちらか一方を指定してください"
+  end
+
+  test "rejects disallowed content type" do
+    m = Material.new(user: @user)
+    m.file.attach(io: StringIO.new("MZ"), filename: "evil.exe", content_type: "application/x-msdownload")
+    assert_not m.valid?
+    assert_includes m.errors[:file], "は対応していない形式です"
+  end
+
+  test "rejects url without http scheme" do
+    m = Material.new(user: @user, url: "ftp://example.com/x")
+    assert_not m.valid?
+    assert_includes m.errors[:url], "は http(s) で始まる URL を指定してください"
+  end
 end
