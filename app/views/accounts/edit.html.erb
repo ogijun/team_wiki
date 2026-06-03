@@ -1,0 +1,24 @@
+<h1>アカウント設定</h1>
+<% if notice %><p class="notice"><%= notice %></p><% end %>
+
+<%= form_with model: @user, url: account_path, method: :patch do |f| %>
+  <% if @user.errors.any? %>
+    <ul class="errors"><% @user.errors.full_messages.each do |m| %><li><%= m %></li><% end %></ul>
+  <% end %>
+
+  <div><%= avatar_tag(@user, size: 64) %></div>
+  <div><%= f.label :avatar, "アイコン画像" %><%= f.file_field :avatar, accept: "image/*" %></div>
+  <div><%= f.label :name, "表示名" %><%= f.text_field :name %></div>
+  <div><%= f.label :email_address, "メール" %><%= f.email_field :email_address %></div>
+
+  <fieldset>
+    <legend>パスワード変更（変えない場合は空欄）</legend>
+    <div><%= f.label :current_password, "現在のパスワード" %><%= f.password_field :current_password %></div>
+    <div><%= f.label :password, "新しいパスワード" %><%= f.password_field :password %></div>
+    <div><%= f.label :password_confirmation, "確認" %><%= f.password_field :password_confirmation %></div>
+  </fieldset>
+
+  <%= f.submit "更新" %>
+<% end %>
+
+<p><%= link_to "公開プロフィールを見る", user_path(@user) %></p>
