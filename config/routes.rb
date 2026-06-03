@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resource :session, only: %i[new destroy]
-  get "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/discord/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
   resources :articles do
     resources :revisions, only: %i[index show] do
