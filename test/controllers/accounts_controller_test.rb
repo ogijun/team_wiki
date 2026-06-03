@@ -2,8 +2,8 @@ require "test_helper"
 
 class AccountsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "me@example.com", password: "password123", name: "旧名")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "me@example.com", name: "旧名", provider: "discord", uid: "acc-user")
+    sign_in_as(@user)
   end
 
   test "edit requires login" do
@@ -23,35 +23,9 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "rejects email already taken" do
-    User.create!(email_address: "taken@example.com", password: "password123")
+    User.create!(email_address: "taken@example.com", provider: "discord", uid: "acc-taken")
     patch account_url, params: { user: { name: @user.name, email_address: "taken@example.com" } }
     assert_response :unprocessable_entity
     assert_equal "me@example.com", @user.reload.email_address
-  end
-
-  test "changes password with correct current password" do
-    patch account_url, params: { user: {
-      name: @user.name, email_address: @user.email_address,
-      current_password: "password123", password: "newsecret1", password_confirmation: "newsecret1"
-    } }
-    assert @user.reload.authenticate("newsecret1")
-  end
-
-  test "rejects password change with wrong current password" do
-    patch account_url, params: { user: {
-      name: @user.name, email_address: @user.email_address,
-      current_password: "wrong", password: "newsecret1", password_confirmation: "newsecret1"
-    } }
-    assert_response :unprocessable_entity
-    assert @user.reload.authenticate("password123")
-  end
-
-  test "blank password leaves password unchanged and still updates name" do
-    patch account_url, params: { user: {
-      name: "名前だけ", email_address: @user.email_address,
-      current_password: "", password: "", password_confirmation: ""
-    } }
-    assert_equal "名前だけ", @user.reload.name
-    assert @user.authenticate("password123")
   end
 end

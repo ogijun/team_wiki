@@ -2,8 +2,8 @@ require "test_helper"
 
 class ChronicleControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "ch@example.com", password: "password123", name: "CH")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "ch@example.com", name: "CH", provider: "discord", uid: "chr-user")
+    sign_in_as(@user)
   end
 
   test "index requires login" do

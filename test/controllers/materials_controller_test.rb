@@ -2,12 +2,12 @@ require "test_helper"
 
 class MaterialsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "mc@example.com", password: "password123", name: "MC")
+    @user = User.create!(email_address: "mc@example.com", name: "MC", provider: "discord", uid: "mat-user")
     login
   end
 
   def login
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    sign_in_as(@user)
   end
 
   def link_params(extra = {})

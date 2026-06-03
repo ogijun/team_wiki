@@ -2,8 +2,8 @@ require "test_helper"
 
 class RevisionsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "rv@example.com", password: "password123", name: "RV")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "rv@example.com", name: "RV", provider: "discord", uid: "rev-user")
+    sign_in_as(@user)
     @article = Article.create!(title: "Hist", created_by: @user)
     @r1 = ArticleRevisionCreator.call(article: @article, body: "一行目", author: @user)
     @r2 = ArticleRevisionCreator.call(article: @article, body: "一行目\n二行目", author: @user)

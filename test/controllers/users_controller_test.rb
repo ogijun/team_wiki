@@ -2,8 +2,8 @@ require "test_helper"
 
 class UsersControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "prof@example.com", password: "password123", name: "プロフ太郎")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "prof@example.com", name: "プロフ太郎", provider: "discord", uid: "usr-user")
+    sign_in_as(@user)
   end
 
   test "show requires login" do

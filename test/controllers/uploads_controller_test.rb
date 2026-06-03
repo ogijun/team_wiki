@@ -2,8 +2,8 @@ require "test_helper"
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "uc@example.com", password: "password123", name: "UC")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "uc@example.com", name: "UC", provider: "discord", uid: "upl-user")
+    sign_in_as(@user)
   end
 
   test "create returns json url for valid image" do

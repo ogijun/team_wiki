@@ -2,8 +2,8 @@ require "test_helper"
 
 class SearchControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "s@example.com", password: "password123", name: "S")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "s@example.com", name: "S", provider: "discord", uid: "srch-user")
+    sign_in_as(@user)
     @hit = Article.create!(title: "Ruby入門", created_by: @user)
     ArticleRevisionCreator.call(article: @hit, body: "本文にキーワード含む", author: @user)
     @miss = Article.create!(title: "別物", created_by: @user)

@@ -2,8 +2,8 @@ require "test_helper"
 
 class ActivitiesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "ac@example.com", password: "password123", name: "AC")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "ac@example.com", name: "AC", provider: "discord", uid: "act-user")
+    sign_in_as(@user)
   end
 
   test "index requires login" do

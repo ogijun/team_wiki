@@ -2,11 +2,11 @@ require "test_helper"
 
 class ArticlesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "p@example.com", password: "password123", name: "P")
+    @user = User.create!(email_address: "p@example.com", name: "P", provider: "discord", uid: "art-user")
   end
 
   def login
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    sign_in_as(@user)
   end
 
   test "index requires login" do
@@ -155,7 +155,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "show displays contributor avatars linking to users" do
     login
-    bob = User.create!(email_address: "bob2@example.com", password: "password123", name: "Bob")
+    bob = User.create!(email_address: "bob2@example.com", name: "Bob", provider: "discord", uid: "art-bob")
     article = Article.create!(title: "貢献者表示", created_by: @user)
     ArticleRevisionCreator.call(article: article, body: "1", author: @user)
     ArticleRevisionCreator.call(article: article, body: "2", author: bob)

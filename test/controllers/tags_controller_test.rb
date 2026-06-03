@@ -2,8 +2,8 @@ require "test_helper"
 
 class TagsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(email_address: "tg@example.com", password: "password123", name: "TG")
-    post session_url, params: { email_address: @user.email_address, password: "password123" }
+    @user = User.create!(email_address: "tg@example.com", name: "TG", provider: "discord", uid: "tag-user")
+    sign_in_as(@user)
     @article = Article.create!(title: "Tagged", created_by: @user)
     ArticleRevisionCreator.call(article: @article, body: "x", author: @user, tag_names: ["ruby"])
     @tag = Tag.find_by(name: "ruby")
