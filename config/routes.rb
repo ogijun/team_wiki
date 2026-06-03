@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  resource :session
-  resources :passwords, param: :token
-  resource :registration, only: %i[new create]
+  resource :session, only: %i[new destroy]
+  get "/auth/:provider/callback", to: "sessions#create"
+  get "/auth/failure", to: "sessions#failure"
   resources :articles do
     resources :revisions, only: %i[index show] do
       post :restore, on: :member
