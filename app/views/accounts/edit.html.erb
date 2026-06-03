@@ -11,13 +11,6 @@
   <div><%= f.label :name, "表示名" %><%= f.text_field :name %></div>
   <div><%= f.label :email_address, "メール" %><%= f.email_field :email_address %></div>
 
-  <fieldset>
-    <legend>パスワード変更（変えない場合は空欄）</legend>
-    <div><%= f.label :current_password, "現在のパスワード" %><%= f.password_field :current_password %></div>
-    <div><%= f.label :password, "新しいパスワード" %><%= f.password_field :password %></div>
-    <div><%= f.label :password_confirmation, "確認" %><%= f.password_field :password_confirmation %></div>
-  </fieldset>
-
   <%= f.submit "更新" %>
 <% end %>
 
