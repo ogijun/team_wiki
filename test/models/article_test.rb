@@ -3,6 +3,15 @@ require "test_helper"
 class ArticleTest < ActiveSupport::TestCase
   setup { @user = User.create!(email_address: "u@example.com", password: "password123", name: "U") }
 
+  test "contributors are distinct revision authors in first-appearance order" do
+    bob = User.create!(email_address: "bob@example.com", password: "password123", name: "Bob")
+    article = Article.create!(title: "共同編集", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "1", author: @user)
+    ArticleRevisionCreator.call(article: article, body: "2", author: bob)
+    ArticleRevisionCreator.call(article: article, body: "3", author: @user)
+    assert_equal [@user, bob], article.contributors
+  end
+
   test "requires title" do
     article = Article.new(created_by: @user)
     assert_not article.valid?

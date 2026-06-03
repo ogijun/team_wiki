@@ -28,6 +28,13 @@ class Article < ApplicationRecord
 
   def to_param = slug
 
+  # リビジョンの author を初参加順（最初に貢献した順）で重複除去して返す。
+  def contributors
+    ids = revisions.order(:created_at).pluck(:author_id).uniq
+    by_id = User.where(id: ids).with_attached_avatar.index_by(&:id)
+    ids.map { |id| by_id[id] }
+  end
+
   private
 
   def date_columns_consistent

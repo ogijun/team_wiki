@@ -153,6 +153,18 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal Time.zone.local(2000, 1, 1), article.starts_at
   end
 
+  test "show displays contributor avatars linking to users" do
+    login
+    bob = User.create!(email_address: "bob2@example.com", password: "password123", name: "Bob")
+    article = Article.create!(title: "貢献者表示", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "1", author: @user)
+    ArticleRevisionCreator.call(article: article, body: "2", author: bob)
+    get article_url(article)
+    assert_response :success
+    assert_select "section.contributors a[href=?]", user_path(@user)
+    assert_select "section.contributors a[href=?]", user_path(bob)
+  end
+
   test "show renders citations section linking to materials" do
     login
     material = Material.create!(user: @user, url: "https://example.com/src", title: "出典資料")
