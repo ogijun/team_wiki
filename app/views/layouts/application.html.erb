@@ -36,7 +36,7 @@
       <%= link_to "検索", search_path %>
       <span class="spacer"></span>
       <% if Current.user %>
-        <span class="user"><%= Current.user.name %></span>
+        <%= link_to edit_account_path, class: "user" do %><%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %><% end %>
         <span class="btn-muted"><%= button_to "ログアウト", session_path, method: :delete %></span>
       <% end %>
     </nav>
