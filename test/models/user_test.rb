@@ -36,4 +36,9 @@ class UserTest < ActiveSupport::TestCase
     assert u.authenticate("secret123")
     assert_not u.authenticate("wrong")
   end
+
+  test "can be created without a password (oauth user)" do
+    u = User.new(email_address: "oauth@example.com", provider: "discord", uid: "123")
+    assert u.valid?, u.errors.full_messages.join(", ")
+  end
 end

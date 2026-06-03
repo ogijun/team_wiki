@@ -17,4 +17,10 @@ class UsersHelperTest < ActionView::TestCase
     assert_includes html, "avatar-initial"
     assert_includes html, "Z"
   end
+
+  test "avatar_tag uses avatar_url when present and no attachment" do
+    u = User.create!(email_address: "au@example.com", name: "AU", provider: "discord", uid: "u1",
+                     avatar_url: "https://cdn.discordapp.com/avatars/1/abc.png")
+    assert_includes avatar_tag(u), "https://cdn.discordapp.com/avatars/1/abc.png"
+  end
 end

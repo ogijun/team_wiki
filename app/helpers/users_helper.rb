@@ -12,6 +12,8 @@ module UsersHelper
   def avatar_tag(user, size: 40)
     if user.avatar.attached?
       image_tag url_for(user.avatar), width: size, height: size, class: "avatar"
+    elsif user.avatar_url.present?
+      image_tag user.avatar_url, width: size, height: size, class: "avatar"
     else
       initial = display_name(user).to_s.strip.first.to_s.upcase
       content_tag(:span, initial,
