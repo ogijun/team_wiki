@@ -1,0 +1,10 @@
+<header class="profile">
+  <%= avatar_tag(@user, size: 64) %>
+  <h1><%= display_name(@user) %></h1>
+  <p class="muted">参加日: <%= @user.created_at.to_date %></p>
+</header>
+
+<section class="recent-activity">
+  <h2>最近の動き</h2>
+  <%= render "activities/timeline", activities: @activities %>
+</section>
