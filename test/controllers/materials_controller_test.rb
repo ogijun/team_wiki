@@ -91,4 +91,43 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "資料A"
     assert_select "a[href=?]", new_material_path(article_id: article.id)
   end
+
+  test "index paginates with per param" do
+    30.times { |i| Material.create!(user: @user, url: "https://example.com/#{i}", title: "M#{i}") }
+    get materials_url(per: 25)
+    assert_response :success
+    assert_select "table.materials-table tbody tr", count: 25
+    get materials_url(per: 50)
+    assert_select "table.materials-table tbody tr", minimum: 26
+  end
+
+  test "index sorts by name ascending" do
+    Material.create!(user: @user, url: "https://example.com/b", title: "Bravo")
+    Material.create!(user: @user, url: "https://example.com/a", title: "Alpha")
+    get materials_url(sort: "name", dir: "asc")
+    assert_response :success
+    body = @response.body
+    assert body.index("Alpha") < body.index("Bravo"), "Alpha should come before Bravo"
+  end
+
+  test "index sorts by created_at desc by default" do
+    Material.create!(user: @user, url: "https://example.com/old", title: "OLDONE")
+    Material.create!(user: @user, url: "https://example.com/new", title: "NEWONE")
+    get materials_url
+    body = @response.body
+    assert body.index("NEWONE") < body.index("OLDONE"), "newest first by default"
+  end
+
+  test "index ignores invalid sort and per" do
+    Material.create!(user: @user, url: "https://example.com/x", title: "X")
+    get materials_url(sort: "title); DROP TABLE", dir: "sideways", per: "9999")
+    assert_response :success
+  end
+
+  test "index json stays unpaginated full list" do
+    30.times { |i| Material.create!(user: @user, url: "https://example.com/j#{i}", title: "J#{i}") }
+    get materials_url(format: :json, per: 25)
+    data = JSON.parse(@response.body)
+    assert_operator data.size, :>=, 30
+  end
 end

@@ -1,14 +1,30 @@
 class MaterialsController < ApplicationController
+  include Pagy::Backend
+
   before_action :set_material, only: %i[show edit update destroy]
 
+  SORTS = {
+    "name"       => "materials.title",
+    "type"       => "materials.url",
+    "uploader"   => "users.name",
+    "created_at" => "materials.created_at"
+  }.freeze
+
   def index
-    @materials = Material.includes(:user, :article, :tags).order(created_at: :desc)
-    if params[:tag].present?
-      @materials = @materials.joins(:tags).where(tags: { slug: params[:tag] })
-    end
+    scope = Material.includes(:user, :article, :tags)
+    scope = scope.joins(:tags).where(tags: { slug: params[:tag] }) if params[:tag].present?
+
+    sort_key = SORTS.key?(params[:sort]) ? params[:sort] : "created_at"
+    dir = params[:dir] == "asc" ? "asc" : "desc"
+    scope = scope.joins(:user) if sort_key == "uploader"
+    scope = scope.order(Arel.sql("#{SORTS[sort_key]} #{dir} NULLS LAST"))
+
     respond_to do |format|
-      format.html
-      format.json { render json: @materials.map { |m| { slug: m.slug, title: m.display_title } } }
+      format.html do
+        per = [25, 50, 100].include?(params[:per].to_i) ? params[:per].to_i : 25
+        @pagy, @materials = pagy(scope, limit: per)
+      end
+      format.json { render json: scope.map { |m| { slug: m.slug, title: m.display_title } } }
     end
   end
 
