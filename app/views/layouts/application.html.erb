@@ -27,20 +27,29 @@
   </head>
 
   <body>
-    <nav class="site-nav">
-      <%= link_to "ホーム", root_path %>
-      <%= link_to "新規", new_article_path %>
-      <%= link_to "タグ", tags_path %>
-      <%= link_to "資料", materials_path %>
-      <%= link_to "アクティビティ", activities_path %>
-      <%= link_to "年表", chronicle_path %>
-      <%= link_to "検索", search_path %>
-      <span class="spacer"></span>
+    <header>
+    <nav>
+      <ul>
+        <li><%= link_to "ホーム", root_path %></li>
+        <li><%= link_to "新規", new_article_path %></li>
+        <li><%= link_to "タグ", tags_path %></li>
+        <li><%= link_to "資料", materials_path %></li>
+        <li><%= link_to "アクティビティ", activities_path %></li>
+        <li><%= link_to "年表", chronicle_path %></li>
+        <li><%= link_to "検索", search_path %></li>
+      </ul>
       <% if Current.user %>
-        <%= link_to edit_account_path, class: "user" do %><%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %><% end %>
-        <span class="btn-muted"><%= button_to "ログアウト", session_path, method: :delete %></span>
+        <ul>
+          <li>
+            <%= link_to edit_account_path, class: "user" do %>
+              <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
+            <% end %>
+          </li>
+          <li><span class="btn-muted"><%= button_to "ログアウト", session_path, method: :delete %></span></li>
+        </ul>
       <% end %>
     </nav>
+    </header>
     <main>
       <%= yield %>
     </main>

@@ -5,13 +5,13 @@
   <p>タグ <code>#<%= params[:tag] %></code> で絞り込み中 — <%= link_to "解除", materials_path %></p>
 <% end %>
 
-<%= form_with url: materials_path, method: :get, data: { turbo_action: "advance" } do %>
+<%= form_with url: materials_path, method: :get, class: "per-form", data: { turbo_action: "advance" } do %>
   <% request.query_parameters.except("per", "page").each do |k, v| %>
     <%= hidden_field_tag k, v %>
   <% end %>
   表示件数:
   <%= select_tag :per, options_for_select([25, 50, 100], (params[:per].presence || 25).to_i),
-                 onchange: "this.form.requestSubmit()" %>
+                 class: "per-select", onchange: "this.form.requestSubmit()" %>
 <% end %>
 
 <table class="materials-table">
