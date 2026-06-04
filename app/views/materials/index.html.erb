@@ -5,15 +5,38 @@
   <p>タグ <code>#<%= params[:tag] %></code> で絞り込み中 — <%= link_to "解除", materials_path %></p>
 <% end %>
 
-<ul>
-  <% @materials.each do |m| %>
-    <li>
-      <%= m.link? ? "🔗" : "📄" %>
-      <%= link_to m.display_title, material_path(m) %>
-      <span class="muted">by <%= m.user.name %> / <%= m.created_at.to_fs(:short) %></span>
-      <% if m.article %> — <%= link_to "📚#{m.article.title}", m.article %><% end %>
-      <% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %>
-      <code class="muted">[[ref:<%= m.slug %>]]</code>
-    </li>
+<%= form_with url: materials_path, method: :get, data: { turbo_action: "advance" } do %>
+  <% request.query_parameters.except("per", "page").each do |k, v| %>
+    <%= hidden_field_tag k, v %>
   <% end %>
-</ul>
+  表示件数:
+  <%= select_tag :per, options_for_select([25, 50, 100], (params[:per].presence || 25).to_i),
+                 onchange: "this.form.requestSubmit()" %>
+<% end %>
+
+<table class="materials-table">
+  <thead>
+    <tr>
+      <th><%= sortable("type", "種別") %></th>
+      <th><%= sortable("name", "タイトル") %></th>
+      <th><%= sortable("uploader", "アップローダー") %></th>
+      <th><%= sortable("created_at", "作成日時") %></th>
+      <th>タグ</th>
+      <th>引用</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @materials.each do |m| %>
+      <tr>
+        <td><%= m.link? ? "🔗" : "📄" %></td>
+        <td><%= link_to m.display_title, material_path(m) %><% if m.article %> <%= link_to "📚", m.article, title: m.article.title %><% end %></td>
+        <td><%= link_to display_name(m.user), m.user %></td>
+        <td><%= m.created_at.to_fs(:short) %></td>
+        <td><% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></td>
+        <td><code class="muted">[[ref:<%= m.slug %>]]</code></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%== pagy_nav(@pagy) if @pagy.pages > 1 %>
