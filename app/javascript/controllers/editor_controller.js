@@ -108,6 +108,13 @@ export default class extends Controller {
 
     items.forEach((c) => {
       const li = document.createElement("li")
+      if (c.thumb_url) {
+        const img = document.createElement("img")
+        img.src = c.thumb_url
+        img.className = "citation-thumb"
+        img.loading = "lazy"
+        li.append(img)
+      }
       const link = document.createElement("button")
       link.type = "button"
       link.textContent = c.title

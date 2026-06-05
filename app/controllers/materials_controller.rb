@@ -24,7 +24,7 @@ class MaterialsController < ApplicationController
         per = [25, 50, 100].include?(params[:per].to_i) ? params[:per].to_i : 25
         @pagy, @materials = pagy(scope, limit: per)
       end
-      format.json { render json: scope.map { |m| { slug: m.slug, title: m.display_title } } }
+      format.json { render json: scope.map { |m| { slug: m.slug, title: m.display_title, thumb_url: material_thumb_url(m) } } }
     end
   end
 
@@ -72,6 +72,11 @@ class MaterialsController < ApplicationController
 
   def set_material
     @material = Material.find(params[:id])
+  end
+
+  def material_thumb_url(material)
+    return rails_representation_path(material.thumbnail(48)) if material.thumbnailable_file?
+    material.preview_image_url
   end
 
   def material_params

@@ -131,6 +131,17 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_operator data.size, :>=, 30
   end
 
+  test "index json includes thumb_url for youtube and null for plain link" do
+    yt = Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ", title: "動画")
+    plain = Material.create!(user: @user, url: "https://example.com/page", title: "ページ")
+    get materials_url(format: :json)
+    data = JSON.parse(@response.body)
+    yt_entry = data.find { |e| e["slug"] == yt.slug }
+    plain_entry = data.find { |e| e["slug"] == plain.slug }
+    assert_match "img.youtube.com/vi/dQw4w9WgXcQ", yt_entry["thumb_url"]
+    assert_nil plain_entry["thumb_url"]
+  end
+
   test "create persists bibliographic fields and year-only published date" do
     post materials_url, params: { material: {
       url: "https://x.test/a", source: "サンプル誌", author: "サンプル著者",
