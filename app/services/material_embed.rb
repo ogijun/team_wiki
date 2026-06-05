@@ -1,19 +1,21 @@
-# 外部リンク URL を埋め込み用 iframe src に解決する。
-# プロバイダは PROVIDERS に追加して拡張できる（初期は YouTube のみ）。
+# 外部リンク URL を埋め込み/サムネ用に解決する。
+# YouTube ID 抽出を共有し、embed src とサムネ画像 URL の両方を返す。
 module MaterialEmbed
   module_function
 
-  # 各プロバイダ: URL -> 埋め込み src（非対応なら nil）を返す lambda
-  PROVIDERS = [
-    # YouTube: watch?v=, youtu.be/, /embed/
-    ->(url) {
-      id = url[%r{(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([\w-]{11})}, 1]
-      id && "https://www.youtube.com/embed/#{id}"
-    }
-  ].freeze
+  YOUTUBE_ID = %r{(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/)([\w-]{11})}
+
+  def youtube_id(url)
+    url.to_s[YOUTUBE_ID, 1]
+  end
 
   def embed_src(url)
-    return nil if url.blank?
-    PROVIDERS.lazy.filter_map { |p| p.call(url) }.first
+    id = youtube_id(url)
+    id && "https://www.youtube.com/embed/#{id}"
+  end
+
+  def thumbnail_src(url)
+    id = youtube_id(url)
+    id && "https://img.youtube.com/vi/#{id}/hqdefault.jpg"
   end
 end
