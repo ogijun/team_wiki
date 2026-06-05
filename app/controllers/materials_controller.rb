@@ -37,6 +37,7 @@ class MaterialsController < ApplicationController
 
   def create
     @material = Material.new(material_params.merge(user: Current.user))
+    assign_published(@material)
     if @material.save
       sync_tags(@material, params.dig(:material, :tag_names))
       ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
@@ -50,7 +51,9 @@ class MaterialsController < ApplicationController
   end
 
   def update
-    if @material.update(material_params)
+    @material.assign_attributes(material_params)
+    assign_published(@material)
+    if @material.save
       sync_tags(@material, params.dig(:material, :tag_names))
       redirect_to @material
     else
@@ -72,7 +75,18 @@ class MaterialsController < ApplicationController
   end
 
   def material_params
-    params.require(:material).permit(:title, :description, :url, :file, :article_id)
+    params.require(:material).permit(:title, :description, :url, :file, :article_id,
+                                     :source, :author, :retrieved_on,
+                                     :published_year, :published_month, :published_day)
+  end
+
+  def assign_published(material)
+    fd = FuzzyDate.from_parts(
+      year: material_params[:published_year], month: material_params[:published_month],
+      day: material_params[:published_day], hour: nil, minute: nil
+    )
+    material.published_at = fd&.at
+    material.published_precision = fd&.precision
   end
 
   def sync_tags(material, str)

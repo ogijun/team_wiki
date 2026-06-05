@@ -17,6 +17,21 @@
   <p><%= f.label :tag_names, "タグ（カンマ区切り）" %><br>
      <%= f.text_field :tag_names, value: material.tags.map(&:name).join(", ") %></p>
 
+  <fieldset>
+    <legend>出典情報（任意・書けるところだけでOK）</legend>
+    <p><%= f.label :author, "著者・発言者" %><br><%= f.text_field :author %></p>
+    <p><%= f.label :source, "出典元（掲載誌・書籍・サイト名）" %><br><%= f.text_field :source %></p>
+    <p>
+      <%= f.label :published_year, "発行日" %><br>
+      <span class="date-row">
+        <%= f.number_field :published_year, value: material.published_at&.year, placeholder: "年" %>
+        <%= f.number_field :published_month, in: 1..12, value: (%w[month day].include?(material.published_precision.to_s) ? material.published_at&.month : nil), placeholder: "月" %>
+        <%= f.number_field :published_day, in: 1..31, value: (material.published_precision.to_s == "day" ? material.published_at&.day : nil), placeholder: "日" %>
+      </span>
+    </p>
+    <p><%= f.label :retrieved_on, "取得日（Web資料）" %><br><%= f.date_field :retrieved_on %></p>
+  </fieldset>
+
   <%= f.hidden_field :article_id %>
   <%= f.submit %>
 <% end %>

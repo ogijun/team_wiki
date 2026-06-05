@@ -130,4 +130,17 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     data = JSON.parse(@response.body)
     assert_operator data.size, :>=, 30
   end
+
+  test "create persists bibliographic fields and year-only published date" do
+    post materials_url, params: { material: {
+      url: "https://x.test/a", source: "サンプル誌", author: "サンプル著者",
+      retrieved_on: "2026-06-05", published_year: "1998", published_month: "", published_day: ""
+    } }
+    m = Material.order(:created_at).last
+    assert_equal "サンプル誌", m.source
+    assert_equal "サンプル著者", m.author
+    assert_equal Date.new(2026, 6, 5), m.retrieved_on
+    assert_equal "year", m.published_precision
+    assert_equal 1998, m.published_at.year
+  end
 end
