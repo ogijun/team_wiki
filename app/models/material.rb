@@ -17,6 +17,7 @@ class Material < ApplicationRecord
     application/zip
   ].freeze
   MAX_BYTES = 100.megabytes
+  THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
@@ -34,6 +35,18 @@ class Material < ApplicationRecord
   def file? = file.attached?
   def link? = url.present?
   def published = FuzzyDate.wrap(published_at, published_precision)
+
+  def thumbnailable_file?
+    file.attached? && THUMBNAIL_TYPES.include?(file.content_type)
+  end
+
+  def thumbnail(px)
+    file.representation(resize_to_limit: [px, px]) if thumbnailable_file?
+  end
+
+  def preview_image_url
+    MaterialEmbed.thumbnail_src(url) if link?
+  end
 
   def display_title
     return title if title.present?

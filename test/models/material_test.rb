@@ -101,4 +101,27 @@ class MaterialTest < ActiveSupport::TestCase
     assert_not bad.valid?
     assert bad.errors[:published_precision].any?
   end
+
+  test "thumbnailable_file? is true for image, false for non-image and links" do
+    img = attach_png(Material.new(user: @user))
+    assert img.thumbnailable_file?
+    link = Material.new(user: @user, url: "https://youtu.be/dQw4w9WgXcQ")
+    assert_not link.thumbnailable_file?
+  end
+
+  test "thumbnail returns a representation for image, nil for link" do
+    img = attach_png(Material.new(user: @user))
+    img.save!
+    assert_not_nil img.thumbnail(48)
+    link = Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ")
+    assert_nil link.thumbnail(48)
+  end
+
+  test "preview_image_url is youtube thumbnail for youtube link, nil for file" do
+    link = Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ")
+    assert_equal "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg", link.preview_image_url
+    img = attach_png(Material.new(user: @user))
+    img.save!
+    assert_nil img.preview_image_url
+  end
 end
