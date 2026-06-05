@@ -20,17 +20,20 @@ class Material < ApplicationRecord
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
+  validates :published_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
+  validate :published_columns_consistent
   validates :url, format: { with: %r{\Ahttps?://},
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
 
-  attr_accessor :tag_names
+  attr_accessor :tag_names, :published_year, :published_month, :published_day
 
   before_validation :assign_slug, on: :create
   validates :slug, presence: true, uniqueness: true
 
   def file? = file.attached?
   def link? = url.present?
+  def published = FuzzyDate.wrap(published_at, published_precision)
 
   def display_title
     return title if title.present?
@@ -39,6 +42,11 @@ class Material < ApplicationRecord
   end
 
   private
+
+  def published_columns_consistent
+    return unless published_at.present? ^ published_precision.present?
+    errors.add(:published_precision, "が必要です")
+  end
 
   def assign_slug
     return if slug.present?

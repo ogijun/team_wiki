@@ -78,4 +78,27 @@ class MaterialTest < ActiveSupport::TestCase
     assert_match(/\A[a-z0-9]{8}\z/, a.slug)
     assert_not_equal a.slug, b.slug
   end
+
+  test "stores bibliographic fields" do
+    m = Material.create!(user: @user, url: "https://x.test/a",
+                         source: "サンプル誌", author: "サンプル著者",
+                         retrieved_on: Date.new(2026, 6, 5))
+    m.reload
+    assert_equal "サンプル誌", m.source
+    assert_equal "サンプル著者", m.author
+    assert_equal Date.new(2026, 6, 5), m.retrieved_on
+  end
+
+  test "published wraps FuzzyDate when present, nil otherwise" do
+    m = Material.new(user: @user, url: "https://x.test/a",
+                     published_at: Time.zone.local(1998), published_precision: "year")
+    assert_equal "1998年", m.published.label
+    assert_nil Material.new(user: @user, url: "https://x.test/b").published
+  end
+
+  test "published_at and published_precision must be both present or both blank" do
+    bad = Material.new(user: @user, url: "https://x.test/a", published_at: Time.zone.local(1998))
+    assert_not bad.valid?
+    assert bad.errors[:published_precision].any?
+  end
 end
