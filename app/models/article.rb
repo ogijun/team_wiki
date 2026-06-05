@@ -1,4 +1,7 @@
 class Article < ApplicationRecord
+  KINDS = { "work" => "作品", "person" => "人物", "event" => "出来事" }.freeze
+  STATUSES = { "stub" => "スタブ", "writing" => "執筆中", "done" => "完成" }.freeze
+
   belongs_to :created_by, class_name: "User"
   belongs_to :current_revision, class_name: "Revision", optional: true
   has_many :revisions, dependent: :destroy
@@ -10,6 +13,8 @@ class Article < ApplicationRecord
 
   validates :title, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true
+  validates :kind, inclusion: { in: KINDS.keys }, allow_nil: true
+  validates :status, inclusion: { in: STATUSES.keys }
 
   before_validation :assign_slug, on: :create
 
@@ -27,6 +32,9 @@ class Article < ApplicationRecord
   def ends = FuzzyDate.wrap(ends_at, ends_precision)
 
   def to_param = slug
+
+  def kind_label = kind ? KINDS[kind] : "未分類"
+  def status_label = STATUSES[status]
 
   # リビジョンの author を初参加順（最初に貢献した順）で重複除去して返す。
   def contributors

@@ -90,4 +90,30 @@ class ArticleTest < ActiveSupport::TestCase
                             starts_at: Time.zone.local(1980), starts_precision: "year")
     assert_equal [older, newer], Article.chronicled.to_a
   end
+
+  test "default status is stub" do
+    article = Article.create!(title: "状態既定", created_by: @user)
+    assert_equal "stub", article.status
+  end
+
+  test "status must be one of STATUSES" do
+    article = Article.new(title: "状態不正", created_by: @user, status: "bogus")
+    assert_not article.valid?
+    assert article.errors[:status].any?
+  end
+
+  test "kind allows nil and valid values, rejects others" do
+    assert Article.new(title: "k1", created_by: @user, kind: nil).valid?
+    assert Article.new(title: "k2", created_by: @user, kind: "work").valid?
+    bad = Article.new(title: "k3", created_by: @user, kind: "bogus")
+    assert_not bad.valid?
+    assert bad.errors[:kind].any?
+  end
+
+  test "labels map slug to Japanese, nil kind is 未分類" do
+    a = Article.new(title: "ラベル", created_by: @user, kind: "person", status: "writing")
+    assert_equal "人物", a.kind_label
+    assert_equal "執筆中", a.status_label
+    assert_equal "未分類", Article.new(title: "x", created_by: @user, kind: nil).kind_label
+  end
 end
