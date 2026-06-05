@@ -1,9 +1,9 @@
-# サンプルデータベース Wiki
+# Team Wiki
 
-サンプル作品に関する記事・資料をチームで編集する社内向け Wiki。
+記事・資料をチームで編集する Wiki アプリケーション。
 Discord サーバーのメンバー（特定ロール保持者）だけがログインして閲覧・編集できる。
 
-> リポジトリ名は `team_wiki` だが、ローカル/プレ環境は `team-wiki-pre.test` など別名で公開している。
+汎用的な Wiki 基盤として作られており、個別の用途（特定テーマのデータベース等）はこのアプリの応用例として運用する。
 
 ## 主な機能
 
@@ -51,14 +51,14 @@ Discord ログインを実際に通すには `.env` に以下を設定する。
 | `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` | Discord アプリの OAuth2 認証情報 |
 | `DISCORD_GUILD_ID` | ログインを許可するサーバー（ギルド）ID |
 | `DISCORD_REQUIRED_ROLE_ID` | 必須ロール ID（このロール保持者のみ許可） |
-| `APP_BASE_URL` | redirect_uri を固定（例: `http://team-wiki-pre.test`）。Discord 側に登録したコールバックと scheme/host を一致させる |
+| `APP_BASE_URL` | redirect_uri を固定（例: `http://team-wiki.test`）。Discord 側に登録したコールバックと scheme/host を一致させる |
 
 > Discord 開発者ポータルのリダイレクト URI には `<APP_BASE_URL>/auth/discord/callback` をフルパスで登録する。
 
 ### ローカルドメイン（任意）
 
-ポート番号を隠して `.test` ドメインで動かすため、チームでは [puma-dev](https://github.com/puma/puma-dev) を使用。
-macOS で `.test` の名前解決が効かない場合は `/etc/hosts` に `127.0.0.1 team-wiki-pre.test` を追加する。
+ポート番号を隠して `.test` ドメインで動かすため、[puma-dev](https://github.com/puma/puma-dev) を使うとよい。
+macOS で `.test` の名前解決が効かない場合は `/etc/hosts` に `127.0.0.1 <任意のホスト>.test` を追加する。
 
 ## デプロイ
 
