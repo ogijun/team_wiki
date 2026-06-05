@@ -37,6 +37,6 @@
 
 <p>
   <%= link_to "編集", edit_material_path(@material) %> |
-  <%= button_to "削除", @material, method: :delete, data: { turbo_confirm: "削除しますか?" } %> |
+  <%= button_to "削除", @material, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %> |
   <%= link_to "一覧へ", materials_path %>
 </p>
