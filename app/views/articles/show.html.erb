@@ -31,7 +31,7 @@
       <h2>出典</h2>
       <ol>
         <% @rendered.references.each do |ref| %>
-          <li id="ref-<%= ref.number %>"><%= link_to ref.material.display_title, ref.material %></li>
+          <li id="ref-<%= ref.number %>"><%= citation_text(ref.material) %></li>
         <% end %>
       </ol>
     </section>
