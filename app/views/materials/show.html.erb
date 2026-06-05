@@ -26,8 +26,8 @@
   <p><%= link_to @material.url, @material.url, target: "_blank", rel: "noopener" %></p>
 <% else %>
   <p><%= link_to "⬇ #{@material.file.filename}", rails_blob_path(@material.file) %></p>
-  <% if @material.file.content_type.to_s.start_with?("image/") %>
-    <%= image_tag rails_blob_path(@material.file), style: "max-width:100%" %>
+  <% if @material.thumbnailable_file? %>
+    <%= link_to image_tag(@material.thumbnail(640), style: "max-width:100%"), rails_blob_path(@material.file) %>
   <% end %>
 <% end %>
 
