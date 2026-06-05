@@ -185,4 +185,32 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "sup.ref-broken"
     assert_select "section.citations", count: 0
   end
+
+  test "create persists kind and status" do
+    login
+    post articles_url, params: { article: {
+      title: "種別付き", body: "本文", kind: "work", status: "writing"
+    } }
+    article = Article.find_by(title: "種別付き")
+    assert_equal "work", article.kind
+    assert_equal "writing", article.status
+  end
+
+  test "update without status param preserves existing status" do
+    login
+    article = Article.create!(title: "完成済み", created_by: @user, status: "done")
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    patch article_url(article), params: { article: { title: "完成済み", body: "更新本文" } }
+    assert_equal "done", article.reload.status
+  end
+
+  test "index filters by kind" do
+    login
+    Article.create!(title: "作品A", created_by: @user, kind: "work", status: "done")
+    Article.create!(title: "人物B", created_by: @user, kind: "person", status: "stub")
+    get articles_url(kind: "work")
+    assert_response :success
+    assert_select "a", text: "作品A"
+    assert_select "a", text: "人物B", count: 0
+  end
 end

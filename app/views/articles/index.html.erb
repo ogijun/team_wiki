@@ -1,8 +1,18 @@
 <h1>記事一覧</h1>
 <p><%= link_to "新規作成", new_article_path %> | <%= link_to "検索", search_path %></p>
+<p class="filters">
+  種別:
+  <%= link_to "すべて", articles_path %>
+  <% Article::KINDS.each do |slug, label| %>| <%= link_to label, articles_path(kind: slug, status: params[:status]) %><% end %>
+  ／ 状態:
+  <% Article::STATUSES.each do |slug, label| %><%= link_to label, articles_path(status: slug, kind: params[:kind]) %> <% end %>
+</p>
 <ul>
   <% @articles.each do |article| %>
-    <li><%= link_to article.title, article %> <small><%= article.updated_at.to_date %></small></li>
+    <li>
+      <%= link_to article.title, article %>
+      <small><%= article.status_label %><% if article.kind %>・<%= article.kind_label %><% end %> / <%= article.updated_at.to_date %></small>
+    </li>
   <% end %>
 </ul>
 

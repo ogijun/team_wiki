@@ -1,5 +1,9 @@
 <article>
   <h1><%= @article.title %></h1>
+  <p class="badges">
+    <span class="badge badge-status"><%= @article.status_label %></span>
+    <% if @article.kind %><span class="badge badge-kind"><%= @article.kind_label %></span><% end %>
+  </p>
   <% if @article.starts %>
     <p class="when">🗓 <%= @article.starts.label %><% if @article.ends %> 〜 <%= @article.ends.label %><% end %></p>
   <% end %>

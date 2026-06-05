@@ -32,6 +32,14 @@
     </div>
   </fieldset>
 
+  <div>
+    <%= f.label :kind, "種別" %>
+    <%= f.select :kind, Article::KINDS.map { |slug, label| [label, slug] }, { include_blank: "未分類" } %>
+  </div>
+  <div>
+    <%= f.label :status, "状態" %>
+    <%= f.select :status, Article::STATUSES.map { |slug, label| [label, slug] }, { selected: article.status || "stub" } %>
+  </div>
   <div><%= f.label :title, "タイトル" %><%= f.text_field :title %></div>
   <div>
     <%= f.label :body, "本文(Markdown)" %>

@@ -3,6 +3,8 @@ class ArticlesController < ApplicationController
 
   def index
     @articles = Article.order(updated_at: :desc)
+    @articles = @articles.where(kind: params[:kind]) if Article::KINDS.key?(params[:kind])
+    @articles = @articles.where(status: params[:status]) if Article::STATUSES.key?(params[:status])
     @recent_activities = Activity.includes(:user, :subject).order(created_at: :desc).limit(10)
   end
 
@@ -20,7 +22,9 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    @article = Article.new(title: article_params[:title], created_by: Current.user)
+    @article = Article.new(title: article_params[:title], created_by: Current.user,
+                           kind: article_params[:kind].presence,
+                           status: article_params[:status].presence || "stub")
     assign_fuzzy_dates(@article)
     if article_params[:body].blank?
       @article.errors.add(:body, "を入力してください")
@@ -45,6 +49,8 @@ class ArticlesController < ApplicationController
 
   def update
     @article.title = article_params[:title]
+    @article.kind = article_params[:kind].presence
+    @article.status = article_params[:status].presence || @article.status
     assign_fuzzy_dates(@article)
     if article_params[:body].blank?
       @article.errors.add(:body, "を入力してください")
@@ -82,7 +88,7 @@ class ArticlesController < ApplicationController
   end
 
   def article_params
-    params.require(:article).permit(:title, :body, :tag_names, :edit_summary,
+    params.require(:article).permit(:title, :body, :tag_names, :edit_summary, :kind, :status,
                                     :start_year, :start_month, :start_day, :start_hour, :start_minute,
                                     :end_year, :end_month, :end_day, :end_hour, :end_minute)
   end
