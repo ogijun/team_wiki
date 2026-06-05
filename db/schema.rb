@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_03_080000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_05_013549) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -58,14 +58,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_03_080000) do
     t.integer "current_revision_id"
     t.datetime "ends_at"
     t.string "ends_precision"
+    t.string "kind"
     t.string "slug", null: false
     t.datetime "starts_at"
     t.string "starts_precision"
+    t.string "status", default: "stub", null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["created_by_id"], name: "index_articles_on_created_by_id"
+    t.index ["kind"], name: "index_articles_on_kind"
     t.index ["slug"], name: "index_articles_on_slug", unique: true
     t.index ["starts_at"], name: "index_articles_on_starts_at"
+    t.index ["status"], name: "index_articles_on_status"
     t.index ["title"], name: "index_articles_on_title", unique: true
   end
 
@@ -83,9 +87,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_03_080000) do
 
   create_table "materials", force: :cascade do |t|
     t.integer "article_id"
+    t.string "author"
     t.datetime "created_at", null: false
     t.text "description"
+    t.datetime "published_at"
+    t.string "published_precision"
+    t.date "retrieved_on"
     t.string "slug", null: false
+    t.string "source"
     t.string "title"
     t.datetime "updated_at", null: false
     t.string "url"
