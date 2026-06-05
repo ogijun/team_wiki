@@ -76,3 +76,11 @@
   border-color: var(--border);
 }
 form.button_to { display: inline; }
+
+/* Article metadata badges */
+.badges { margin: 0.25rem 0 0.75rem; }
+.badge { display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.5rem; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.badge-status { background: var(--code-bg); }
+.bibliography { margin: 0.5rem 0; }
+.bibliography dt { font-size: 0.8rem; color: var(--muted); }
+.bibliography dd { margin: 0 0 0.4rem; }
