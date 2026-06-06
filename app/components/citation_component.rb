@@ -15,12 +15,10 @@ class CitationComponent < ViewComponent::Base
   private
 
   def lead
-    @lead ||= begin
-      s = +""
-      s << @material.author if @material.author.present?
-      s << "『#{@material.source}』" if @material.source.present?
-      s << "(#{@material.published_at.year})" if @material.published_at.present?
-      s
-    end
+    [
+      (@material.author if @material.author.present?),
+      ("『#{@material.source}』" if @material.source.present?),
+      ("(#{@material.published_at.year})" if @material.published_at.present?),
+    ].compact.join
   end
 end

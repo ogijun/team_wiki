@@ -1,9 +1,5 @@
 <%= form_with model: material do |f| %>
-  <% if material.errors.any? %>
-    <ul class="errors">
-      <% material.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
-    </ul>
-  <% end %>
+  <%= render "shared/error_messages", record: material %>
 
   <% if Current.user&.admin? %>
     <div class="admin-box">

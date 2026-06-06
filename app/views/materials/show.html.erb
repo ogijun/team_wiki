@@ -4,7 +4,7 @@
   引用ハンドル: <code>[[ref:<%= @material.slug %>]]</code>
   <%= button_tag "引用タグをコピー", type: "button", class: "secondary outline btn-sm", data: { action: "clipboard#copy" } %>
 </p>
-<p class="muted">by <%= @material.user.name %> / <%= @material.created_at.to_fs(:jp) %>
+<p class="muted">by <%= display_name(@material.user) %> / <%= @material.created_at.to_fs(:jp) %>
   <% if @material.article %> — <%= link_to "📚#{@material.article.title}", @material.article %><% end %>
 </p>
 <p class="badges">
