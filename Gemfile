@@ -50,6 +50,9 @@ gem "aws-sdk-s3", "~> 1.224", require: false
 # Pagination
 gem "pagy", "~> 9.3"
 
+# Reusable, unit-testable view components
+gem "view_component", "~> 4.0"
+
 # Wiki content: GitHub-flavored Markdown rendering and revision diffs
 gem "commonmarker", "~> 2.0"
 gem "diffy", "~> 3.4"
