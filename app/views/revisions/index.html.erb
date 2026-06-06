@@ -7,7 +7,7 @@
       <% if (prev = @previous_of[rev.id]) %>
         <%= link_to "前の版との差分", article_revision_path(@article, rev, a: prev.id) %>
       <% end %>
-      <%= button_to "この版に復元", restore_article_revision_path(@article, rev), data: { turbo_confirm: "復元しますか?" } %>
+      <%= button_to "この版に復元", restore_article_revision_path(@article, rev), class: "secondary outline btn-sm", data: { turbo_confirm: "復元しますか?" } %>
     </li>
   <% end %>
 </ul>

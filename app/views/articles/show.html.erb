@@ -16,7 +16,7 @@
   <% end %>
   <div class="actions">
     <%= link_to "編集", edit_article_path(@article), role: "button", class: "btn-sm" %>
-    <%= link_to "履歴", article_revisions_path(@article), role: "button", class: "secondary outline btn-sm" %>
+    <%= link_to "履歴", article_revisions_path(@article) %>
     <%= button_to "削除", @article, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %>
   </div>
   <% if @article.tags.any? %>
