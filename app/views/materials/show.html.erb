@@ -12,7 +12,7 @@
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
 </p>
 <div class="actions">
-  <%= link_to "編集", edit_material_path(@material) %>
+  <%= link_to "編集", edit_material_path(@material), role: "button", class: "btn-sm" %>
   <%= button_to "削除", @material, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %>
 </div>
 
