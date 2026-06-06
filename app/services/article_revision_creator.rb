@@ -15,9 +15,9 @@ module ArticleRevisionCreator
   def sync_links(article, body)
     titles = WikiLinkExtractor.call(body)
     article.outgoing_links.destroy_all
+    by_title = Article.where(title: titles).index_by(&:title)
     titles.each do |title|
-      target = Article.find_by(title: title)
-      article.outgoing_links.create!(target_title: title, target_article_id: target&.id)
+      article.outgoing_links.create!(target_title: title, target_article_id: by_title[title]&.id)
     end
   end
 
