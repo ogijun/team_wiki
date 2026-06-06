@@ -4,9 +4,7 @@
     <span class="badge badge-status"><%= @article.status_label %></span>
     <% if @article.kind %><span class="badge badge-kind"><%= @article.kind_label %></span><% end %>
   </p>
-  <% if @article.starts %>
-    <p class="when">🗓 <%= @article.starts.label %><% if @article.ends %> 〜 <%= @article.ends.label %><% end %></p>
-  <% end %>
+  <%= render FuzzyDateComponent.new(starts: @article.starts, ends: @article.ends, icon: true) %>
   <% contributors = @article.contributors %>
   <% if contributors.any? %>
     <section class="contributors">

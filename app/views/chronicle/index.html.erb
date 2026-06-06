@@ -6,9 +6,7 @@
     <ul>
       <% articles.each do |a| %>
         <li>
-          <span class="when">
-            <%= a.starts.label %><% if a.ends %> 〜 <%= a.ends.label %><% end %>
-          </span>
+          <%= render FuzzyDateComponent.new(starts: a.starts, ends: a.ends) %>
           <%= link_to a.title, a %>
         </li>
       <% end %>
