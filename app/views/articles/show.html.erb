@@ -1,4 +1,5 @@
 <article>
+  <%= link_to "← 記事一覧", articles_path, class: "back-link" %>
   <h1><%= @article.title %></h1>
   <p class="badges">
     <%= render BadgeComponent.new(text: @article.status_label, variant: :status) %>
@@ -13,11 +14,11 @@
       <% end %>
     </section>
   <% end %>
-  <p>
-    <%= link_to "編集", edit_article_path(@article) %> |
-    <%= link_to "履歴", article_revisions_path(@article) %> |
+  <div class="actions">
+    <%= link_to "編集", edit_article_path(@article) %>
+    <%= link_to "履歴", article_revisions_path(@article) %>
     <%= button_to "削除", @article, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %>
-  </p>
+  </div>
   <% if @article.tags.any? %>
     <p>タグ: <% @article.tags.each do |t| %><%= link_to "##{t.name}", tag_path(t) %> <% end %></p>
   <% end %>

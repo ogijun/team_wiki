@@ -131,6 +131,15 @@ body { padding-left: var(--sidebar-width); }
 .sidebar .user-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--ink-soft); text-decoration: none; }
 .sidebar .user-link:hover { color: var(--accent); }
 
+/* ── Page action conventions ──────────────────
+   back-link (上の戻り) / page-header (index: 見出し+主ボタン) /
+   actions (show: 編集・履歴 左、削除は右へ分離). */
+.back-link { display: inline-block; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 0.5rem; }
+.back-link:hover { color: var(--accent); }
+.page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.actions { display: flex; align-items: center; gap: 0.9rem; margin: 0.6rem 0 1.4rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--hairline); }
+.actions form.button_to { margin-left: auto; }
+
 /* ── App components ───────────────────────── */
 
 /* Revision diff */

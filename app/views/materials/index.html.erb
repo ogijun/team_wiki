@@ -1,5 +1,7 @@
-<h1>資料</h1>
-<p><%= link_to "資料を追加", new_material_path %></p>
+<div class="page-header">
+  <h1>資料</h1>
+  <%= link_to "資料を追加", new_material_path, role: "button" %>
+</div>
 
 <% if params[:tag].present? %>
   <p>タグ <code>#<%= params[:tag] %></code> で絞り込み中 — <%= link_to "解除", materials_path %></p>

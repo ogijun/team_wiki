@@ -1,5 +1,7 @@
-<h1>記事一覧</h1>
-<p><%= link_to "新規作成", new_article_path %> | <%= link_to "検索", search_path %></p>
+<div class="page-header">
+  <h1>記事一覧</h1>
+  <%= link_to "新規作成", new_article_path, role: "button" %>
+</div>
 <p class="filters">
   種別:
   <%= link_to "すべて", articles_path %>
