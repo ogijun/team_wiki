@@ -21,6 +21,11 @@ module Authentication
       resume_session || request_authentication
     end
 
+    def require_admin
+      return if Current.user&.admin?
+      redirect_to root_path, alert: "この操作には管理者権限が必要です。", status: :see_other
+    end
+
     def resume_session
       Current.session ||= find_session_by_cookie
     end

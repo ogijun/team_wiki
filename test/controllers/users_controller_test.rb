@@ -19,4 +19,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: /プロフ太郎/
     assert_select "li", text: /テストタグ/
   end
+
+  test "members index is admin only" do
+    get users_url
+    assert_redirected_to root_url
+
+    @user.update!(role: "admin")
+    get users_url
+    assert_response :success
+    assert_select "td", text: /プロフ太郎/
+  end
 end
