@@ -46,7 +46,7 @@
     <%= f.text_area :body, value: body_value, data: { controller: "editor", editor_target: "source" } %>
   </div>
   <div><%= f.label :tag_names, "タグ(カンマ区切り)" %><%= f.text_field :tag_names, value: tag_names_value %></div>
-  <div><%= f.label :edit_summary, "編集メモ" %><%= f.text_field :edit_summary %></div>
+  <div><%= f.label :edit_summary, "編集メモ" %><%= f.text_area :edit_summary, rows: 2 %></div>
 
   <%= f.submit %>
 <% end %>
