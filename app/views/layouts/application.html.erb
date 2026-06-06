@@ -29,32 +29,36 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <header class="site-header">
-      <nav class="site-header__inner">
-        <ul>
-          <li><strong class="brand"><%= link_to "Team Wiki", root_path %></strong></li>
-          <li><%= link_to "ホーム", root_path %></li>
-          <li><%= link_to "新規", new_article_path %></li>
-          <li><%= link_to "タグ", tags_path %></li>
-          <li><%= link_to "資料", materials_path %></li>
-          <li><%= link_to "アクティビティ", activities_path %></li>
-          <li><%= link_to "年表", chronicle_path %></li>
-          <li><%= link_to "検索", search_path %></li>
-          <% if Current.user&.admin? %><li><%= link_to "メンバー", users_path %></li><% end %>
-        </ul>
-        <% if Current.user %>
-          <ul>
-            <li>
-              <%= link_to edit_account_path, class: "user-link" do %>
-                <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
-              <% end %>
-            </li>
-            <li><%= button_to "ログアウト", session_path, method: :delete, class: "secondary outline btn-sm" %></li>
-          </ul>
-        <% end %>
-      </nav>
+  <body data-controller="sidebar">
+    <header class="topbar">
+      <button type="button" class="topbar__toggle" data-action="sidebar#toggle" aria-label="メニューを開閉">☰</button>
+      <strong class="brand"><%= link_to "Team Wiki", root_path %></strong>
     </header>
+
+    <aside class="sidebar">
+      <strong class="brand sidebar__brand"><%= link_to "Team Wiki", root_path %></strong>
+      <nav class="sidebar__nav" data-action="click->sidebar#close">
+        <%= link_to "ホーム", root_path %>
+        <%= link_to "新規", new_article_path %>
+        <%= link_to "タグ", tags_path %>
+        <%= link_to "資料", materials_path %>
+        <%= link_to "アクティビティ", activities_path %>
+        <%= link_to "年表", chronicle_path %>
+        <%= link_to "検索", search_path %>
+        <% if Current.user&.admin? %><%= link_to "メンバー", users_path %><% end %>
+      </nav>
+      <% if Current.user %>
+        <div class="sidebar__user">
+          <%= link_to edit_account_path, class: "user-link" do %>
+            <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
+          <% end %>
+          <%= button_to "ログアウト", session_path, method: :delete, class: "secondary outline btn-sm" %>
+        </div>
+      <% end %>
+    </aside>
+
+    <div class="backdrop" data-action="click->sidebar#close"></div>
+
     <main>
       <%= yield %>
     </main>

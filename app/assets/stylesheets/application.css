@@ -21,6 +21,7 @@
   --code-bg:    #f5f5f1;
   --border:     #e7e6e0;
   --page:       62rem;     /* shared width: header inner === content panel */
+  --sidebar-width: 15rem;
 
   /* Map PicoCSS to our palette/typography */
   --pico-font-family-sans-serif: "IBM Plex Sans JP", system-ui, sans-serif;
@@ -79,23 +80,47 @@ main > article {
   background: none; border: 0; border-radius: 0; box-shadow: none;
 }
 
-/* ── Header / navigation ──────────────────────
-   Markup is Pico's `nav > ul > li`; Pico flexes the two <ul> apart.
-   We only add the sticky bar, width, and palette. */
-.site-header {
-  position: sticky; top: 0; z-index: 10;
-  max-width: none; padding: 0;          /* full-bleed bar over Pico's header container */
-  backdrop-filter: saturate(1.2) blur(8px);
-  background: rgba(253, 253, 251, 0.9);   /* same as --panel (#fdfdfb) */
-  border-bottom: 1px solid var(--hairline);
+/* ── Side navigation ──────────────────────────
+   Wide: fixed left sidebar, content shifted right via body padding.
+   Narrow (<= 880px): off-canvas drawer toggled by the topbar hamburger (overlay). */
+body { padding-left: var(--sidebar-width); }
+
+.topbar { display: none; }
+
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-width); z-index: 30;
+  display: flex; flex-direction: column; gap: 0.15rem;
+  padding: 1rem 0.9rem 1.3rem; overflow-y: auto;
+  background: var(--panel); border-right: 1px solid var(--hairline);
 }
-.site-header__inner {
-  max-width: var(--page); margin: 0 auto;
-  padding: 0.4rem 2.2rem;
-  align-items: center;
+.sidebar__brand { font-size: 1.1rem; padding: 0.2rem 0.4rem 0.9rem; }
+.sidebar__nav { display: flex; flex-direction: column; gap: 0.1rem; }
+.sidebar__nav a {
+  color: var(--ink-soft); text-decoration: none; font-size: 0.92rem; font-weight: 500;
+  padding: 0.4rem 0.55rem; border-radius: 7px;
 }
-.site-header__inner a { color: var(--ink-soft); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
-.site-header__inner a:hover { color: var(--accent); }
+.sidebar__nav a:hover { background: var(--accent-weak); color: var(--accent); }
+.sidebar__user {
+  margin-top: auto; padding-top: 0.9rem; border-top: 1px solid var(--hairline);
+  display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;
+}
+
+.backdrop { display: none; }
+
+@media (max-width: 880px) {
+  body { padding-left: 0; }
+  .topbar {
+    display: flex; align-items: center; gap: 0.6rem; position: sticky; top: 0; z-index: 10;
+    padding: 0.45rem 0.9rem; border-bottom: 1px solid var(--hairline);
+    background: rgba(253, 253, 251, 0.92); backdrop-filter: saturate(1.2) blur(8px);
+  }
+  .topbar__toggle { background: none; border: 0; font-size: 1.4rem; line-height: 1; padding: 0.1rem 0.4rem; cursor: pointer; color: var(--ink); }
+  .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: 0 0 40px rgba(43, 43, 43, 0.18); }
+  .sidebar__brand { display: none; }
+  body.sidebar-open .sidebar { transform: translateX(0); }
+  body.sidebar-open .backdrop { display: block; position: fixed; inset: 0; z-index: 20; background: rgba(20, 17, 15, 0.35); }
+}
+
 .brand { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; }
 .brand a { color: var(--ink); }
 .brand::before {
@@ -103,8 +128,8 @@ main > article {
   background: var(--accent); border-radius: 2px; margin-right: 0.5rem;
   transform: translateY(-1px) rotate(45deg);
 }
-.site-header .user-link { display: inline-flex; align-items: center; gap: 0.4rem; }
-.site-header .user-link:hover { color: var(--accent); }
+.sidebar .user-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--ink-soft); text-decoration: none; }
+.sidebar .user-link:hover { color: var(--accent); }
 
 /* ── App components ───────────────────────── */
 
