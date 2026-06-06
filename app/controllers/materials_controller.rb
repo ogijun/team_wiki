@@ -80,9 +80,11 @@ class MaterialsController < ApplicationController
   end
 
   def material_params
-    params.require(:material).permit(:title, :description, :url, :file, :article_id,
-                                     :source, :author, :retrieved_on, :confidence, :rights,
-                                     :published_year, :published_month, :published_day)
+    permitted = [:title, :description, :url, :file, :article_id,
+                 :source, :author, :retrieved_on, :rights,
+                 :published_year, :published_month, :published_day]
+    permitted << :confidence if Current.user&.admin?
+    params.require(:material).permit(*permitted)
   end
 
   def assign_published(material)

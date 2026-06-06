@@ -32,7 +32,12 @@
     <p><%= f.label :retrieved_on, "取得日（Web資料）" %><br><%= f.date_field :retrieved_on %></p>
     <p>
       <%= f.label :confidence, "信頼度" %><br>
-      <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
+      <% if Current.user&.admin? %>
+        <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
+      <% else %>
+        <span class="badge badge-status"><%= material.confidence_label %></span>
+        <small class="muted">（信頼度の変更は管理者のみ）</small>
+      <% end %>
     </p>
     <p>
       <%= f.label :rights, "権利状態" %><br>

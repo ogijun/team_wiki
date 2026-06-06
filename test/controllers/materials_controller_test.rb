@@ -156,11 +156,25 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create persists confidence and rights" do
+    @user.update!(role: "admin")
     post materials_url, params: { material: {
       url: "https://x.test/c", confidence: "confirmed", rights: "quotable"
     } }
     m = Material.order(:created_at).last
     assert_equal "confirmed", m.confidence
     assert_equal "quotable", m.rights
+  end
+
+  test "editor cannot change confidence (ignored)" do
+    m = Material.create!(user: @user, url: "https://x.test/e", confidence: "unconfirmed")
+    patch material_url(m), params: { material: { url: "https://x.test/e", confidence: "confirmed" } }
+    assert_equal "unconfirmed", m.reload.confidence
+  end
+
+  test "admin can change confidence" do
+    @user.update!(role: "admin")
+    m = Material.create!(user: @user, url: "https://x.test/a2", confidence: "unconfirmed")
+    patch material_url(m), params: { material: { url: "https://x.test/a2", confidence: "confirmed" } }
+    assert_equal "confirmed", m.reload.confidence
   end
 end
