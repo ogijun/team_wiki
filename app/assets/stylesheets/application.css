@@ -206,6 +206,8 @@ form.button_to { display: inline; }
   border: 1px solid var(--hairline); color: var(--ink-soft); background: var(--surface);
 }
 .badge-status { background: var(--accent); color: #fff; border-color: var(--accent); }
+.badge-kind { border-color: var(--accent); color: var(--accent); background: var(--accent-weak); }
+.when { color: var(--muted); font-size: 0.9rem; margin: 0.25rem 0 1rem; }
 .bibliography { margin: 0.5rem 0; }
 .bibliography dt { font-size: 0.8rem; color: var(--muted); }
 .bibliography dd { margin: 0 0 0.4rem; }
