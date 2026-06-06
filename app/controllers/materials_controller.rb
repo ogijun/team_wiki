@@ -38,13 +38,14 @@ class MaterialsController < ApplicationController
   def create
     @material = Material.new(material_params.merge(user: Current.user))
     assign_published(@material)
-    if @material.save
+    Material.transaction do
+      @material.save!
       sync_tags(@material, params.dig(:material, :tag_names))
-      ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
-      redirect_to @material
-    else
-      render :new, status: :unprocessable_entity
     end
+    ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
+    redirect_to @material
+  rescue ActiveRecord::RecordInvalid
+    render :new, status: :unprocessable_entity
   end
 
   def edit
@@ -53,12 +54,13 @@ class MaterialsController < ApplicationController
   def update
     @material.assign_attributes(material_params)
     assign_published(@material)
-    if @material.save
+    Material.transaction do
+      @material.save!
       sync_tags(@material, params.dig(:material, :tag_names))
-      redirect_to @material
-    else
-      render :edit, status: :unprocessable_entity
     end
+    redirect_to @material
+  rescue ActiveRecord::RecordInvalid
+    render :edit, status: :unprocessable_entity
   end
 
   def destroy
@@ -89,10 +91,11 @@ class MaterialsController < ApplicationController
     params.require(:material).permit(*permitted)
   end
 
+  # material は assign 済みなので、再 permit せず仮想アクセサから純粋に組み立てる。
   def assign_published(material)
     fd = FuzzyDate.from_parts(
-      year: material_params[:published_year], month: material_params[:published_month],
-      day: material_params[:published_day], hour: nil, minute: nil
+      year: material.published_year, month: material.published_month,
+      day: material.published_day, hour: nil, minute: nil
     )
     material.published_at = fd&.at
     material.published_precision = fd&.precision
