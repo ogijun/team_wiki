@@ -7,6 +7,12 @@ Rails.application.config.x.discord.guild_id = ENV.fetch("DISCORD_GUILD_ID", "tes
 Rails.application.config.x.discord.required_role_id = ENV.fetch("DISCORD_REQUIRED_ROLE_ID", "test-role")
 Rails.application.config.x.discord.admin_role_id = ENV["DISCORD_ADMIN_ROLE_ID"]
 
+# admin_role_id は任意（admin 不在のインスタンスもあり得る）ので raise しないが、
+# 本番で未設定だと全員 editor 扱いになり、既存 admin が次回ログインで降格する。
+if Rails.env.production? && ENV["DISCORD_ADMIN_ROLE_ID"].blank?
+  Rails.logger.warn("[auth] DISCORD_ADMIN_ROLE_ID is unset; all users resolve to 'editor' and any existing admins are demoted on next login.")
+end
+
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :discord,
            ENV.fetch("DISCORD_CLIENT_ID", "test-client"),
