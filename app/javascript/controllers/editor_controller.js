@@ -25,14 +25,15 @@ export default class extends Controller {
 
     this.addCitationButton()
 
-    this.form = this.textarea.closest("form")
-    this.onSubmit = () => { this.textarea.value = this.editor.getMarkdown() }
-    this.form.addEventListener("submit", this.onSubmit)
-
     // Turbo がページをキャッシュする前に片付ける。キャッシュにマウント済みエディタの
     // 残骸が残ると、復元＋再 connect で空のエディタが二重化し空白になるため。
     this.beforeCache = () => this.teardown()
     document.addEventListener("turbo:before-cache", this.beforeCache)
+  }
+
+  // フォーム submit 時に Markdown を textarea へ書き戻す（data-action="submit->editor#writeBack"）。
+  writeBack() {
+    if (this.editor) this.textarea.value = this.editor.getMarkdown()
   }
 
   disconnect() {
@@ -41,7 +42,6 @@ export default class extends Controller {
   }
 
   teardown() {
-    if (this.form) { this.form.removeEventListener("submit", this.onSubmit); this.form = null }
     if (this.editor) { this.editor.destroy(); this.editor = null }
     if (this.holder) { this.holder.remove(); this.holder = null }
     if (this.textarea) this.textarea.style.display = ""

@@ -1,4 +1,4 @@
-<%= form_with model: article, url: form_url do |f| %>
+<%= form_with model: article, url: form_url, data: { controller: "editor", action: "submit->editor#writeBack" } do |f| %>
   <% if article.errors.any? %>
     <ul><% article.errors.full_messages.each do |m| %><li><%= m %></li><% end %></ul>
   <% end %>
@@ -43,7 +43,7 @@
   <div><%= f.label :title, "タイトル" %><%= f.text_field :title %></div>
   <div>
     <%= f.label :body, "本文(Markdown)" %>
-    <%= f.text_area :body, value: body_value, data: { controller: "editor", editor_target: "source" } %>
+    <%= f.text_area :body, value: body_value, data: { editor_target: "source" } %>
   </div>
   <div><%= f.label :tag_names, "タグ(カンマ区切り)" %><%= f.text_field :tag_names, value: tag_names_value %></div>
   <div><%= f.label :edit_summary, "編集メモ" %><%= f.text_area :edit_summary, rows: 2 %></div>
