@@ -9,11 +9,11 @@ export default class extends Controller {
     this.textarea = this.sourceTarget
     this.textarea.style.display = "none"
 
-    const holder = document.createElement("div")
-    this.textarea.after(holder)
+    this.holder = document.createElement("div")
+    this.textarea.after(this.holder)
 
     this.editor = new toastui.Editor({
-      el: holder,
+      el: this.holder,
       height: "500px",
       initialEditType: "markdown",
       previewStyle: "vertical",
@@ -28,11 +28,23 @@ export default class extends Controller {
     this.form = this.textarea.closest("form")
     this.onSubmit = () => { this.textarea.value = this.editor.getMarkdown() }
     this.form.addEventListener("submit", this.onSubmit)
+
+    // Turbo がページをキャッシュする前に片付ける。キャッシュにマウント済みエディタの
+    // 残骸が残ると、復元＋再 connect で空のエディタが二重化し空白になるため。
+    this.beforeCache = () => this.teardown()
+    document.addEventListener("turbo:before-cache", this.beforeCache)
   }
 
   disconnect() {
-    if (this.form) this.form.removeEventListener("submit", this.onSubmit)
-    if (this.editor) this.editor.destroy()
+    document.removeEventListener("turbo:before-cache", this.beforeCache)
+    this.teardown()
+  }
+
+  teardown() {
+    if (this.form) { this.form.removeEventListener("submit", this.onSubmit); this.form = null }
+    if (this.editor) { this.editor.destroy(); this.editor = null }
+    if (this.holder) { this.holder.remove(); this.holder = null }
+    if (this.textarea) this.textarea.style.display = ""
   }
 
   async upload(blob, callback) {
