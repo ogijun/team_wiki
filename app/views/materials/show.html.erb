@@ -3,7 +3,7 @@
   引用ハンドル: <code>[[ref:<%= @material.slug %>]]</code>
   <%= button_tag "引用タグをコピー", type: "button", class: "secondary outline btn-sm", data: { action: "clipboard#copy" } %>
 </p>
-<p class="muted">by <%= @material.user.name %> / <%= @material.created_at.to_fs(:short) %>
+<p class="muted">by <%= @material.user.name %> / <%= @material.created_at.to_fs(:jp) %>
   <% if @material.article %> — <%= link_to "📚#{@material.article.title}", @material.article %><% end %>
 </p>
 <p class="badges">
@@ -16,7 +16,7 @@
     <% if @material.author.present? %><dt>著者・発言者</dt><dd><%= @material.author %></dd><% end %>
     <% if @material.source.present? %><dt>出典元</dt><dd><%= @material.source %></dd><% end %>
     <% if @material.published %><dt>発行日</dt><dd><%= @material.published.label %></dd><% end %>
-    <% if @material.retrieved_on %><dt>取得日</dt><dd><%= @material.retrieved_on.iso8601 %></dd><% end %>
+    <% if @material.retrieved_on %><dt>取得日</dt><dd><%= @material.retrieved_on.to_fs(:jp) %></dd><% end %>
   </dl>
 <% end %>
 

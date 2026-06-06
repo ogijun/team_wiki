@@ -11,7 +11,7 @@
   <% @articles.each do |article| %>
     <li>
       <%= link_to article.title, article %>
-      <small><%= article.status_label %><% if article.kind %>・<%= article.kind_label %><% end %> / <%= article.updated_at.to_date %></small>
+      <small><%= article.status_label %><% if article.kind %>・<%= article.kind_label %><% end %> / <%= article.updated_at.to_date.to_fs(:jp) %></small>
     </li>
   <% end %>
 </ul>

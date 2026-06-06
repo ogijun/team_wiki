@@ -10,7 +10,7 @@ class CitationComponent < ViewComponent::Base
     segments << "#{lead}. " if lead.present?
     segments << helpers.link_to(@material.display_title, @material)
     if @material.link? && @material.retrieved_on.present?
-      segments << " ［取得: #{@material.retrieved_on.iso8601}］"
+      segments << " ［取得: #{@material.retrieved_on.to_fs(:jp)}］"
     end
     safe_join(segments)
   end

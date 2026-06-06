@@ -31,7 +31,7 @@
         <td><%= render MaterialThumbComponent.new(material: m, px: 48) %></td>
         <td><%= link_to m.display_title, material_path(m) %><% if m.article %> <%= link_to "📚", m.article, title: m.article.title %><% end %></td>
         <td><%= link_to display_name(m.user), m.user %></td>
-        <td><%= m.created_at.to_fs(:short) %></td>
+        <td><%= m.created_at.to_fs(:jp) %></td>
         <td><% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></td>
         <td><code class="muted">[[ref:<%= m.slug %>]]</code></td>
       </tr>

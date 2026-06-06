@@ -14,7 +14,7 @@ class CitationComponentTest < ViewComponent::TestCase
     html = render_inline(CitationComponent.new(material: m)).to_html
     assert_includes html, "サンプル著者『サンプル誌』(1998). "
     assert_match(/<a [^>]*>インタビュー<\/a>/, html)
-    assert_includes html, "［取得: 2026-06-05］"
+    assert_includes html, "［取得: 2026年6月5日］"
   end
 
   test "title-only citation has no lead separator" do
