@@ -4,8 +4,8 @@
   <% if @material.article %> — <%= link_to "📚#{@material.article.title}", @material.article %><% end %>
 </p>
 <p class="badges">
-  <span class="badge badge-status"><%= @material.confidence_label %></span>
-  <% if @material.rights %><span class="badge"><%= @material.rights_label %></span><% end %>
+  <%= render BadgeComponent.new(text: @material.confidence_label, variant: :status) %>
+  <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
 </p>
 
 <% if @material.author.present? || @material.source.present? || @material.published || @material.retrieved_on %>

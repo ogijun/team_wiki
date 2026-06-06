@@ -6,7 +6,7 @@
       <tr>
         <td><%= avatar_tag(u, size: 28) %></td>
         <td><%= link_to display_name(u), u %></td>
-        <td><% if u.admin? %><span class="badge badge-status">管理者</span><% else %>編集<% end %></td>
+        <td><% if u.admin? %><%= render BadgeComponent.new(text: "管理者", variant: :status) %><% else %>編集<% end %></td>
         <td><%= u.created_at.to_date %></td>
         <td><%= @last_activity[u.id]&.to_date %></td>
       </tr>

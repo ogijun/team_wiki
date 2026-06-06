@@ -35,7 +35,7 @@
       <% if Current.user&.admin? %>
         <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
       <% else %>
-        <span class="badge badge-status"><%= material.confidence_label %></span>
+        <%= render BadgeComponent.new(text: material.confidence_label, variant: :status) %>
         <small class="muted">（信頼度の変更は管理者のみ）</small>
       <% end %>
     </p>

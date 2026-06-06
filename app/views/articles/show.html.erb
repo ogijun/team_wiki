@@ -1,8 +1,8 @@
 <article>
   <h1><%= @article.title %></h1>
   <p class="badges">
-    <span class="badge badge-status"><%= @article.status_label %></span>
-    <% if @article.kind %><span class="badge badge-kind"><%= @article.kind_label %></span><% end %>
+    <%= render BadgeComponent.new(text: @article.status_label, variant: :status) %>
+    <% if @article.kind %><%= render BadgeComponent.new(text: @article.kind_label, variant: :kind) %><% end %>
   </p>
   <%= render FuzzyDateComponent.new(starts: @article.starts, ends: @article.ends, icon: true) %>
   <% contributors = @article.contributors %>
