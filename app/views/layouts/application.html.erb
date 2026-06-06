@@ -41,6 +41,7 @@
           <li><%= link_to "アクティビティ", activities_path %></li>
           <li><%= link_to "年表", chronicle_path %></li>
           <li><%= link_to "検索", search_path %></li>
+          <% if Current.user&.admin? %><li><%= link_to "メンバー", users_path %></li><% end %>
         </ul>
         <% if Current.user %>
           <ul>

@@ -1,6 +1,6 @@
 <header class="profile">
   <%= avatar_tag(@user, size: 64) %>
-  <h1><%= display_name(@user) %></h1>
+  <h1><%= display_name(@user) %><% if @user.admin? %> <span class="badge badge-status">管理者</span><% end %></h1>
   <p class="muted">参加日: <%= @user.created_at.to_date %></p>
 </header>
 
