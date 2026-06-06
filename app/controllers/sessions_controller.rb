@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
       return redirect_to new_session_path, alert: "このサービスへのアクセス権がありません。"
     end
 
-    user = upsert_user(auth)
+    user = upsert_user(auth, role: role_for(membership))
     start_new_session_for user
     redirect_to after_authentication_url
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
@@ -39,7 +39,7 @@ class SessionsController < ApplicationController
   # Discord uid で既存ユーザを探し、無ければ「同じ(検証済み)メールの既存ユーザ」に
   # Discord を紐づける（アカウントリンク）。それも無ければ新規作成。
   # ギルド+ロールでゲート済みの信頼された内部利用前提でメールリンクを許容する。
-  def upsert_user(auth)
+  def upsert_user(auth, role:)
     email = auth.dig("info", "email")
     user = User.find_by(provider: "discord", uid: auth.uid.to_s)
     user ||= User.find_by(email_address: email) if email.present?
@@ -47,11 +47,17 @@ class SessionsController < ApplicationController
 
     user.provider = "discord"
     user.uid = auth.uid.to_s
+    user.role = role
     user.email_address = email if user.email_address.blank?
     user.name = auth.dig("info", "name") if user.name.blank?
     user.avatar_url = safe_avatar_url(auth.dig("info", "image")) if user.avatar_url.blank?
     user.save!
     user
+  end
+
+  def role_for(membership)
+    admin_id = Rails.configuration.x.discord.admin_role_id
+    admin_id.present? && membership.role_ids.include?(admin_id.to_s) ? "admin" : "editor"
   end
 
   def safe_avatar_url(url)

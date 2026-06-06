@@ -13,8 +13,6 @@ module AuthTestHelper
     end
   end
 
-  private
-
   # DiscordGuildMembership.call を一時的に差し替える（minitest/mock 非依存）。
   def stub_membership(result)
     original = DiscordGuildMembership.method(:call)

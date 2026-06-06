@@ -42,4 +42,26 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
     assert_empty cookies[:session_id]
   end
+
+  test "maps discord admin role to admin, otherwise editor" do
+    OmniAuth.config.test_mode = true
+    OmniAuth.config.mock_auth[:discord] = OmniAuth::AuthHash.new(
+      provider: "discord", uid: "admin-uid",
+      info: { name: "Admin", email: "admin@example.com" }
+    )
+    required = Rails.configuration.x.discord.required_role_id.to_s
+    Rails.configuration.x.discord.admin_role_id = "admin-role-1"
+
+    stub_membership(DiscordGuildMembership::Result.new(true, [required, "admin-role-1"])) do
+      get "/auth/discord/callback"
+    end
+    assert_equal "admin", User.find_by(uid: "admin-uid").role
+
+    stub_membership(DiscordGuildMembership::Result.new(true, [required])) do
+      get "/auth/discord/callback"
+    end
+    assert_equal "editor", User.find_by(uid: "admin-uid").role
+  ensure
+    Rails.configuration.x.discord.admin_role_id = nil
+  end
 end

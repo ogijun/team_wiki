@@ -5,6 +5,7 @@ end
 
 Rails.application.config.x.discord.guild_id = ENV.fetch("DISCORD_GUILD_ID", "test-guild")
 Rails.application.config.x.discord.required_role_id = ENV.fetch("DISCORD_REQUIRED_ROLE_ID", "test-role")
+Rails.application.config.x.discord.admin_role_id = ENV["DISCORD_ADMIN_ROLE_ID"]
 
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :discord,
