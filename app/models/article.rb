@@ -55,10 +55,6 @@ class Article < ApplicationRecord
   end
 
   def assign_slug
-    return if slug.present?
-    self.slug = loop do
-      candidate = Slug.token
-      break candidate unless Article.exists?(slug: candidate)
-    end
+    self.slug ||= Slug.unique_token { |c| Article.exists?(slug: c) }
   end
 end

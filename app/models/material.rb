@@ -69,11 +69,7 @@ class Material < ApplicationRecord
   end
 
   def assign_slug
-    return if slug.present?
-    self.slug = loop do
-      candidate = Slug.token
-      break candidate unless Material.exists?(slug: candidate)
-    end
+    self.slug ||= Slug.unique_token { |c| Material.exists?(slug: c) }
   end
 
   def exactly_one_source
