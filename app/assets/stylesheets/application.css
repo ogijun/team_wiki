@@ -219,24 +219,10 @@ body { padding-left: var(--sidebar-width); }
 .per-form { margin: 0 0 1rem; }
 .per-select { display: inline-block; margin: 0 0 0 0.4rem; }
 
-/* Un-fullwidth form controls. Pico forces buttons/submits to display:block + width:100%
-   via high-specificity selectors, so override decisively (content-width, inline-block).
-   Exclude the toast-ui editor's own buttons (toastui-* classes) — their icons are sized
-   background images that collapse if forced to auto width. */
-button:not([class*="toastui-"]),
-[type="submit"]:not([class*="toastui-"]),
-[type="reset"]:not([class*="toastui-"]),
-[type="button"]:not([class*="toastui-"]),
-[role="button"]:not([class*="toastui-"]) {
-  display: inline-block !important;
-  width: auto !important;
-}
-select { width: auto; }
-
-/* Citation picker popup list items keep their full-width block layout. */
-/* Width/display must beat the global content-width button override. */
-.citation-list button { display: block !important; width: 100% !important; }
-.citation-btn { width: auto !important; }
+/* Pico full-widths only submit controls (button[type=submit], input[type=submit], select)
+   with NO !important. Match that selector — later in the cascade wins — to keep them
+   content-width. Other buttons / [role=button] are already auto-width by default. */
+button[type="submit"], input[type="submit"], select { width: auto; }
 
 /* button_to renders a <form>; keep it inline so action buttons sit beside links/text.
    Button styling now uses Pico variants (.secondary / .outline). */
