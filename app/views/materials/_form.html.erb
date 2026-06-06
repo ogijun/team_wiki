@@ -24,9 +24,9 @@
     <p>
       <%= f.label :published_year, "発行日" %><br>
       <span class="date-row">
-        <%= f.number_field :published_year, value: material.published_at&.year, placeholder: "年" %>
-        <%= f.number_field :published_month, in: 1..12, value: (%w[month day].include?(material.published_precision.to_s) ? material.published_at&.month : nil), placeholder: "月" %>
-        <%= f.number_field :published_day, in: 1..31, value: (material.published_precision.to_s == "day" ? material.published_at&.day : nil), placeholder: "日" %>
+        <%= f.number_field :published_year, value: fuzzy_part(material.published, :year), placeholder: "年" %>
+        <%= f.number_field :published_month, in: 1..12, value: fuzzy_part(material.published, :month), placeholder: "月" %>
+        <%= f.number_field :published_day, in: 1..31, value: fuzzy_part(material.published, :day), placeholder: "日" %>
       </span>
     </p>
     <p><%= f.label :retrieved_on, "取得日（Web資料）" %><br><%= f.date_field :retrieved_on %></p>
