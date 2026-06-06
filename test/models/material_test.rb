@@ -79,14 +79,14 @@ class MaterialTest < ActiveSupport::TestCase
     assert_not_equal a.slug, b.slug
   end
 
-  test "stores bibliographic fields" do
+  test "stores bibliographic fields and free-form memo" do
     m = Material.create!(user: @user, url: "https://x.test/a",
                          source: "サンプル誌", author: "サンプル著者",
-                         retrieved_on: Date.new(2026, 6, 5))
+                         memo: "後半のインタビューが要確認")
     m.reload
     assert_equal "サンプル誌", m.source
     assert_equal "サンプル著者", m.author
-    assert_equal Date.new(2026, 6, 5), m.retrieved_on
+    assert_equal "後半のインタビューが要確認", m.memo
   end
 
   test "published wraps FuzzyDate when present, nil otherwise" do

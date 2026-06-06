@@ -80,8 +80,8 @@ class MaterialsController < ApplicationController
   end
 
   def material_params
-    permitted = [:title, :description, :article_id,
-                 :source, :author, :retrieved_on, :rights,
+    permitted = [:title, :description, :article_id, :memo,
+                 :source, :author, :rights,
                  :published_year, :published_month, :published_day]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。
     permitted += [:file, :url] unless @material&.persisted?
