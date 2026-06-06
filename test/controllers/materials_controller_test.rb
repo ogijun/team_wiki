@@ -82,14 +82,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "資料Z", Activity.where(action: "material.deleted").order(:id).last.subject_label
   end
 
-  test "article show lists its materials and add link" do
+  test "article show lists its associated materials" do
     article = Article.create!(title: "Docs", created_by: @user)
     ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
     Material.create!(user: @user, url: "https://example.com/d", title: "資料A", article: article)
     get article_url(article)
     assert_response :success
     assert_select "a", text: "資料A"
-    assert_select "a[href=?]", new_material_path(article_id: article.id)
   end
 
   test "index paginates with per param" do

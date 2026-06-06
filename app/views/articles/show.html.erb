@@ -44,13 +44,14 @@
       </ul>
     </section>
   <% end %>
-  <section class="materials">
-    <h2>資料</h2>
-    <ul>
-      <% @article.materials.order(created_at: :desc).each do |m| %>
-        <li><%= m.link? ? "🔗" : "📄" %> <%= link_to m.display_title, material_path(m) %></li>
-      <% end %>
-    </ul>
-    <p><%= link_to "この記事に資料を追加", new_material_path(article_id: @article.id) %></p>
-  </section>
+  <% if @article.materials.any? %>
+    <section class="materials">
+      <h2>資料</h2>
+      <ul>
+        <% @article.materials.order(created_at: :desc).each do |m| %>
+          <li><%= m.link? ? "🔗" : "📄" %> <%= link_to m.display_title, material_path(m) %></li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
 </article>
