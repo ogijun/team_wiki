@@ -29,7 +29,7 @@
       <h2>出典</h2>
       <ol>
         <% @rendered.references.each do |ref| %>
-          <li id="ref-<%= ref.number %>"><%= citation_text(ref.material) %></li>
+          <li id="ref-<%= ref.number %>"><%= render CitationComponent.new(material: ref.material) %></li>
         <% end %>
       </ol>
     </section>
