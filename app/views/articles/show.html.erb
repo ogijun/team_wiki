@@ -50,7 +50,7 @@
       <h2>資料</h2>
       <ul>
         <% @article.materials.order(created_at: :desc).each do |m| %>
-          <li><%= m.link? ? "🔗" : "📄" %> <%= link_to m.display_title, material_path(m) %></li>
+          <li><%= media_icon(m) %> <%= link_to m.display_title, material_path(m) %></li>
         <% end %>
       </ul>
     </section>

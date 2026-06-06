@@ -9,4 +9,11 @@ module MaterialsHelper
             materials_path(request.query_parameters.merge(sort: column, dir: next_dir, page: nil)),
             class: "sort-link"
   end
+
+  MEDIA_ICONS = { link: "🔗", image: "🖼", video: "🎬", audio: "🎵", document: "📄" }.freeze
+
+  # Material#media_kind を絵文字に対応づける（表示の単一窓口）。
+  def media_icon(material)
+    MEDIA_ICONS.fetch(material.media_kind)
+  end
 end

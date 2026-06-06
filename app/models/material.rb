@@ -52,6 +52,17 @@ class Material < ApplicationRecord
     MaterialEmbed.thumbnail_src(url) if link?
   end
 
+  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。
+  def media_kind
+    return :link if link?
+    case file.content_type.to_s.split("/").first
+    when "image" then :image
+    when "video" then :video
+    when "audio" then :audio
+    else :document
+    end
+  end
+
   def display_title
     return title if title.present?
     return file.filename.to_s if file.attached?
