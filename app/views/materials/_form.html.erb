@@ -5,6 +5,18 @@
     </ul>
   <% end %>
 
+  <% if Current.user&.admin? %>
+    <div class="admin-box">
+      <span class="admin-box__label">管理者操作</span>
+      <p>
+        <%= f.label :confidence, "信頼度（出典検証の確定）" %><br>
+        <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
+      </p>
+    </div>
+  <% else %>
+    <p class="muted">信頼度: <%= render BadgeComponent.new(text: material.confidence_label, variant: :status) %> <small>（変更は管理者のみ）</small></p>
+  <% end %>
+
   <p><%= f.label :title, "タイトル（任意）" %><br><%= f.text_field :title %></p>
   <p><%= f.label :description, "説明（任意）" %><br><%= f.text_area :description %></p>
 
@@ -38,15 +50,6 @@
       </span>
     </p>
     <p><%= f.label :retrieved_on, "取得日（Web資料）" %><br><%= f.date_field :retrieved_on %></p>
-    <p>
-      <%= f.label :confidence, "信頼度" %><br>
-      <% if Current.user&.admin? %>
-        <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
-      <% else %>
-        <%= render BadgeComponent.new(text: material.confidence_label, variant: :status) %>
-        <small class="muted">（信頼度の変更は管理者のみ）</small>
-      <% end %>
-    </p>
     <p>
       <%= f.label :rights, "権利状態" %><br>
       <%= f.select :rights, Material::RIGHTS_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>
