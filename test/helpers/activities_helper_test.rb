@@ -19,4 +19,9 @@ class ActivitiesHelperTest < ActionView::TestCase
     a = Activity.new(user: @user, action: "article.created", subject_label: nil)
     assert_equal "が記事を作成しました", activity_phrase(a)
   end
+
+  # action の追加時に表示文言の追加を忘れると沈黙の汎用フォールバックに落ちるのを防ぐ。
+  test "every Activity action has a display phrase" do
+    assert_equal Activity::ACTIONS.sort, ActivitiesHelper::PHRASES.keys.sort
+  end
 end
