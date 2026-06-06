@@ -1,7 +1,7 @@
 require "test_helper"
 
 class SessionsControllerTest < ActionDispatch::IntegrationTest
-  setup { @user = User.take }
+  setup { @user = User.create!(email_address: "sess@example.com", name: "Sess", provider: "discord", uid: "sess-user") }
 
   test "new" do
     get new_session_path
