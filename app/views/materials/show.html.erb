@@ -49,6 +49,7 @@
   <% end %>
 <% end %>
 
-<% if @material.tags.any? %>
-  <p>タグ: <% @material.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
+<% tags = @material.tags.to_a %>
+<% if tags.any? %>
+  <p>タグ: <% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
 <% end %>

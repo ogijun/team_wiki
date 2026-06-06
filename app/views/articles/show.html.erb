@@ -19,8 +19,9 @@
     <%= link_to "履歴", article_revisions_path(@article) %>
     <%= button_to "削除", @article, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %>
   </div>
-  <% if @article.tags.any? %>
-    <p>タグ: <% @article.tags.each do |t| %><%= link_to "##{t.name}", tag_path(t) %> <% end %></p>
+  <% tags = @article.tags.to_a %>
+  <% if tags.any? %>
+    <p>タグ: <% tags.each do |t| %><%= link_to "##{t.name}", tag_path(t) %> <% end %></p>
   <% end %>
   <div class="page-body">
     <%= @rendered.html %>
@@ -35,21 +36,23 @@
       </ol>
     </section>
   <% end %>
-  <% if @backlinks.any? %>
+  <% backlinks = @backlinks.to_a %>
+  <% if backlinks.any? %>
     <section class="backlinks">
       <h2>バックリンク</h2>
       <ul>
-        <% @backlinks.each do |link| %>
+        <% backlinks.each do |link| %>
           <li><%= link_to link.source_article.title, link.source_article %></li>
         <% end %>
       </ul>
     </section>
   <% end %>
-  <% if @article.materials.any? %>
+  <% materials = @article.materials.order(created_at: :desc).to_a %>
+  <% if materials.any? %>
     <section class="materials">
       <h2>資料</h2>
       <ul>
-        <% @article.materials.order(created_at: :desc).each do |m| %>
+        <% materials.each do |m| %>
           <li><%= media_icon(m) %> <%= link_to m.display_title, material_path(m) %></li>
         <% end %>
       </ul>
