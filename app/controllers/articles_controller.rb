@@ -10,7 +10,7 @@ class ArticlesController < ApplicationController
 
   def show
     @renderer = MarkdownRenderer.new(
-      link_resolver: WikiLinkResolver.new.to_proc,
+      link_resolver: WikiLinkResolver.method(:call),
       ref_resolver: ->(handle) { Material.find_by(slug: handle) }
     )
     @rendered = @renderer.render(@article.current_revision&.body.to_s)

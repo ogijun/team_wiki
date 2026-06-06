@@ -7,14 +7,14 @@ class WikiLinkResolverTest < ActiveSupport::TestCase
   end
 
   test "existing title resolves to article path and exists true" do
-    info = WikiLinkResolver.new.call("存在")
+    info = WikiLinkResolver.call("存在")
     assert info[:exists]
     # path helpers percent-encode unicode slugs
     assert_includes info[:href], CGI.escape(@article.slug)
   end
 
   test "missing title resolves to new article link with exists false" do
-    info = WikiLinkResolver.new.call("無い")
+    info = WikiLinkResolver.call("無い")
     assert_not info[:exists]
     assert_includes info[:href], CGI.escape("無い")
   end

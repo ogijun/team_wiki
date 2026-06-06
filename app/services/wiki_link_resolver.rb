@@ -1,16 +1,15 @@
-class WikiLinkResolver
-  include Rails.application.routes.url_helpers
+# 記事タイトルを { href:, exists: } に解決するステートレスな resolver。
+# MarkdownRenderer に callable(WikiLinkResolver.method(:call)) として注入される。
+module WikiLinkResolver
+  module_function
 
   def call(title)
+    routes = Rails.application.routes.url_helpers
     article = Article.find_by(title: title)
     if article
-      { href: article_path(article), exists: true }
+      { href: routes.article_path(article), exists: true }
     else
-      { href: new_article_path(title: title), exists: false }
+      { href: routes.new_article_path(title: title), exists: false }
     end
-  end
-
-  def to_proc
-    method(:call).to_proc
   end
 end
