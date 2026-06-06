@@ -164,6 +164,22 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "quotable", m.rights
   end
 
+  test "source url is locked after create, metadata still editable" do
+    m = Material.create!(user: @user, url: "https://x.test/orig")
+    patch material_url(m), params: { material: { url: "https://x.test/changed", title: "新タイトル" } }
+    m.reload
+    assert_equal "https://x.test/orig", m.url
+    assert_equal "新タイトル", m.title
+  end
+
+  test "edit form does not expose file or url inputs" do
+    m = Material.create!(user: @user, url: "https://x.test/orig")
+    get edit_material_url(m)
+    assert_response :success
+    assert_select "input[name=?]", "material[url]", count: 0
+    assert_select "input[name=?]", "material[file]", count: 0
+  end
+
   test "editor cannot change confidence (ignored)" do
     m = Material.create!(user: @user, url: "https://x.test/e", confidence: "unconfirmed")
     patch material_url(m), params: { material: { url: "https://x.test/e", confidence: "confirmed" } }
