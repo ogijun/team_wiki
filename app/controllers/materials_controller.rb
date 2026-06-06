@@ -5,7 +5,7 @@ class MaterialsController < ApplicationController
 
   SORTS = {
     "name"       => "materials.title",
-    "type"       => "materials.url",
+    "type"       => "(materials.url IS NULL)", # 種別＝リンク/ファイルでグルーピング（URL文字列順ではない）
     "uploader"   => "users.name",
     "created_at" => "materials.created_at"
   }.freeze

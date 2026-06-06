@@ -164,6 +164,15 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "quotable", m.rights
   end
 
+  test "index sorts by type (link/file grouping) without error" do
+    Material.create!(user: @user, url: "https://example.com/a", title: "L")
+    img = Material.new(user: @user)
+    img.file.attach(io: StringIO.new("x"), filename: "f.png", content_type: "image/png")
+    img.save!
+    get materials_url(sort: "type")
+    assert_response :success
+  end
+
   test "source url is locked after create, metadata still editable" do
     m = Material.create!(user: @user, url: "https://x.test/orig")
     patch material_url(m), params: { material: { url: "https://x.test/changed", title: "新タイトル" } }
