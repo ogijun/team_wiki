@@ -19,6 +19,16 @@
   </div>
 
   <div class="field">
+    <%= f.label :icon, "アプリアイコン（正方形・任意）" %>
+    <small class="field__hint">favicon とスマホのホーム追加アイコンに使われます。正方形の画像を1枚どうぞ。</small>
+    <% if @setting.icon.attached? %>
+      <div class="media-preview"><%= image_tag @setting.icon.variant(resize_to_fill: [48, 48]) %></div>
+      <label class="field__check"><%= check_box_tag :remove_icon, "1" %> アイコンを削除して既定に戻す</label>
+    <% end %>
+    <%= f.file_field :icon, accept: "image/*" %>
+  </div>
+
+  <div class="field">
     <%= f.label :about, "このサイトについて（Markdown）" %>
     <small class="field__hint"><%= link_to "公開ページ", about_path %>に表示されます。記法は記事と同じ Markdown（<code>[[記事名]]</code> や <code>[ref:資料]</code> も使えます）。</small>
     <%= f.text_area :about, rows: 12, placeholder: "このウィキの目的、使い方、編集ルールなどを書いてください。" %>

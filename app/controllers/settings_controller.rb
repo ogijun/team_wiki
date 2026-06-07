@@ -8,6 +8,7 @@ class SettingsController < ApplicationController
   def update
     @setting = SiteSetting.instance
     @setting.logo.purge if params[:remove_logo] == "1"
+    @setting.icon.purge if params[:remove_icon] == "1"
     if @setting.update(setting_params)
       redirect_to edit_settings_path, notice: "設定を更新しました。"
     else
@@ -18,6 +19,6 @@ class SettingsController < ApplicationController
   private
 
   def setting_params
-    params.require(:site_setting).permit(:brand_name, :logo, :about, :footer)
+    params.require(:site_setting).permit(:brand_name, :logo, :icon, :about, :footer)
   end
 end
