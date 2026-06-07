@@ -1,4 +1,6 @@
-if Rails.env.production?
+# 本番では Discord 設定が必須。ただしビルド時のアセットプリコンパイル
+# (SECRET_KEY_BASE_DUMMY 下) では ENV がまだ注入されていないので検証をスキップする。
+if Rails.env.production? && ENV["SECRET_KEY_BASE_DUMMY"].blank?
   raise "DISCORD_GUILD_ID must be set" if ENV["DISCORD_GUILD_ID"].blank?
   raise "DISCORD_REQUIRED_ROLE_ID must be set" if ENV["DISCORD_REQUIRED_ROLE_ID"].blank?
 end
@@ -9,7 +11,7 @@ Rails.application.config.x.discord.admin_role_id = ENV["DISCORD_ADMIN_ROLE_ID"]
 
 # admin_role_id は任意（admin 不在のインスタンスもあり得る）ので raise しないが、
 # 本番で未設定だと全員 editor 扱いになり、既存 admin が次回ログインで降格する。
-if Rails.env.production? && ENV["DISCORD_ADMIN_ROLE_ID"].blank?
+if Rails.env.production? && ENV["SECRET_KEY_BASE_DUMMY"].blank? && ENV["DISCORD_ADMIN_ROLE_ID"].blank?
   Rails.logger.warn("[auth] DISCORD_ADMIN_ROLE_ID is unset; all users resolve to 'editor' and any existing admins are demoted on next login.")
 end
 
