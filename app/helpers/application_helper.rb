@@ -11,6 +11,18 @@ module ApplicationHelper
     fuzzy.at.public_send(part == :minute ? :min : part)
   end
 
+  # 管理者が設定する自由記述（About 本文・共通フッタ）を、記事と同じ Markdown
+  # パイプライン（[[記事名]]・[[ref:資料]] 込み）で描画する。空なら nil。
+  def render_site_markdown(text)
+    return if text.blank?
+
+    links = WikiLinkResolver.resolve_all(WikiLinkExtractor.call(text))
+    MarkdownRenderer.new(
+      link_resolver: ->(title) { links[title] || WikiLinkResolver.call(title) },
+      ref_resolver: ->(handle) { Material.find_by(slug: handle) }
+    ).render(text)
+  end
+
   # ── ブランド表示 ──
   def site_setting
     @site_setting ||= SiteSetting.instance
