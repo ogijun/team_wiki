@@ -11,6 +11,7 @@
 
   <div class="field">
     <%= f.label :logo, "ロゴ画像（任意・あれば名称より優先）" %>
+    <small class="field__hint">サイドバーに高さ28pxで表示されます。横長のロゴ向け。背景透過のPNG/WebP・高さ56px程度（横幅は自由）が目安です。</small>
     <% if @setting.logo.attached? %>
       <%= image_tag @setting.logo, class: "brand-logo" %>
       <label class="field__check"><%= check_box_tag :remove_logo, "1" %> ロゴを削除してテキスト名に戻す</label>
