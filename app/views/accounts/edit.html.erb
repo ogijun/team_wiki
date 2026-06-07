@@ -1,13 +1,22 @@
 <h1>アカウント設定</h1>
 <% if notice %><p class="notice"><%= notice %></p><% end %>
 
-<%= form_with model: @user, url: account_path, method: :patch do |f| %>
+<%= form_with model: @user, url: account_path, method: :patch, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: @user %>
 
-  <div><%= avatar_tag(@user, size: 64) %></div>
-  <div><%= f.label :avatar, "アイコン画像" %><%= f.file_field :avatar, accept: "image/*" %></div>
-  <div><%= f.label :name, "表示名" %><%= f.text_field :name %></div>
-  <div><%= f.label :email_address, "メール" %><%= f.email_field :email_address %></div>
+  <div class="field">
+    <%= f.label :avatar, "アイコン画像" %>
+    <div class="media-preview"><%= avatar_tag(@user, size: 64) %></div>
+    <%= f.file_field :avatar, accept: "image/*" %>
+  </div>
+  <div class="field">
+    <%= f.label :name, "表示名" %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :email_address, "メール" %>
+    <%= f.email_field :email_address %>
+  </div>
 
   <%= f.submit "更新" %>
 <% end %>

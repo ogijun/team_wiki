@@ -1,26 +1,26 @@
-<%= form_with model: material do |f| %>
+<%= form_with model: material, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: material %>
 
   <% if Current.user&.admin? %>
     <div class="admin-box">
       <span class="admin-box__label">管理者操作</span>
-      <p>
-        <%= f.label :confidence, "信頼度（出典検証の確定）" %><br>
+      <div class="field">
+        <%= f.label :confidence, "信頼度（出典検証の確定）" %>
         <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
-      </p>
+      </div>
     </div>
   <% else %>
     <p class="muted">信頼度: <%= render BadgeComponent.new(text: material.confidence_label, variant: :status) %> <small>（変更は管理者のみ）</small></p>
   <% end %>
 
-  <p><%= f.label :title, "タイトル（任意）" %><br><%= f.text_field :title %></p>
-  <p><%= f.label :description, "説明（任意）" %><br><%= f.text_area :description %></p>
+  <div class="field"><%= f.label :title, "タイトル（任意）" %><%= f.text_field :title %></div>
+  <div class="field"><%= f.label :description, "説明（任意）" %><%= f.text_area :description %></div>
 
   <% if material.new_record? %>
     <fieldset>
       <legend>ファイル または URL のどちらか一方（登録後は変更できません）</legend>
-      <p><%= f.label :file, "ファイル" %><br><%= f.file_field :file %></p>
-      <p><%= f.label :url, "URL（YouTube等）" %><br><%= f.url_field :url, value: material.url %></p>
+      <div class="field"><%= f.label :file, "ファイル" %><%= f.file_field :file %></div>
+      <div class="field"><%= f.label :url, "URL（YouTube等）" %><%= f.url_field :url, value: material.url %></div>
     </fieldset>
   <% else %>
     <p class="muted">
@@ -30,32 +30,34 @@
     </p>
   <% end %>
 
-  <p><%= f.label :tag_names, "タグ（カンマ区切り）" %><br>
-     <%= f.text_field :tag_names, value: material.tags.map(&:name).join(", ") %></p>
+  <div class="field">
+    <%= f.label :tag_names, "タグ（カンマ区切り）" %>
+    <%= f.text_field :tag_names, value: material.tags.map(&:name).join(", ") %>
+  </div>
 
   <fieldset>
     <legend>出典情報（任意・書けるところだけでOK）</legend>
-    <p><%= f.label :author, "著者・発言者" %><br><%= f.text_field :author %></p>
-    <p><%= f.label :source, "出典元（掲載誌・書籍・サイト名）" %><br><%= f.text_field :source %></p>
-    <p>
-      <%= f.label :published_year, "発行日" %><br>
+    <div class="field"><%= f.label :author, "著者・発言者" %><%= f.text_field :author %></div>
+    <div class="field"><%= f.label :source, "出典元（掲載誌・書籍・サイト名）" %><%= f.text_field :source %></div>
+    <div class="field">
+      <%= f.label :published_year, "発行日" %>
       <span class="date-row">
         <%= f.number_field :published_year, value: fuzzy_part(material.published, :year), placeholder: "年" %>
         <%= f.number_field :published_month, in: 1..12, value: fuzzy_part(material.published, :month), placeholder: "月" %>
         <%= f.number_field :published_day, in: 1..31, value: fuzzy_part(material.published, :day), placeholder: "日" %>
       </span>
-    </p>
-    <p>
-      <%= f.label :rights, "権利状態" %><br>
+    </div>
+    <div class="field">
+      <%= f.label :rights, "権利状態" %>
       <%= f.select :rights, Material::RIGHTS_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>
-    </p>
+    </div>
   </fieldset>
 
-  <p>
-    <%= f.label :memo, "メモ（自由記述）" %><br>
+  <div class="field">
+    <%= f.label :memo, "メモ（自由記述）" %>
+    <small class="field__hint">使い方は自由。気づいたこと・補足など。</small>
     <%= f.text_area :memo, rows: 3 %>
-    <small class="muted">使い方は自由。気づいたこと・補足など。</small>
-  </p>
+  </div>
 
   <%= f.hidden_field :article_id %>
   <%= f.submit %>

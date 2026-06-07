@@ -233,11 +233,13 @@ body { padding-left: var(--sidebar-width); }
 
 /* Stacked form: each field group owns its spacing; label sits tight to its control. */
 .stacked-form .field { margin-bottom: 1.6rem; }
+.stacked-form .field:last-child { margin-bottom: 0; }
 .stacked-form .field > label { margin-bottom: 0.4rem; }
 .stacked-form .field > :where(input, textarea, select) { margin-bottom: 0; }
 .field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
 .field__hint code { font-size: 0.85em; }
 .field__check { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0; font-weight: 400; }
+.media-preview { margin: 0.1rem 0 0.6rem; }
 
 /* Compact, inline per-page selector */
 .per-form { margin: 0 0 1rem; }
