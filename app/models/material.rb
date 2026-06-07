@@ -18,7 +18,7 @@ class Material < ApplicationRecord
   ].freeze
   MAX_BYTES = 100.megabytes
   THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
-  CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "secondary" => "二次引用", "unconfirmed" => "未確認" }.freeze
+  CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "unconfirmed" => "未確認" }.freeze
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
 
   validate :exactly_one_source
