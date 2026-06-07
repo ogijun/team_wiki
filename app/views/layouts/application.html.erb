@@ -37,15 +37,27 @@
 
     <aside class="sidebar">
       <strong class="brand sidebar__brand"><%= link_to brand_display, root_path %></strong>
+
+      <form class="sidebar__search" action="<%= search_path %>" method="get" role="search">
+        <input type="search" name="q" placeholder="検索…" aria-label="検索">
+      </form>
+
       <nav class="sidebar__nav" data-action="click->sidebar#close">
         <%= link_to "ホーム", root_path %>
-        <%= link_to "新規", new_article_path %>
-        <%= link_to "タグ", tags_path %>
-        <%= link_to "資料", materials_path %>
-        <%= link_to "アクティビティ", activities_path %>
-        <%= link_to "年表", chronicle_path %>
-        <%= link_to "検索", search_path %>
-        <% if Current.user&.admin? %><%= link_to "メンバー", users_path %><% end %>
+        <div class="nav-group">
+          <span class="nav-group__label">コンテンツ</span>
+          <%= link_to "記事一覧", articles_path %>
+          <%= link_to "年表", chronicle_path %>
+          <%= link_to "タグ", tags_path %>
+          <%= link_to "資料", materials_path %>
+        </div>
+        <% if Current.user&.admin? %>
+          <div class="nav-group">
+            <span class="nav-group__label">管理</span>
+            <%= link_to "メンバー", users_path %>
+            <%= link_to "設定", edit_settings_path %>
+          </div>
+        <% end %>
       </nav>
       <% if Current.user %>
         <div class="sidebar__user">

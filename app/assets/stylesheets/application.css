@@ -93,13 +93,20 @@ body { padding-left: var(--sidebar-width); }
   padding: 1rem 0.9rem 1.3rem; overflow-y: auto;
   background: var(--panel); border-right: 1px solid var(--hairline);
 }
-.sidebar__brand { font-size: 1.1rem; padding: 0.2rem 0.4rem 0.9rem; }
+.sidebar__brand { font-size: 1.1rem; padding: 0.2rem 0.4rem 0.6rem; }
+.sidebar__search { margin: 0 0 0.6rem; }
+.sidebar__search input { width: 100%; font-size: 0.85rem; padding: 0.35rem 0.6rem; margin: 0; }
 .sidebar__nav { display: flex; flex-direction: column; gap: 0.1rem; }
 .sidebar__nav a {
   color: var(--ink-soft); text-decoration: none; font-size: 0.92rem; font-weight: 500;
   padding: 0.4rem 0.55rem; border-radius: 7px;
 }
 .sidebar__nav a:hover { background: var(--accent-weak); color: var(--accent); }
+.nav-group { display: flex; flex-direction: column; gap: 0.1rem; margin-top: 0.9rem; }
+.nav-group__label {
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; color: var(--muted);
+  padding: 0 0.55rem 0.2rem;
+}
 .sidebar__user {
   margin-top: auto; padding-top: 0.9rem; border-top: 1px solid var(--hairline);
   display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;
@@ -249,3 +256,12 @@ form.button_to { display: inline; }
 /* Material thumbnails */
 .material-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; vertical-align: middle; }
 .material-thumb--icon { display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; background: var(--code-bg); }
+
+/* Home dashboard */
+.dashboard-stats { display: flex; gap: 1.4rem; flex-wrap: wrap; margin: 0.5rem 0 1.4rem; color: var(--ink-soft); font-size: 0.9rem; }
+.dashboard-stats strong { font-size: 1.15rem; color: var(--ink); }
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.2rem; }
+.dashboard-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+.dashboard-card h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
+.dashboard-card ul { margin: 0; padding-left: 1.1rem; }
+.dashboard-card li { margin-bottom: 0.35rem; }
