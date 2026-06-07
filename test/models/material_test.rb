@@ -150,4 +150,14 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal "全文非公開", m.rights_label
     assert_equal "未設定", Material.new(user: @user, url: "https://x.test/a", rights: nil).rights_label
   end
+
+  test "transcribable? is true for media kinds, false for plain links" do
+    audio = Material.new(user: @user)
+    audio.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
+    audio.save!
+    assert audio.transcribable?
+
+    link = Material.create!(user: @user, title: "外部記事", url: "https://example.com/article")
+    assert_not link.transcribable?
+  end
 end

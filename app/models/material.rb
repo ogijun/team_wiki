@@ -2,6 +2,7 @@ class Material < ApplicationRecord
   belongs_to :user
   belongs_to :article, optional: true
   has_one_attached :file
+  has_one :transcription, dependent: :destroy
   has_many :taggings, as: :taggable, dependent: :destroy
   has_many :tags, through: :taggings
 
@@ -20,6 +21,7 @@ class Material < ApplicationRecord
   THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
   CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "unconfirmed" => "未確認" }.freeze
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
+  TRANSCRIBABLE_KINDS = %i[image video audio document].freeze
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
@@ -62,6 +64,8 @@ class Material < ApplicationRecord
     else :document
     end
   end
+
+  def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)
 
   def display_title
     return title if title.present?
