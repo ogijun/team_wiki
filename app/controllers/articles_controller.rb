@@ -5,7 +5,6 @@ class ArticlesController < ApplicationController
     @articles = Article.order(updated_at: :desc)
     @articles = @articles.where(kind: params[:kind]) if Article::KINDS.key?(params[:kind])
     @articles = @articles.where(status: params[:status]) if Article::STATUSES.key?(params[:status])
-    @recent_activities = Activity.includes(:user, :subject).order(created_at: :desc).limit(10)
   end
 
   def show

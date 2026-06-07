@@ -1,0 +1,51 @@
+<div class="page-header">
+  <h1>ホーム</h1>
+  <%= link_to "新規作成", new_article_path, role: "button" %>
+</div>
+
+<section class="dashboard-stats">
+  <span><strong><%= @stats[:articles] %></strong> 記事</span>
+  <span><strong><%= @stats[:materials] %></strong> 資料</span>
+  <span><strong><%= @stats[:unconfirmed_materials] %></strong> 未確認資料</span>
+</section>
+
+<div class="dashboard-grid">
+  <section class="dashboard-card">
+    <h2>最近更新された記事</h2>
+    <% if @recent_articles.any? %>
+      <ul>
+        <% @recent_articles.each do |article| %>
+          <li>
+            <%= link_to article.title, article %>
+            <small><%= article.updated_at.to_date.to_fs(:jp) %></small>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="muted">まだ記事がありません。</p>
+    <% end %>
+    <p><%= link_to "記事一覧へ", articles_path %></p>
+  </section>
+
+  <section class="dashboard-card">
+    <h2>加筆を求む</h2>
+    <% if @stub_articles.any? %>
+      <ul>
+        <% @stub_articles.each do |article| %>
+          <li>
+            <%= link_to article.title, article %>
+            <small><%= article.status_label %></small>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="muted">スタブ/執筆中の記事はありません。</p>
+    <% end %>
+  </section>
+</div>
+
+<section class="dashboard-card recent-activity">
+  <h2>最近の動き</h2>
+  <%= render "activities/timeline", activities: @recent_activities %>
+  <p><%= link_to "すべて見る", activities_path %></p>
+</section>
