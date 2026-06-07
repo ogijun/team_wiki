@@ -21,8 +21,11 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on Cloudflare R2 (see config/storage.yml). Credentials via ENV (Kamal/1Password).
-  config.active_storage.service = :r2
+  # Storage backend is selectable via ENV so we can run on the local Disk volume now
+  # and switch to an object store later by setting ACTIVE_STORAGE_SERVICE (e.g. r2, b2,
+  # sakura) plus the matching service in config/storage.yml. Defaults to local Disk
+  # (persisted on the Kamal `team_wiki_storage` volume). See config/storage.yml.
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "local").to_sym
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
