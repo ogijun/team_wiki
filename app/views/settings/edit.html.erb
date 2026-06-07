@@ -1,34 +1,34 @@
 <div class="page-header"><h1>サイト設定</h1></div>
 <% if notice %><p class="notice"><%= notice %></p><% end %>
 
-<%= form_with model: @setting, url: settings_path, method: :patch do |f| %>
+<%= form_with model: @setting, url: settings_path, method: :patch, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: @setting %>
 
-  <p>
-    <%= f.label :brand_name, "ブランド名（ロゴ未設定時に表示）" %><br>
+  <div class="field">
+    <%= f.label :brand_name, "ブランド名（ロゴ未設定時に表示）" %>
     <%= f.text_field :brand_name, placeholder: "Team Wiki" %>
-  </p>
+  </div>
 
-  <p>
-    <%= f.label :logo, "ロゴ画像（任意・あれば名称より優先）" %><br>
+  <div class="field">
+    <%= f.label :logo, "ロゴ画像（任意・あれば名称より優先）" %>
     <% if @setting.logo.attached? %>
       <%= image_tag @setting.logo, class: "brand-logo" %>
-      <label><%= check_box_tag :remove_logo, "1" %> ロゴを削除してテキスト名に戻す</label><br>
+      <label class="field__check"><%= check_box_tag :remove_logo, "1" %> ロゴを削除してテキスト名に戻す</label>
     <% end %>
     <%= f.file_field :logo, accept: "image/*" %>
-  </p>
+  </div>
 
-  <p>
-    <%= f.label :about, "このサイトについて（Markdown）" %><br>
-    <small class="muted"><%= link_to "公開ページ", about_path %>に表示されます。記法は記事と同じ Markdown（<code>[[記事名]]</code> や <code>[ref:資料]</code> も使えます）。</small>
+  <div class="field">
+    <%= f.label :about, "このサイトについて（Markdown）" %>
+    <small class="field__hint"><%= link_to "公開ページ", about_path %>に表示されます。記法は記事と同じ Markdown（<code>[[記事名]]</code> や <code>[ref:資料]</code> も使えます）。</small>
     <%= f.text_area :about, rows: 12, placeholder: "このウィキの目的、使い方、編集ルールなどを書いてください。" %>
-  </p>
+  </div>
 
-  <p>
-    <%= f.label :footer, "共通フッタ（Markdown）" %><br>
-    <small class="muted">全ページの最下部に表示されます。著作権表示や「困ったら Discord へ」などの常設案内に。</small>
+  <div class="field">
+    <%= f.label :footer, "共通フッタ（Markdown）" %>
+    <small class="field__hint">全ページの最下部に表示されます。著作権表示や「困ったら Discord へ」などの常設案内に。</small>
     <%= f.text_area :footer, rows: 4, placeholder: "© 2026 〇〇 — 困ったら [Discord](https://discord.gg/...) へ" %>
-  </p>
+  </div>
 
   <%= f.submit "更新" %>
 <% end %>
