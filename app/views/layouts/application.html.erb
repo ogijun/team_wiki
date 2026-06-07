@@ -59,14 +59,17 @@
           </div>
         <% end %>
       </nav>
-      <% if Current.user %>
-        <div class="sidebar__user">
-          <%= link_to edit_account_path, class: "user-link" do %>
-            <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
-          <% end %>
-          <%= button_to "ログアウト", session_path, method: :delete, class: "secondary outline btn-sm" %>
-        </div>
-      <% end %>
+      <div class="sidebar__bottom">
+        <% if Current.user %>
+          <div class="sidebar__user">
+            <%= link_to edit_account_path, class: "user-link" do %>
+              <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
+            <% end %>
+            <%= button_to "ログアウト", session_path, method: :delete, class: "secondary outline btn-sm" %>
+          </div>
+        <% end %>
+        <%= link_to "このサイトについて", about_path, class: "sidebar__about", data: { action: "click->sidebar#close" } %>
+      </div>
     </aside>
 
     <div class="backdrop" data-action="click->sidebar#close"></div>

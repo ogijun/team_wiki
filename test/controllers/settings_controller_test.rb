@@ -21,6 +21,12 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "サンプルWiki", SiteSetting.instance.brand_name
   end
 
+  test "admin updates about text" do
+    @user.update!(role: "admin")
+    patch settings_url, params: { site_setting: { brand_name: "x", about: "## ようこそ" } }
+    assert_equal "## ようこそ", SiteSetting.instance.about
+  end
+
   test "admin can remove logo (falls back to text)" do
     @user.update!(role: "admin")
     s = SiteSetting.instance

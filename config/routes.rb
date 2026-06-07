@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resources :tags, only: %i[index show create destroy]
   resources :activities, only: :index
   get "chronicle", to: "chronicle#index"
+  get "about", to: "about#show"
   resources :users, only: %i[show index]
   resource :account, only: %i[edit update]
   get "search", to: "search#index"

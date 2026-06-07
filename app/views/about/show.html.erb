@@ -1,0 +1,16 @@
+<% content_for :title, "このサイトについて" %>
+
+<div class="page-header">
+  <h1>このサイトについて</h1>
+  <% if Current.user&.admin? %>
+    <%= link_to "編集", edit_settings_path, role: "button", class: "btn-sm secondary outline" %>
+  <% end %>
+</div>
+
+<% if @setting.about.present? %>
+  <div class="page-body"><%= @rendered.html %></div>
+<% else %>
+  <p class="muted">
+    まだ説明が設定されていません。<% if Current.user&.admin? %><%= link_to "設定から記入できます。", edit_settings_path %><% end %>
+  </p>
+<% end %>

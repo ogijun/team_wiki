@@ -107,10 +107,12 @@ body { padding-left: var(--sidebar-width); }
   font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; color: var(--muted);
   padding: 0 0.55rem 0.2rem;
 }
+.sidebar__bottom { margin-top: auto; }
 .sidebar__user {
-  margin-top: auto; padding-top: 0.9rem; border-top: 1px solid var(--hairline);
+  padding-top: 0.9rem; border-top: 1px solid var(--hairline);
   display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;
 }
+.sidebar__about { display: block; margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); }
 
 .backdrop { display: none; }
 

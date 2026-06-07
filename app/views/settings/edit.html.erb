@@ -18,5 +18,11 @@
     <%= f.file_field :logo, accept: "image/*" %>
   </p>
 
+  <p>
+    <%= f.label :about, "このサイトについて（Markdown）" %><br>
+    <small class="muted"><%= link_to "公開ページ", about_path %>に表示されます。記法は記事と同じ Markdown（<code>[[記事名]]</code> や <code>[ref:資料]</code> も使えます）。</small>
+    <%= f.text_area :about, rows: 12, placeholder: "このウィキの目的、使い方、編集ルールなどを書いてください。" %>
+  </p>
+
   <%= f.submit "更新" %>
 <% end %>
