@@ -24,5 +24,11 @@
     <%= f.text_area :about, rows: 12, placeholder: "このウィキの目的、使い方、編集ルールなどを書いてください。" %>
   </p>
 
+  <p>
+    <%= f.label :footer, "共通フッタ（Markdown）" %><br>
+    <small class="muted">全ページの最下部に表示されます。著作権表示や「困ったら Discord へ」などの常設案内に。</small>
+    <%= f.text_area :footer, rows: 4, placeholder: "© 2026 〇〇 — 困ったら [Discord](https://discord.gg/...) へ" %>
+  </p>
+
   <%= f.submit "更新" %>
 <% end %>

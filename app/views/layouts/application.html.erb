@@ -76,6 +76,9 @@
 
     <main>
       <%= yield %>
+      <% if (footer = render_site_markdown(site_setting.footer)) %>
+        <footer class="site-footer"><%= footer.html %></footer>
+      <% end %>
     </main>
   </body>
 </html>

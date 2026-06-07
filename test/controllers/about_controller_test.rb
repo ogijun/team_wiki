@@ -26,6 +26,19 @@ class AboutControllerTest < ActionDispatch::IntegrationTest
     assert_select "p.muted"
   end
 
+  test "renders the site footer markdown on every page when set" do
+    SiteSetting.instance.update!(footer: "© 2026 — 困ったら [Discord](https://discord.gg/x) へ")
+    sign_in_as(@user)
+    get about_url
+    assert_select "footer.site-footer a[href=?]", "https://discord.gg/x"
+  end
+
+  test "omits the footer element when blank" do
+    sign_in_as(@user)
+    get about_url
+    assert_select "footer.site-footer", count: 0
+  end
+
   test "shows an edit link only to admins" do
     SiteSetting.instance.update!(about: "x")
     sign_in_as(@user)

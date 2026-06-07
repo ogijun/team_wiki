@@ -114,6 +114,12 @@ body { padding-left: var(--sidebar-width); }
 }
 .sidebar__about { display: block; margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); }
 
+.site-footer {
+  margin-top: 3rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline);
+  font-size: 0.82rem; color: var(--muted);
+}
+.site-footer p { margin: 0.2rem 0; }
+
 .backdrop { display: none; }
 
 @media (max-width: 880px) {
