@@ -47,7 +47,7 @@
         <div class="nav-group">
           <span class="nav-group__label">コンテンツ</span>
           <%= link_to "記事一覧", articles_path %>
-          <%= link_to "年表", chronicle_path %>
+          <%= link_to chronicle_path do %>年表 <small class="wip">(検討中)</small><% end %>
           <%= link_to "タグ", tags_path %>
           <%= link_to "資料", materials_path %>
         </div>

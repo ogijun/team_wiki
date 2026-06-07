@@ -257,6 +257,14 @@ form.button_to { display: inline; }
 .material-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; vertical-align: middle; }
 .material-thumb--icon { display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; background: var(--code-bg); }
 
+/* WIP marker (e.g. 年表 (検討中)) */
+.wip { color: var(--muted); font-size: 0.7rem; font-weight: normal; }
+
+/* Chronicle (interim flat view) */
+.chronicle-note { margin: 0 0 1.4rem; }
+.chronicle-list { margin: 0; padding-left: 1.1rem; }
+.chronicle-list li { margin-bottom: 0.35rem; }
+
 /* Home dashboard */
 .dashboard-stats { display: flex; gap: 1.4rem; flex-wrap: wrap; margin: 0.5rem 0 1.4rem; color: var(--ink-soft); font-size: 0.9rem; }
 .dashboard-stats strong { font-size: 1.15rem; color: var(--ink); }
