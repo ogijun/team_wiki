@@ -41,4 +41,14 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     patch settings_url, params: { site_setting: { brand_name: "x" }, remove_logo: "1" }
     assert_not SiteSetting.instance.logo.attached?
   end
+
+  test "admin can remove icon (falls back to default)" do
+    @user.update!(role: "admin")
+    s = SiteSetting.instance
+    s.icon.attach(io: StringIO.new("x"), filename: "i.png", content_type: "image/png")
+    s.save!
+    assert SiteSetting.instance.icon.attached?
+    patch settings_url, params: { site_setting: { brand_name: "x" }, remove_icon: "1" }
+    assert_not SiteSetting.instance.icon.attached?
+  end
 end

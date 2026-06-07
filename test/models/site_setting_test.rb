@@ -20,4 +20,17 @@ class SiteSettingTest < ActiveSupport::TestCase
     s.logo.attach(io: StringIO.new("x"), filename: "logo.png", content_type: "image/png")
     assert s.valid?, s.errors.full_messages.join(", ")
   end
+
+  test "rejects a non-image icon" do
+    s = SiteSetting.instance
+    s.icon.attach(io: StringIO.new("x"), filename: "a.txt", content_type: "text/plain")
+    assert_not s.valid?
+    assert s.errors[:icon].any?
+  end
+
+  test "accepts an image icon" do
+    s = SiteSetting.instance
+    s.icon.attach(io: StringIO.new("x"), filename: "icon.png", content_type: "image/png")
+    assert s.valid?, s.errors.full_messages.join(", ")
+  end
 end
