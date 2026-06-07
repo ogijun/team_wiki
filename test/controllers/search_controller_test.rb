@@ -24,4 +24,14 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     get search_url, params: { q: "" }
     assert_response :success
   end
+
+  test "shows the full-text-not-enabled note when a query is present" do
+    get search_url, params: { q: "Ruby" }
+    assert_select "p.search-note"
+  end
+
+  test "omits the note when no query" do
+    get search_url, params: { q: "" }
+    assert_select "p.search-note", count: 0
+  end
 end
