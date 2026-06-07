@@ -1,0 +1,23 @@
+require "test_helper"
+
+class SiteSettingTest < ActiveSupport::TestCase
+  test "instance returns the single row, creating it once" do
+    s1 = SiteSetting.instance
+    s2 = SiteSetting.instance
+    assert_equal s1.id, s2.id
+    assert_equal 1, SiteSetting.count
+  end
+
+  test "rejects a non-image logo" do
+    s = SiteSetting.instance
+    s.logo.attach(io: StringIO.new("x"), filename: "a.txt", content_type: "text/plain")
+    assert_not s.valid?
+    assert s.errors[:logo].any?
+  end
+
+  test "accepts an image logo" do
+    s = SiteSetting.instance
+    s.logo.attach(io: StringIO.new("x"), filename: "logo.png", content_type: "image/png")
+    assert s.valid?, s.errors.full_messages.join(", ")
+  end
+end

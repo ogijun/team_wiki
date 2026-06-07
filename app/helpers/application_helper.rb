@@ -10,4 +10,23 @@ module ApplicationHelper
     return nil unless fuzzy && PRECISION_RANK.fetch(fuzzy.precision, -1) >= PART_MIN_RANK.fetch(part)
     fuzzy.at.public_send(part == :minute ? :min : part)
   end
+
+  # ── ブランド表示 ──
+  def site_setting
+    @site_setting ||= SiteSetting.instance
+  end
+
+  # ロゴが無いときのテキスト名: 設定 → ENV → 既定。
+  def brand_name
+    site_setting.brand_name.presence || ENV["APP_BRAND_NAME"].presence || "Team Wiki"
+  end
+
+  # ロゴ添付ありなら画像、無ければテキスト名を返す。
+  def brand_display
+    if site_setting.logo.attached?
+      image_tag site_setting.logo, alt: brand_name, class: "brand-logo"
+    else
+      brand_name
+    end
+  end
 end

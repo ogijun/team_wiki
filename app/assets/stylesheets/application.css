@@ -122,6 +122,7 @@ body { padding-left: var(--sidebar-width); }
 }
 
 .brand { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; }
+.brand-logo { max-height: 28px; width: auto; vertical-align: middle; }
 .brand a { color: var(--ink); }
 .brand::before {
   content: ""; display: inline-block; width: 0.5rem; height: 0.5rem;

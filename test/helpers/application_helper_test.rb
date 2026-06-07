@@ -26,4 +26,23 @@ class ApplicationHelperTest < ActionView::TestCase
   test "fuzzy_part of nil is nil" do
     assert_nil fuzzy_part(nil, :year)
   end
+
+  test "brand_name falls back to default when setting blank" do
+    SiteSetting.instance.update!(brand_name: nil)
+    assert_equal "Team Wiki", brand_name
+  end
+
+  test "brand_name uses the setting value when present" do
+    SiteSetting.instance.update!(brand_name: "サンプルWiki")
+    assert_equal "サンプルWiki", brand_name
+  end
+
+  test "brand_display is text when no logo, image when logo attached" do
+    s = SiteSetting.instance
+    s.update!(brand_name: "テキスト名")
+    assert_equal "テキスト名", brand_display
+    s.logo.attach(io: StringIO.new("x"), filename: "logo.png", content_type: "image/png")
+    @site_setting = nil # 再読み込み
+    assert_match(/<img /, brand_display)
+  end
 end
