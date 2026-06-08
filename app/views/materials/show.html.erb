@@ -35,6 +35,23 @@
   </section>
 <% end %>
 
+<% if @material.transcribable? %>
+  <section class="transcription">
+    <h2>書き起こし
+      <% if @material.transcription %>
+        <%= render BadgeComponent.new(text: @material.transcription.status_label, variant: :status) %>
+      <% end %>
+    </h2>
+    <% if @material.transcription %>
+      <div class="transcription-body"><%= @material.transcription.body %></div>
+      <p><%= link_to "編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
+    <% else %>
+      <p class="muted">まだ書き起こされていません。</p>
+      <%= link_to "書き起こす", edit_material_transcription_path(@material), role: "button", class: "btn-sm" %>
+    <% end %>
+  </section>
+<% end %>
+
 <% if @material.link? %>
   <% if (src = MaterialEmbed.embed_src(@material.url)) %>
     <div class="embed">
