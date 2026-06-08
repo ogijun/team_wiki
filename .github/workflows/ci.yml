@@ -5,6 +5,11 @@ on:
   push:
     branches: [ main ]
 
+# 同一ブランチで新しい push が来たら、進行中の古い run を打ち切る。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
