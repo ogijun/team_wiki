@@ -38,7 +38,8 @@ gem "bootsnap", require: false
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 # Pinned to match reserve_app (co-hosted on the same VPS) so we share the same
 # kamal-proxy version and never need to reboot the proxy out from under it.
-gem "kamal", "2.10.1", require: false
+# reserve_app moved to 2.11.0 (proxy v0.9.2) on 2026-06-08; bumped to match.
+gem "kamal", "2.11.0", require: false
 
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
