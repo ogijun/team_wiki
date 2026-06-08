@@ -13,6 +13,8 @@ class Article < ApplicationRecord
 
   validates :title, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true
+  # フォームの「未分類」(include_blank) は "" を送る。空文字は nil 扱いにして allow_nil を効かせる。
+  normalizes :kind, with: ->(v) { v.presence }
   validates :kind, inclusion: { in: KINDS.keys }, allow_nil: true
   validates :status, inclusion: { in: STATUSES.keys }
 
