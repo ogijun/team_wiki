@@ -11,7 +11,10 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: true
+  validates :role, inclusion: { in: %w[editor admin] }
   validate :acceptable_avatar, if: -> { avatar.attached? }
+
+  def admin? = role == "admin"
 
   private
 

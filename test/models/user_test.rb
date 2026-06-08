@@ -41,4 +41,21 @@ class UserTest < ActiveSupport::TestCase
     u = User.new(email_address: "oauth@example.com", provider: "discord", uid: "123")
     assert u.valid?, u.errors.full_messages.join(", ")
   end
+
+  test "default role is editor" do
+    u = User.create!(email_address: "r1@example.com")
+    assert_equal "editor", u.role
+    assert_not u.admin?
+  end
+
+  test "admin? true only for admin role" do
+    u = User.create!(email_address: "r2@example.com", role: "admin")
+    assert u.admin?
+  end
+
+  test "role must be editor or admin" do
+    u = User.new(email_address: "r3@example.com", role: "bogus")
+    assert_not u.valid?
+    assert u.errors[:role].any?
+  end
 end
