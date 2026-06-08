@@ -81,7 +81,7 @@ class MaterialsController < ApplicationController
 
   def material_params
     params.require(:material).permit(:title, :description, :url, :file, :article_id,
-                                     :source, :author, :retrieved_on,
+                                     :source, :author, :retrieved_on, :confidence, :rights,
                                      :published_year, :published_month, :published_day)
   end
 

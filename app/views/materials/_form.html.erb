@@ -30,6 +30,14 @@
       </span>
     </p>
     <p><%= f.label :retrieved_on, "取得日（Web資料）" %><br><%= f.date_field :retrieved_on %></p>
+    <p>
+      <%= f.label :confidence, "信頼度" %><br>
+      <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
+    </p>
+    <p>
+      <%= f.label :rights, "権利状態" %><br>
+      <%= f.select :rights, Material::RIGHTS_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>
+    </p>
   </fieldset>
 
   <%= f.hidden_field :article_id %>

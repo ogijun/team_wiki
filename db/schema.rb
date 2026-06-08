@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_05_013549) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_06_022514) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -88,11 +88,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_013549) do
   create_table "materials", force: :cascade do |t|
     t.integer "article_id"
     t.string "author"
+    t.string "confidence", default: "unconfirmed", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "published_at"
     t.string "published_precision"
     t.date "retrieved_on"
+    t.string "rights"
     t.string "slug", null: false
     t.string "source"
     t.string "title"
@@ -100,6 +102,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_013549) do
     t.string "url"
     t.integer "user_id", null: false
     t.index ["article_id"], name: "index_materials_on_article_id"
+    t.index ["confidence"], name: "index_materials_on_confidence"
+    t.index ["rights"], name: "index_materials_on_rights"
     t.index ["slug"], name: "index_materials_on_slug", unique: true
     t.index ["user_id"], name: "index_materials_on_user_id"
   end

@@ -124,4 +124,30 @@ class MaterialTest < ActiveSupport::TestCase
     img.save!
     assert_nil img.preview_image_url
   end
+
+  test "default confidence is unconfirmed" do
+    m = Material.create!(user: @user, url: "https://x.test/a")
+    assert_equal "unconfirmed", m.confidence
+  end
+
+  test "confidence must be one of CONFIDENCE_LEVELS" do
+    m = Material.new(user: @user, url: "https://x.test/a", confidence: "bogus")
+    assert_not m.valid?
+    assert m.errors[:confidence].any?
+  end
+
+  test "rights allows nil and valid values, rejects others" do
+    assert Material.new(user: @user, url: "https://x.test/a", rights: nil).valid?
+    assert Material.new(user: @user, url: "https://x.test/a", rights: "quotable").valid?
+    bad = Material.new(user: @user, url: "https://x.test/a", rights: "bogus")
+    assert_not bad.valid?
+    assert bad.errors[:rights].any?
+  end
+
+  test "labels map slug to Japanese; rights nil label is 未設定" do
+    m = Material.new(user: @user, url: "https://x.test/a", confidence: "confirmed", rights: "private")
+    assert_equal "原本確認済", m.confidence_label
+    assert_equal "全文非公開", m.rights_label
+    assert_equal "未設定", Material.new(user: @user, url: "https://x.test/a", rights: nil).rights_label
+  end
 end

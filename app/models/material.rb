@@ -18,6 +18,8 @@ class Material < ApplicationRecord
   ].freeze
   MAX_BYTES = 100.megabytes
   THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
+  CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "secondary" => "二次引用", "unconfirmed" => "未確認" }.freeze
+  RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
@@ -26,6 +28,8 @@ class Material < ApplicationRecord
   validates :url, format: { with: %r{\Ahttps?://},
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
+  validates :confidence, inclusion: { in: CONFIDENCE_LEVELS.keys }
+  validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
 
   attr_accessor :tag_names, :published_year, :published_month, :published_day
 
@@ -53,6 +57,9 @@ class Material < ApplicationRecord
     return file.filename.to_s if file.attached?
     url
   end
+
+  def confidence_label = CONFIDENCE_LEVELS[confidence]
+  def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
 
   private
 

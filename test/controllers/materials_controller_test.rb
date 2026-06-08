@@ -154,4 +154,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "year", m.published_precision
     assert_equal 1998, m.published_at.year
   end
+
+  test "create persists confidence and rights" do
+    post materials_url, params: { material: {
+      url: "https://x.test/c", confidence: "confirmed", rights: "quotable"
+    } }
+    m = Material.order(:created_at).last
+    assert_equal "confirmed", m.confidence
+    assert_equal "quotable", m.rights
+  end
 end

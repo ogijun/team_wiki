@@ -3,6 +3,10 @@
 <p class="muted">by <%= @material.user.name %> / <%= @material.created_at.to_fs(:short) %>
   <% if @material.article %> — <%= link_to "📚#{@material.article.title}", @material.article %><% end %>
 </p>
+<p class="badges">
+  <span class="badge badge-status"><%= @material.confidence_label %></span>
+  <% if @material.rights %><span class="badge"><%= @material.rights_label %></span><% end %>
+</p>
 
 <% if @material.author.present? || @material.source.present? || @material.published || @material.retrieved_on %>
   <dl class="bibliography">
