@@ -36,15 +36,21 @@
   </div>
   <div class="field">
     <%= f.label :status, "状態" %>
+    <small class="field__hint">スタブ＝書きかけでもOK。完成にしなくて大丈夫、あとから育てられます。</small>
     <%= f.select :status, Article::STATUSES.map { |slug, label| [label, slug] }, { selected: article.status || "stub" } %>
   </div>
   <div class="field"><%= f.label :title, "タイトル" %><%= f.text_field :title %></div>
   <div class="field">
     <%= f.label :body, "本文(Markdown)" %>
+    <small class="field__hint">他の記事へは <code>[[記事名]]</code> でリンクできます（赤いリンクは未作成＝作ればOK）。資料を出典として引用するときは、ツールバーの「引用」ボタンから挿入します。</small>
     <%= f.text_area :body, value: body_value, data: { editor_target: "source" } %>
   </div>
   <div class="field"><%= f.label :tag_names, "タグ(カンマ区切り)" %><%= f.text_field :tag_names, value: tag_names_value %></div>
-  <div class="field"><%= f.label :edit_summary, "編集メモ" %><%= f.text_area :edit_summary, rows: 2 %></div>
+  <div class="field">
+    <%= f.label :edit_summary, "編集メモ" %>
+    <small class="field__hint">何を変えたか一言（任意・空でもOK）。履歴に残るので、後から経緯を追いやすくなります。</small>
+    <%= f.text_area :edit_summary, rows: 2 %>
+  </div>
 
   <%= f.submit %>
 <% end %>

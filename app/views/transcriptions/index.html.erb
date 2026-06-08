@@ -1,6 +1,12 @@
 <% content_for :title, "トランスクリプト進捗" %>
 <div class="page-header"><h1>トランスクリプト進捗</h1></div>
 
+<% if @groups.empty? %>
+  <div class="empty-state">
+    動画・音声・画像・PDF の資料を登録すると、ここに文字起こしの作業リストが並びます。聞き取れた／読み取れた範囲でOK、完璧でなくて大丈夫です。
+    <div class="empty-state__cta"><%= link_to "資料を追加", new_material_path, role: "button", class: "btn-sm" %></div>
+  </div>
+<% else %>
 <% [["todo", "未着手"], ["drafting", "作業中"], ["done", "完了"]].each do |key, label| %>
   <% items = @groups[key] || [] %>
   <section>
@@ -21,4 +27,5 @@
       <p class="muted">なし</p>
     <% end %>
   </section>
+<% end %>
 <% end %>

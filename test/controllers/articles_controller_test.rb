@@ -14,6 +14,12 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".actions button", text: "削除", count: 0
   end
 
+  test "index shows a friendly empty state when there are no articles" do
+    Article.destroy_all
+    get articles_url
+    assert_select ".empty-state"
+  end
+
   test "index requires login" do
     delete session_url
     get articles_url

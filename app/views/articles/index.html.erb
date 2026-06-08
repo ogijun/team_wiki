@@ -9,11 +9,18 @@
   ／ 状態:
   <% Article::STATUSES.each do |slug, label| %><%= link_to label, articles_path(status: slug, kind: params[:kind]) %> <% end %>
 </p>
-<ul>
-  <% @articles.each do |article| %>
-    <li>
-      <%= link_to article.title, article %>
-      <small><%= article.status_label %><% if article.kind %>・<%= article.kind_label %><% end %> / <%= article.updated_at.to_date.to_fs(:jp) %></small>
-    </li>
-  <% end %>
-</ul>
+<% if @articles.any? %>
+  <ul>
+    <% @articles.each do |article| %>
+      <li>
+        <%= link_to article.title, article %>
+        <small><%= article.status_label %><% if article.kind %>・<%= article.kind_label %><% end %> / <%= article.updated_at.to_date.to_fs(:jp) %></small>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="empty-state">
+    まだ記事がありません。最初の1本を書いてみましょう。完璧でなくて大丈夫、あとからいくらでも直せます。
+    <div class="empty-state__cta"><%= link_to "記事を書いてみる", new_article_path, role: "button", class: "btn-sm" %></div>
+  </div>
+<% end %>

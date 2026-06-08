@@ -27,6 +27,12 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "資料A"
   end
 
+  test "index shows a friendly empty state when there are no materials" do
+    Material.destroy_all
+    get materials_url
+    assert_select ".empty-state"
+  end
+
   test "index shows transcription status column instead of the citation tag" do
     media = Material.new(user: @user, title: "音声X")
     media.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")

@@ -5,10 +5,15 @@
 
 <% if @q.present? %>
   <p class="muted search-note">いまはまだ全文検索が有効になっていないため、検索精度はよくありません。</p>
-<% end %>
-
-<ul>
-  <% @articles.each do |article| %>
-    <li><%= link_to article.title, article %></li>
+  <% if @articles.any? %>
+    <ul>
+      <% @articles.each do |article| %>
+        <li><%= link_to article.title, article %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="empty-state">
+      「<%= @q %>」に一致する記事は見つかりませんでした。別の言葉や、記事名の一部でもお試しください。（全文検索は今後対応予定です）
+    </div>
   <% end %>
-</ul>
+<% end %>
