@@ -11,7 +11,7 @@
     <li>
       <%= link_to "##{t.name}", tag_path(t) %>
       <% if t.usage_count.zero? %>
-        <%= button_to "削除", tag_path(t), method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %>
+        <%= button_to "削除", tag_path(t), method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %>
       <% end %>
     </li>
   <% end %>

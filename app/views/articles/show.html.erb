@@ -17,7 +17,6 @@
   <div class="actions">
     <%= link_to "編集", edit_article_path(@article), role: "button", class: "btn-sm" %>
     <%= link_to "履歴", article_revisions_path(@article) %>
-    <%= button_to "削除", @article, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %>
   </div>
   <% tags = @article.tags.to_a %>
   <% if tags.any? %>
@@ -58,4 +57,9 @@
       </ul>
     </section>
   <% end %>
+
+  <div class="danger-zone">
+    <span class="danger-zone__label">危険な操作</span>
+    <%= button_to "削除", @article, method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "削除しますか?" } %>
+  </div>
 </article>

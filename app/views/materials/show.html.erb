@@ -13,7 +13,6 @@
 </p>
 <div class="actions">
   <%= link_to "編集", edit_material_path(@material), role: "button", class: "btn-sm" %>
-  <%= button_to "削除", @material, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %>
 </div>
 
 <div class="preview-placeholder muted">ここには資料のサムネイルなどが表示される予定です（開発中）</div>
@@ -72,3 +71,8 @@
 <% if tags.any? %>
   <p>タグ: <% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
 <% end %>
+
+<div class="danger-zone">
+  <span class="danger-zone__label">危険な操作</span>
+  <%= button_to "削除", @material, method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "削除しますか?" } %>
+</div>

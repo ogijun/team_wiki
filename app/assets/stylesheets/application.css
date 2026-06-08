@@ -16,6 +16,8 @@
   --accent:     #2f4b7c;   /* 藍 */
   --accent-dark:#26406b;
   --accent-weak:#eef1f6;
+  --danger:     #b3261e;   /* 削除など破壊的操作 */
+  --danger-weak:#f7eceb;
   --hairline:   #e7e6e0;
   --grid:       #dcdacd;
   --code-bg:    #f5f5f1;
@@ -148,13 +150,19 @@ body { padding-left: var(--sidebar-width); }
 .sidebar .user-link:hover { color: var(--accent); }
 
 /* ── Page action conventions ──────────────────
-   back-link (上の戻り) / page-header (index: 見出し+主ボタン) /
-   actions (show: 編集・履歴 左、削除は右へ分離). */
+   back-link (上の戻り) / page-header (index: 見出し+主ボタン=既定サイズ) /
+   actions (show: 編集・履歴など建設的操作のみ、ボタンは btn-sm で統一) /
+   delete は actions に置かず最下部の danger-zone(赤・隔離)へ. */
 .back-link { display: inline-block; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 0.5rem; }
 .back-link:hover { color: var(--accent); }
 .page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .actions { display: flex; align-items: center; gap: 0.9rem; margin: 0.6rem 0 1.4rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--hairline); }
-.actions form.button_to { margin-left: auto; }
+
+/* 破壊的操作の隔離ゾーン（show の最下部） */
+.danger-zone { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--hairline); }
+.danger-zone__label { display: block; font-size: 0.78rem; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 0.45rem; }
+.btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+.btn-danger:hover, .btn-danger:focus { background: var(--danger); color: #fff; border-color: var(--danger); }
 
 /* 管理者専用操作を上部で強調するブロック */
 .admin-box { border: 1px solid var(--accent); border-left-width: 3px; background: var(--accent-weak); border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0 0 1.3rem; }
