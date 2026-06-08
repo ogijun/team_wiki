@@ -50,7 +50,7 @@ gem "image_processing", "~> 1.2"
 gem "aws-sdk-s3", "~> 1.224", require: false
 
 # Pagination
-gem "pagy", "~> 9.3"
+gem "pagy", "~> 43.5"
 
 # Reusable, unit-testable view components
 gem "view_component", "~> 4.0"
