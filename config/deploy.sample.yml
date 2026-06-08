@@ -1,0 +1,77 @@
+# Kamal deploy config TEMPLATE.
+# Copy to config/deploy.yml (gitignored) and fill in your instance values.
+#   cp config/deploy.sample.yml config/deploy.yml
+
+# Name of your application. Used to uniquely configure containers.
+service: team_wiki
+
+# Name of the container image (use your-user/app-name on external registries).
+image: your-user/team_wiki
+
+# Deploy to these servers.
+servers:
+  web:
+    - 203.0.113.10   # your server IP
+
+# Enable SSL auto certification via Let's Encrypt. Requires config.assume_ssl
+# and config.force_ssl in production.rb (already set).
+proxy:
+  ssl: true
+  host: wiki.example.com   # your domain (A record -> the server IP)
+
+# Where you keep your container images.
+registry:
+  server: docker.io
+  username: your-user
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+env:
+  secret:
+    - RAILS_MASTER_KEY
+    # Discord OAuth + role mapping. Required at runtime in production (see omniauth.rb).
+    - DISCORD_CLIENT_ID
+    - DISCORD_CLIENT_SECRET
+    - DISCORD_GUILD_ID
+    - DISCORD_REQUIRED_ROLE_ID
+    - DISCORD_ADMIN_ROLE_ID
+    # Object-storage credentials — uncomment when moving off local Disk (see below).
+    # - R2_ENDPOINT
+    # - R2_ACCESS_KEY_ID
+    # - R2_SECRET_ACCESS_KEY
+  clear:
+    # Pin OmniAuth's redirect_uri host so it matches the Discord OAuth callback URL.
+    APP_BASE_URL: https://wiki.example.com
+
+    # Storage backend. Defaults to local Disk (persisted on the team_wiki_storage volume).
+    # To switch to an object store: add the service to config/storage.yml, set the value
+    # below, and re-enable the matching secrets above + in .kamal/secrets.
+    # ACTIVE_STORAGE_SERVICE: r2
+    # R2_BUCKET: team-wiki
+
+    # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
+    SOLID_QUEUE_IN_PUMA: true
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
+
+# Persistent volume for the SQLite databases and local Active Storage files.
+volumes:
+  - "team_wiki_storage:/rails/storage"
+
+# Bridge fingerprinted assets between versions to avoid 404 on in-flight requests.
+asset_path: /rails/public/assets
+
+# Configure the image builder.
+builder:
+  arch: amd64
+  # Build amd64 remotely on the server (useful when your machine is arm64):
+  # remote: ssh://deploy@203.0.113.10
+
+# Use a different ssh user than root.
+ssh:
+  user: deploy

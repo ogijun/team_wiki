@@ -33,3 +33,6 @@
 
 # Local-only design/plan docs (per workflow rules)
 /docs/superpowers/
+
+# Instance-specific Kamal deploy config; commit config/deploy.sample.yml instead.
+/config/deploy.yml
