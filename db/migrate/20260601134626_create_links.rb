@@ -7,7 +7,7 @@ class CreateLinks < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :links, [:source_page_id, :target_title], unique: true
+    add_index :links, [ :source_page_id, :target_title ], unique: true
     add_index :links, :target_page_id
     add_index :links, :target_title
   end

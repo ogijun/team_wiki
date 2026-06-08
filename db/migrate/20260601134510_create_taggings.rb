@@ -6,6 +6,6 @@ class CreateTaggings < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :taggings, [:tag_id, :taggable_type, :taggable_id], unique: true, name: "index_taggings_uniqueness"
+    add_index :taggings, [ :tag_id, :taggable_type, :taggable_id ], unique: true, name: "index_taggings_uniqueness"
   end
 end

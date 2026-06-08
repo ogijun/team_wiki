@@ -20,7 +20,7 @@ class WikiLinkResolverTest < ActiveSupport::TestCase
   end
 
   test "resolve_all maps each title in one pass, existing vs missing" do
-    map = WikiLinkResolver.resolve_all(["存在", "無い", "存在"])
+    map = WikiLinkResolver.resolve_all([ "存在", "無い", "存在" ])
     assert map["存在"][:exists]
     assert_includes map["存在"][:href], CGI.escape(@article.slug)
     assert_not map["無い"][:exists]
