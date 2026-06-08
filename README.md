@@ -90,3 +90,7 @@ bin/kamal setup    # 初回（以降は bin/kamal deploy）
 Kamal の永続ボリューム（`/rails/storage`）に保存されるためデプロイをまたいでも残る。
 
 オブジェクトストレージに移す場合は、`config/storage.yml` にサービスを追加し（R2 などの S3 互換）、`ACTIVE_STORAGE_SERVICE` を設定、対応するシークレット（`R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` 等）を `.kamal/secrets` と `config/deploy.yml` の env に追加する。Active Storage の blob キーは保存先非依存なので、移行はキーを保ったまま実体をコピーして `service_name` を更新するだけでよい。
+
+## ライセンス
+
+[GNU Affero General Public License v3.0](LICENSE)（AGPL-3.0）の下で公開している。ネットワーク越しに利用させる場合も、改変版のソース提供義務が及ぶ点に注意。
