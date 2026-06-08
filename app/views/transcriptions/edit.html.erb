@@ -1,0 +1,21 @@
+<% content_for :title, "書き起こし — #{@material.display_title}" %>
+
+<p><%= link_to "← 資料へ戻る", @material %></p>
+<div class="page-header"><h1>書き起こし</h1></div>
+<p class="muted"><%= @material.display_title %></p>
+
+<%= form_with model: @transcription, url: material_transcription_path(@material), method: :patch, class: "stacked-form" do |f| %>
+  <%= render "shared/error_messages", record: @transcription %>
+
+  <div class="field">
+    <%= f.label :status, "状態" %>
+    <%= f.select :status, Transcription::STATUSES.map { |slug, label| [label, slug] } %>
+  </div>
+  <div class="field">
+    <%= f.label :body, "本文" %>
+    <small class="field__hint">改行はそのまま保持されます。長尺は「p.3」「0:12:34」などの見出しを本文内に書いてください。</small>
+    <%= f.text_area :body, rows: 18 %>
+  </div>
+
+  <%= f.submit "保存" %>
+<% end %>
