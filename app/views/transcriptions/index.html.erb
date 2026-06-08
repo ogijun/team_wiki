@@ -4,12 +4,15 @@
 <% [["todo", "未着手"], ["drafting", "作業中"], ["done", "完了"]].each do |key, label| %>
   <% items = @groups[key] || [] %>
   <section>
-    <h2><%= label %> <small class="muted">(<%= items.size %>)</small></h2>
+    <h2 class="section-head"><%= label %> <span class="pill"><%= items.size %></span></h2>
     <% if items.any? %>
-      <ul>
+      <ul class="rows">
         <% items.each do |m| %>
-          <li>
-            <%= link_to m.display_title, m %>
+          <li class="row">
+            <span class="row__main"><%= media_icon(m) %> <%= link_to m.display_title, m %></span>
+            <% if (t = m.transcription) %>
+              <span class="meta"><%= avatar_tag(t.author, size: 20) %> <%= display_name(t.author) %> · <%= t.updated_at.to_fs(:jp) %></span>
+            <% end %>
             <%= link_to (key == "todo" ? "作成" : "編集"), edit_material_transcription_path(m), class: "btn-sm" %>
           </li>
         <% end %>

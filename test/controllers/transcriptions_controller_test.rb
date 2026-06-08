@@ -56,4 +56,11 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "完了音声"
     assert_select "a", text: "リンク", count: 0
   end
+
+  test "index shows the assignee for in-progress transcripts" do
+    worker = User.create!(email_address: "w@example.com", name: "ワーカー", provider: "discord", uid: "worker")
+    Transcription.create!(material: @media, author: worker, body: "途中まで", status: "drafting")
+    get transcriptions_url
+    assert_select ".meta", text: /ワーカー/
+  end
 end

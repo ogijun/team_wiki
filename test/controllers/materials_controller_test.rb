@@ -40,7 +40,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   test "material detail shows the preview placeholder" do
     m = Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
     get material_url(m)
-    assert_select ".preview-placeholder"
+    assert_select ".placeholder"
   end
 
   test "show isolates delete in a danger zone, not the actions row" do

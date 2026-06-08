@@ -15,7 +15,7 @@
   <%= link_to "編集", edit_material_path(@material), role: "button", class: "btn-sm" %>
 </div>
 
-<div class="preview-placeholder muted">ここには資料のサムネイルなどが表示される予定です（開発中）</div>
+<div class="placeholder">ここには資料のサムネイルなどが表示される予定です（開発中）</div>
 
 <% if @material.author.present? || @material.source.present? || @material.published %>
   <dl class="bibliography">
@@ -44,7 +44,7 @@
       <% end %>
     </h2>
     <% if @material.transcription %>
-      <div class="transcription-body"><%= @material.transcription.body %></div>
+      <div class="prewrap"><%= @material.transcription.body %></div>
       <p><%= link_to "編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
     <% else %>
       <p class="muted">まだトランスクリプトがありません。</p>
