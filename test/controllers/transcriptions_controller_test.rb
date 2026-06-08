@@ -39,4 +39,21 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     get edit_material_transcription_url(@link)
     assert_redirected_to material_url(@link)
   end
+
+  test "index groups media materials by transcription status" do
+    todo = Material.new(user: @user, title: "未着手動画")
+    todo.file.attach(io: StringIO.new("x"), filename: "v.mp4", content_type: "video/mp4")
+    todo.save!
+    done = Material.new(user: @user, title: "完了音声")
+    done.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
+    done.save!
+    Transcription.create!(material: done, author: @user, body: "ok", status: "done")
+    Material.create!(user: @user, title: "リンク", url: "https://example.com/x") # 対象外
+
+    get transcriptions_url
+    assert_response :success
+    assert_select "a", text: "未着手動画"
+    assert_select "a", text: "完了音声"
+    assert_select "a", text: "リンク", count: 0
+  end
 end
