@@ -1,5 +1,7 @@
 # Team Wiki
 
+[![CI](https://github.com/ogijun/team_wiki/actions/workflows/ci.yml/badge.svg)](https://github.com/ogijun/team_wiki/actions/workflows/ci.yml)
+
 記事・資料をチームで編集する Wiki アプリケーション。
 Discord サーバーのメンバー（特定ロール保持者）だけがログインして閲覧・編集できる。
 
