@@ -1,0 +1,13 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "269097aa64f93fc98def7d77afa2b7fcec5f08ce7dc344e90075d051c414c83a",
+      "note": "Diffy::Diff#to_s(:html) HTML-escapes the diffed line content; only the diff markup is html_safe. Reviewed safe."
+    },
+    {
+      "fingerprint": "a95af94fd81eb2bc69fdffbf7b1e214af2a05cd6f3647c6cf4b286bc0932a74f",
+      "note": "material.url is validated to \\Ahttps?://\\S+\\z (http/https only, no whitespace), so the href can't be a javascript:/data: scheme; rel=noopener is set. Reviewed safe."
+    }
+  ],
+  "brakeman_version": "8.0.4"
+}

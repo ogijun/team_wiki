@@ -30,7 +30,7 @@ class Material < ApplicationRecord
   fuzzy_date_attribute :published_at
 
   validates :published_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
-  validates :url, format: { with: %r{\Ahttps?://},
+  validates :url, format: { with: %r{\Ahttps?://\S+\z},
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
   validates :confidence, inclusion: { in: CONFIDENCE_LEVELS.keys }
