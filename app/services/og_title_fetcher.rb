@@ -18,7 +18,7 @@ module OgTitleFetcher
   TIMEOUT = 3 # 秒（open/read 各）
   MAX_BYTES = 512 * 1024
   USER_AGENT = "team_wiki-link-preview/1.0"
-  ALLOWED_PORTS = [80, 443].freeze
+  ALLOWED_PORTS = [ 80, 443 ].freeze
 
   # 内部/予約レンジ（IPv4/IPv6）。ここに解決される URL は取得しない。
   BLOCKED_RANGES = [

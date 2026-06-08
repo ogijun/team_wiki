@@ -51,7 +51,7 @@ class Material < ApplicationRecord
   end
 
   def thumbnail(px)
-    file.representation(resize_to_limit: [px, px]) if thumbnailable_file?
+    file.representation(resize_to_limit: [ px, px ]) if thumbnailable_file?
   end
 
   def preview_image_url

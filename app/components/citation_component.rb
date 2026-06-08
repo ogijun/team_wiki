@@ -18,7 +18,7 @@ class CitationComponent < ViewComponent::Base
     [
       (@material.author if @material.author.present?),
       ("『#{@material.source}』" if @material.source.present?),
-      ("(#{@material.published_at.year})" if @material.published_at.present?),
+      ("(#{@material.published_at.year})" if @material.published_at.present?)
     ].compact.join
   end
 end

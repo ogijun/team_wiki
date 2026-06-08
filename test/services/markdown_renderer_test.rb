@@ -65,8 +65,8 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     m1 = Object.new
     m2 = Object.new
     result = render_full("x[[ref:h1]] y[[ref:h2]]", { "h1" => m1, "h2" => m2 })
-    assert_equal [1, 2], result.references.map(&:number)
-    assert_equal [m1, m2], result.references.map(&:material)
+    assert_equal [ 1, 2 ], result.references.map(&:number)
+    assert_equal [ m1, m2 ], result.references.map(&:material)
   end
 
   test "broken ref shows red marker and is not collected" do

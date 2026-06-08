@@ -21,7 +21,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       provider: "discord", uid: @user.uid,
       info: { name: @user.name, email: @user.email_address, image: @user.avatar_url }
     )
-    result = DiscordGuildMembership::Result.new(true, ["other-role"])
+    result = DiscordGuildMembership::Result.new(true, [ "other-role" ])
     original = DiscordGuildMembership.method(:call)
     DiscordGuildMembership.define_singleton_method(:call) { |**| result }
     begin
@@ -52,12 +52,12 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     required = Rails.configuration.x.discord.required_role_id.to_s
     Rails.configuration.x.discord.admin_role_id = "admin-role-1"
 
-    stub_membership(DiscordGuildMembership::Result.new(true, [required, "admin-role-1"])) do
+    stub_membership(DiscordGuildMembership::Result.new(true, [ required, "admin-role-1" ])) do
       get "/auth/discord/callback"
     end
     assert_equal "admin", User.find_by(uid: "admin-uid").role
 
-    stub_membership(DiscordGuildMembership::Result.new(true, [required])) do
+    stub_membership(DiscordGuildMembership::Result.new(true, [ required ])) do
       get "/auth/discord/callback"
     end
     assert_equal "editor", User.find_by(uid: "admin-uid").role

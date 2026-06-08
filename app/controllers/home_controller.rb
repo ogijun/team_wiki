@@ -6,7 +6,7 @@ class HomeController < ApplicationController
     @stats = {
       articles: Article.count,
       materials: Material.count,
-      unconfirmed_materials: Material.where(confidence: "unconfirmed").count,
+      unconfirmed_materials: Material.where(confidence: "unconfirmed").count
     }
   end
 end

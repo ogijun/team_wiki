@@ -40,7 +40,7 @@ class ArticleRevisionCreatorTest < ActiveSupport::TestCase
     ArticleRevisionCreator.call(article: article, body: "x", author: @user)
     article.tag_names = "a"
     ArticleRevisionCreator.call(article: article, body: "x", author: @user)
-    assert_equal ["a"], article.reload.tags.pluck(:name)
+    assert_equal [ "a" ], article.reload.tags.pluck(:name)
   end
 
   test "backfills inbound broken links when target article is created" do

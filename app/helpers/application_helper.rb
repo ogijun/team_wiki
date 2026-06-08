@@ -32,7 +32,7 @@ module ApplicationHelper
   # favicon / apple-touch-icon を1枚の正方形画像から生成するためのもの。
   def site_icon_url(size)
     return unless site_setting.icon.attached?
-    url_for(site_setting.icon.variant(resize_to_fill: [size, size]))
+    url_for(site_setting.icon.variant(resize_to_fill: [ size, size ]))
   end
 
   # ロゴが無いときのテキスト名: 設定 → ENV → 既定。

@@ -7,7 +7,7 @@ module AuthTestHelper
       info: { name: user.name, email: user.email_address, image: user.avatar_url }
     )
     role = Rails.configuration.x.discord.required_role_id.to_s
-    result = DiscordGuildMembership::Result.new(true, [role])
+    result = DiscordGuildMembership::Result.new(true, [ role ])
     stub_membership(result) do
       get "/auth/discord/callback"
     end

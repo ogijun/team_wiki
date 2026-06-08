@@ -29,7 +29,7 @@ class ArticleTest < ActiveSupport::TestCase
     ArticleRevisionCreator.call(article: article, body: "1", author: @user)
     ArticleRevisionCreator.call(article: article, body: "2", author: bob)
     ArticleRevisionCreator.call(article: article, body: "3", author: @user)
-    assert_equal [@user, bob], article.contributors
+    assert_equal [ @user, bob ], article.contributors
   end
 
   test "requires title" do
@@ -108,7 +108,7 @@ class ArticleTest < ActiveSupport::TestCase
                             starts_at: Time.zone.local(1990), starts_precision: "year")
     older = Article.create!(title: "1980", created_by: @user,
                             starts_at: Time.zone.local(1980), starts_precision: "year")
-    assert_equal [older, newer], Article.chronicled.to_a
+    assert_equal [ older, newer ], Article.chronicled.to_a
   end
 
   test "default status is stub" do

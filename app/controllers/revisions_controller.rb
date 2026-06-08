@@ -4,7 +4,7 @@ class RevisionsController < ApplicationController
   def index
     @revisions = @article.revisions.order(created_at: :desc).to_a
     # newest-first list: each revision's predecessor is the next (older) one
-    @previous_of = @revisions.each_cons(2).to_h { |newer, older| [newer.id, older] }
+    @previous_of = @revisions.each_cons(2).to_h { |newer, older| [ newer.id, older ] }
   end
 
   def show
