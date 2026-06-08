@@ -14,7 +14,10 @@ Rails.application.routes.draw do
   resources :users, only: %i[show index]
   resource :account, only: %i[edit update]
   get "search", to: "search#index"
-  resources :materials
+  resources :materials do
+    resource :transcription, only: %i[edit update]
+  end
+  get "transcriptions", to: "transcriptions#index"
   resources :uploads, only: :create
   root "home#index"
   resource :settings, only: %i[edit update]
