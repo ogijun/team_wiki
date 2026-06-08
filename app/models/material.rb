@@ -1,6 +1,6 @@
 class Material < ApplicationRecord
   belongs_to :user
-  belongs_to :page, optional: true
+  belongs_to :article, optional: true
   has_one_attached :file
   has_many :taggings, as: :taggable, dependent: :destroy
   has_many :tags, through: :taggings

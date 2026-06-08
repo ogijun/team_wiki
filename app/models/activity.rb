@@ -1,6 +1,6 @@
 class Activity < ApplicationRecord
   ACTIONS = %w[
-    page.created page.edited page.deleted
+    article.created article.edited article.deleted
     material.added material.deleted
     tag.created tag.deleted
     user.joined

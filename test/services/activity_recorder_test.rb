@@ -17,8 +17,8 @@ class ActivityRecorderTest < ActiveSupport::TestCase
   end
 
   test "derives label from subject title" do
-    page = Page.create!(title: "導出", created_by: @user)
-    ActivityRecorder.record(actor: @user, action: "page.created", subject: page)
+    article = Article.create!(title: "導出", created_by: @user)
+    ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
     assert_equal "導出", Activity.order(:id).last.subject_label
   end
 

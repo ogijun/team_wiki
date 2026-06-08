@@ -1,13 +1,13 @@
-<h1>履歴: <%= @page.title %></h1>
+<h1>履歴: <%= @article.title %></h1>
 <ul>
   <% @revisions.each do |rev| %>
     <li>
-      <%= link_to "##{rev.id} #{rev.created_at.to_fs(:short)}", page_revision_path(@page, rev) %>
+      <%= link_to "##{rev.id} #{rev.created_at.to_fs(:short)}", article_revision_path(@article, rev) %>
       by <%= rev.author.name %> <%= rev.edit_summary %>
       <% if (prev = @previous_of[rev.id]) %>
-        <%= link_to "前の版との差分", page_revision_path(@page, rev, a: prev.id) %>
+        <%= link_to "前の版との差分", article_revision_path(@article, rev, a: prev.id) %>
       <% end %>
-      <%= button_to "この版に復元", restore_page_revision_path(@page, rev), data: { turbo_confirm: "復元しますか?" } %>
+      <%= button_to "この版に復元", restore_article_revision_path(@article, rev), data: { turbo_confirm: "復元しますか?" } %>
     </li>
   <% end %>
 </ul>

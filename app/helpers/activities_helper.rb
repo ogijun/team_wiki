@@ -1,9 +1,9 @@
 module ActivitiesHelper
   # action -> [接頭文言, 接尾文言]。label がある場合は 接頭 + 「label」 + 接尾。
   PHRASES = {
-    "page.created"     => ["がページ", "を作成しました"],
-    "page.edited"      => ["がページ", "を編集しました"],
-    "page.deleted"     => ["がページ", "を削除しました"],
+    "article.created"  => ["が記事", "を作成しました"],
+    "article.edited"   => ["が記事", "を編集しました"],
+    "article.deleted"  => ["が記事", "を削除しました"],
     "material.added"   => ["が資料", "を追加しました"],
     "material.deleted" => ["が資料", "を削除しました"],
     "tag.created"      => ["がタグ", "を作成しました"],

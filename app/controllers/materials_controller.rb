@@ -12,7 +12,7 @@ class MaterialsController < ApplicationController
   end
 
   def new
-    @material = Material.new(page_id: params[:page_id])
+    @material = Material.new(article_id: params[:article_id])
   end
 
   def create
@@ -52,7 +52,7 @@ class MaterialsController < ApplicationController
   end
 
   def material_params
-    params.require(:material).permit(:title, :description, :url, :file, :page_id)
+    params.require(:material).permit(:title, :description, :url, :file, :article_id)
   end
 
   def sync_tags(material, str)

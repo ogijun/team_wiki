@@ -1,6 +1,6 @@
 class Tag < ApplicationRecord
   has_many :taggings, dependent: :destroy
-  has_many :pages, through: :taggings, source: :taggable, source_type: "Page"
+  has_many :articles, through: :taggings, source: :taggable, source_type: "Article"
   has_many :materials, through: :taggings, source: :taggable, source_type: "Material"
 
   validates :name, presence: true, uniqueness: true

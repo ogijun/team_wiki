@@ -17,6 +17,6 @@
   <p><%= f.label :tag_names, "タグ（カンマ区切り）" %><br>
      <%= f.text_field :tag_names, value: material.tags.map(&:name).join(", ") %></p>
 
-  <%= f.hidden_field :page_id %>
+  <%= f.hidden_field :article_id %>
   <%= f.submit %>
 <% end %>

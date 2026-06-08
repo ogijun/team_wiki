@@ -15,11 +15,11 @@ class MaterialTest < ActiveSupport::TestCase
     assert m.valid?, m.errors.full_messages.join(", ")
   end
 
-  test "belongs to a page optionally" do
-    page = Page.create!(title: "P", created_by: @user)
-    m = attach_png(Material.new(user: @user, page: page))
+  test "belongs to an article optionally" do
+    article = Article.create!(title: "P", created_by: @user)
+    m = attach_png(Material.new(user: @user, article: article))
     assert m.save
-    assert_equal page, m.reload.page
+    assert_equal article, m.reload.article
   end
 
   test "link-type material is valid" do

@@ -4,12 +4,12 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = User.create!(email_address: "tg@example.com", password: "password123", name: "TG")
     post session_url, params: { email_address: @user.email_address, password: "password123" }
-    @page = Page.create!(title: "Tagged", created_by: @user)
-    PageRevisionCreator.call(page: @page, body: "x", author: @user, tag_names: ["ruby"])
+    @article = Article.create!(title: "Tagged", created_by: @user)
+    ArticleRevisionCreator.call(article: @article, body: "x", author: @user, tag_names: ["ruby"])
     @tag = Tag.find_by(name: "ruby")
   end
 
-  test "show lists pages with the tag" do
+  test "show lists articles with the tag" do
     get tag_url(@tag)
     assert_response :success
     assert_select "a", text: "Tagged"
@@ -44,7 +44,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
-  test "destroy removes a tag with no pages" do
+  test "destroy removes a tag with no articles" do
     empty = Tag.create!(name: "unused")
     assert_difference("Tag.count", -1) do
       delete tag_url(empty)
@@ -53,7 +53,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     assert_not Tag.exists?(empty.id)
   end
 
-  test "destroy refuses a tag that has pages" do
+  test "destroy refuses a tag that has articles" do
     assert_no_difference("Tag.count") do
       delete tag_url(@tag)
     end

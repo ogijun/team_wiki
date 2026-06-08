@@ -11,7 +11,7 @@
       <%= m.link? ? "🔗" : "📄" %>
       <%= link_to m.display_title, material_path(m) %>
       <span class="muted">by <%= m.user.name %> / <%= m.created_at.to_fs(:short) %></span>
-      <% if m.page %> — <%= link_to "📚#{m.page.title}", m.page %><% end %>
+      <% if m.article %> — <%= link_to "📚#{m.article.title}", m.article %><% end %>
       <% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %>
     </li>
   <% end %>

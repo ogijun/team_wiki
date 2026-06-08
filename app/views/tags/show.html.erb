@@ -1,6 +1,6 @@
 <h1>#<%= @tag.name %></h1>
 <ul>
-  <% @pages.each do |page| %>
-    <li><%= link_to page.title, page %></li>
+  <% @articles.each do |article| %>
+    <li><%= link_to article.title, article %></li>
   <% end %>
 </ul>

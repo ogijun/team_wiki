@@ -37,11 +37,11 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "new prefills page_id from query" do
-    page = Page.create!(title: "PP", created_by: @user)
-    get new_material_url(page_id: page.id)
+  test "new prefills article_id from query" do
+    article = Article.create!(title: "PP", created_by: @user)
+    get new_material_url(article_id: article.id)
     assert_response :success
-    assert_select "input[name=?][value=?]", "material[page_id]", page.id.to_s
+    assert_select "input[name=?][value=?]", "material[article_id]", article.id.to_s
   end
 
   test "destroy removes material" do
@@ -66,13 +66,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "資料Z", Activity.where(action: "material.deleted").order(:id).last.subject_label
   end
 
-  test "page show lists its materials and add link" do
-    page = Page.create!(title: "Docs", created_by: @user)
-    PageRevisionCreator.call(page: page, body: "本文", author: @user)
-    Material.create!(user: @user, url: "https://example.com/d", title: "資料A", page: page)
-    get page_url(page)
+  test "article show lists its materials and add link" do
+    article = Article.create!(title: "Docs", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    Material.create!(user: @user, url: "https://example.com/d", title: "資料A", article: article)
+    get article_url(article)
     assert_response :success
     assert_select "a", text: "資料A"
-    assert_select "a[href=?]", new_material_path(page_id: page.id)
+    assert_select "a[href=?]", new_material_path(article_id: article.id)
   end
 end

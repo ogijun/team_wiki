@@ -1,0 +1,2 @@
+<h1>編集: <%= @article.title %></h1>
+<%= render "form", article: @article, form_url: article_path(@article), body_value: @body, tag_names_value: @tag_names %>

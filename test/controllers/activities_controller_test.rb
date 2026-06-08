@@ -13,10 +13,10 @@ class ActivitiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index lists activities newest first and survives deleted subject" do
-    page = Page.create!(title: "生存", created_by: @user)
-    ActivityRecorder.record(actor: @user, action: "page.created", subject: page)
-    ActivityRecorder.record(actor: @user, action: "page.deleted", subject_label: "消えた")
-    page.destroy # 1件目の subject が dangling になる
+    article = Article.create!(title: "生存", created_by: @user)
+    ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
+    ActivityRecorder.record(actor: @user, action: "article.deleted", subject_label: "消えた")
+    article.destroy # 1件目の subject が dangling になる
 
     get activities_url
     assert_response :success

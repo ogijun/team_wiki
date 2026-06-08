@@ -6,14 +6,14 @@ class ActivityTest < ActiveSupport::TestCase
   end
 
   test "valid with user and action" do
-    a = Activity.new(user: @user, action: "page.created", subject_label: "X")
+    a = Activity.new(user: @user, action: "article.created", subject_label: "X")
     assert a.valid?, a.errors.full_messages.join(", ")
   end
 
   test "subject is optional and survives subject deletion" do
-    page = Page.create!(title: "Subj", created_by: @user)
-    a = Activity.create!(user: @user, action: "page.created", subject: page, subject_label: "Subj")
-    page.destroy
+    article = Article.create!(title: "Subj", created_by: @user)
+    a = Activity.create!(user: @user, action: "article.created", subject: article, subject_label: "Subj")
+    article.destroy
     assert_nil a.reload.subject
     assert_equal "Subj", a.subject_label
   end

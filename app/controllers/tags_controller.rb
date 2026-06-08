@@ -17,7 +17,7 @@ class TagsController < ApplicationController
 
   def show
     @tag = Tag.find_by!(slug: params[:id])
-    @pages = @tag.pages.order(updated_at: :desc)
+    @articles = @tag.articles.order(updated_at: :desc)
   end
 
   def destroy
