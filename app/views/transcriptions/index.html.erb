@@ -15,7 +15,7 @@
       <ul class="rows">
         <% items.each do |m| %>
           <li class="row">
-            <span class="row__main"><%= media_icon(m) %> <%= link_to m.display_title, m %></span>
+            <span class="row__main"><%= media_icon(m) %> <%= link_to m.title, m %></span>
             <% if (t = m.transcription) %>
               <span class="meta"><%= avatar_tag(t.author, size: 20) %> <%= display_name(t.author) %> · <%= t.updated_at.to_fs(:jp) %></span>
             <% end %>

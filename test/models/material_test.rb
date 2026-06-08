@@ -58,15 +58,18 @@ class MaterialTest < ActiveSupport::TestCase
     assert_includes m.errors[:url], "は http(s) で始まる URL を指定してください"
   end
 
-  test "display_title falls back to filename then url" do
-    m = attach_png(Material.new(user: @user))
-    assert_equal "a.png", m.display_title
-
-    titled = attach_png(Material.new(user: @user, title: "正式名"))
-    assert_equal "正式名", titled.display_title
+  test "title is auto-filled on create from filename (base) or url when blank" do
+    img = attach_png(Material.new(user: @user))
+    img.validate # before_validation :ensure_title
+    assert_equal "a", img.title # "a.png" -> base "a"
 
     link = Material.new(user: @user, url: "https://example.com/doc")
-    assert_equal "https://example.com/doc", link.display_title
+    link.validate
+    assert_equal "https://example.com/doc", link.title
+
+    titled = attach_png(Material.new(user: @user, title: "正式名"))
+    titled.validate
+    assert_equal "正式名", titled.title # 入力済みは維持
   end
 
   test "can be tagged and tag exposes materials" do

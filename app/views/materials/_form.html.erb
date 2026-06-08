@@ -14,7 +14,11 @@
     <p class="muted">信頼度: <%= render BadgeComponent.new(text: material.confidence_label, variant: :status) %> <small>（変更は管理者のみ）</small></p>
   <% end %>
 
-  <div class="field"><%= f.label :title, "タイトル（任意）" %><%= f.text_field :title %></div>
+  <div class="field">
+    <%= f.label :title, "タイトル" %>
+    <small class="field__hint">空のままなら、ファイル名や YouTube・ページのタイトルから自動で入ります。</small>
+    <%= f.text_field :title %>
+  </div>
   <div class="field"><%= f.label :description, "説明（任意）" %><%= f.text_area :description %></div>
 
   <% if material.new_record? %>
