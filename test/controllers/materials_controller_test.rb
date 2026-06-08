@@ -43,6 +43,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".preview-placeholder"
   end
 
+  test "show isolates delete in a danger zone, not the actions row" do
+    m = Material.create!(user: @user, url: "https://example.com/d", title: "削除資料")
+    get material_url(m)
+    assert_select ".danger-zone button", text: "削除"
+    assert_select ".actions button", text: "削除", count: 0
+  end
+
   test "index json returns slug and title" do
     m = Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
     get materials_url(format: :json)

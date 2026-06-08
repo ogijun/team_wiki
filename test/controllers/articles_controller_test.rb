@@ -6,6 +6,14 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
   end
 
+  test "show isolates delete in a danger zone, not the actions row" do
+    article = Article.create!(title: "削除テスト", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    get article_url(article)
+    assert_select ".danger-zone button", text: "削除"
+    assert_select ".actions button", text: "削除", count: 0
+  end
+
   test "index requires login" do
     delete session_url
     get articles_url
