@@ -1,7 +1,7 @@
-<% content_for :title, "書き起こし — #{@material.display_title}" %>
+<% content_for :title, "トランスクリプト — #{@material.display_title}" %>
 
 <p><%= link_to "← 資料へ戻る", @material %></p>
-<div class="page-header"><h1>書き起こし</h1></div>
+<div class="page-header"><h1>トランスクリプト</h1></div>
 <p class="muted"><%= @material.display_title %></p>
 
 <%= form_with model: @transcription, url: material_transcription_path(@material), method: :patch, class: "stacked-form" do |f| %>

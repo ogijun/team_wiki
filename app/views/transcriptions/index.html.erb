@@ -1,5 +1,5 @@
-<% content_for :title, "書き起こし進捗" %>
-<div class="page-header"><h1>書き起こし進捗</h1></div>
+<% content_for :title, "トランスクリプト進捗" %>
+<div class="page-header"><h1>トランスクリプト進捗</h1></div>
 
 <% [["todo", "未着手"], ["drafting", "作業中"], ["done", "完了"]].each do |key, label| %>
   <% items = @groups[key] || [] %>
@@ -10,7 +10,7 @@
         <% items.each do |m| %>
           <li>
             <%= link_to m.display_title, m %>
-            <%= link_to (key == "todo" ? "書き起こす" : "編集"), edit_material_transcription_path(m), class: "btn-sm" %>
+            <%= link_to (key == "todo" ? "作成" : "編集"), edit_material_transcription_path(m), class: "btn-sm" %>
           </li>
         <% end %>
       </ul>
