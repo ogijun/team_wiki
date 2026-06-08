@@ -10,6 +10,12 @@
   --accent: #2563eb;
   --muted: #666;
   --code-bg: #f5f5f5;
+
+  /* Compress Pico's mobile-first defaults for desktop (size & spacing). */
+  --pico-font-size: 90%;
+  --pico-spacing: 0.75rem;
+  --pico-form-element-spacing-vertical: 0.4rem;
+  --pico-form-element-spacing-horizontal: 0.6rem;
 }
 
 /* Revision diff */
@@ -67,7 +73,12 @@
 
 /* Compact, inline per-page selector (override Pico's full-width select) */
 .per-form { margin: 0 0 1rem; }
-.per-select { width: auto; display: inline-block; margin: 0 0 0 0.4rem; }
+.per-select { display: inline-block; margin: 0 0 0 0.4rem; }
+
+/* Un-fullwidth form controls (Pico sets width:100%; sizing comes from --pico-* vars above). */
+button, input[type="submit"], input[type="reset"], [role="button"], select {
+  width: auto;
+}
 
 /* Muted/secondary button (e.g. logout, delete) over Pico buttons */
 .btn-muted button {
