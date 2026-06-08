@@ -324,3 +324,7 @@ form.button_to { display: inline; }
 
 /* 「未実装/予定」を示す破線プレースホルダー */
 .placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
+
+/* 空状態: 一覧が0件のときのやさしい案内（コンテンツが増えれば消える）。.placeholder とは別物。 */
+.empty-state { padding: 1.5rem 0.2rem; color: var(--muted); line-height: 1.9; }
+.empty-state__cta { margin-top: 0.6rem; }

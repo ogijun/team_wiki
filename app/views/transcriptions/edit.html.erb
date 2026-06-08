@@ -3,6 +3,7 @@
 <p><%= link_to "← 資料へ戻る", @material %></p>
 <div class="page-header"><h1>トランスクリプト</h1></div>
 <p class="muted"><%= @material.display_title %></p>
+<p class="muted">この資料の音声・文字をテキストに書き起こします。聞き取れた／読み取れた範囲でOK。完璧でなくて大丈夫、あとから直せます。</p>
 
 <%= form_with model: @transcription, url: material_transcription_path(@material), method: :patch, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: @transcription %>

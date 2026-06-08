@@ -6,6 +6,7 @@
       <span class="admin-box__label">管理者操作</span>
       <div class="field">
         <%= f.label :confidence, "信頼度（出典検証の確定）" %>
+        <small class="field__hint">原本そのものを確認できたら「原本確認済」、できていなければ「未確認」のままで。</small>
         <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
       </div>
     </div>

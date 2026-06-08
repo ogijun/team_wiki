@@ -6,13 +6,19 @@
   <%= f.submit "作成" %>
 <% end %>
 
-<ul>
-  <% @tags.each do |t| %>
-    <li>
-      <%= link_to "##{t.name}", tag_path(t) %>
-      <% if t.usage_count.zero? %>
-        <%= button_to "削除", tag_path(t), method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %>
-      <% end %>
-    </li>
-  <% end %>
-</ul>
+<% if @tags.any? %>
+  <ul>
+    <% @tags.each do |t| %>
+      <li>
+        <%= link_to "##{t.name}", tag_path(t) %>
+        <% if t.usage_count.zero? %>
+          <%= button_to "削除", tag_path(t), method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="empty-state">
+    タグはまだありません。記事や資料を編集するとき「タグ」欄にカンマ区切りで入れると、ここに集まって分類できます（例: <code>資料, 下書き</code>）。
+  </div>
+<% end %>

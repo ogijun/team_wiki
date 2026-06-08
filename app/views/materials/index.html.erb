@@ -16,6 +16,7 @@
                  class: "per-select", onchange: "this.form.requestSubmit()" %>
 <% end %>
 
+<% if @materials.any? %>
 <table class="materials-table">
   <thead>
     <tr>
@@ -46,5 +47,10 @@
     <% end %>
   </tbody>
 </table>
-
 <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+<% else %>
+  <div class="empty-state">
+    資料（PDF・画像・動画・音声・URL）をここに集めます。お手持ちの本やサイト、動画など、出典になりそうなものを「資料を追加」から登録しておくと、記事から引用できます。
+    <div class="empty-state__cta"><%= link_to "資料を追加", new_material_path, role: "button", class: "btn-sm" %></div>
+  </div>
+<% end %>
