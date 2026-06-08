@@ -10,6 +10,12 @@ class MaterialTest < ActiveSupport::TestCase
     material
   end
 
+  test "blank rights is normalized to nil (フォームの未設定=空文字を許容)" do
+    m = Material.new(user: @user, url: "https://example.com/x", title: "t", rights: "")
+    assert m.valid?, m.errors.full_messages.join(", ")
+    assert_nil m.rights
+  end
+
   test "file-type material is valid" do
     m = attach_png(Material.new(user: @user, title: "図"))
     assert m.valid?, m.errors.full_messages.join(", ")

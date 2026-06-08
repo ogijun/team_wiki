@@ -31,6 +31,8 @@ class Material < ApplicationRecord
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
   validates :confidence, inclusion: { in: CONFIDENCE_LEVELS.keys }
+  # フォームの「未設定」(include_blank) は "" を送る。空文字は nil 扱いにして allow_nil を効かせる。
+  normalizes :rights, with: ->(v) { v.presence }
   validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
 
   attr_accessor :tag_names, :published_year, :published_month, :published_day
