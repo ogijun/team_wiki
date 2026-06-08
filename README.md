@@ -8,12 +8,14 @@ Discord サーバーのメンバー（特定ロール保持者）だけがログ
 ## 主な機能
 
 - **記事 (Article)** — Markdown 本文、リビジョン履歴と版間差分、貢献者表示。種別（作品/人物/出来事）と編集状態（スタブ/執筆中/完成）。
-- **資料 (Material)** — ファイル添付または URL（YouTube 等の埋め込み対応）。書誌情報（著者・出典元・発行日・取得日）、画像/YouTube のサムネイル。
+- **資料 (Material)** — ファイル添付または URL（YouTube 等の埋め込み対応）。書誌情報（著者・出典元・発行日・自由記述メモ）、信頼度（原本確認済/未確認）・権利状態、画像/YouTube のサムネイル。登録後はファイル/URL の差し替え不可（履歴性のため）。
+- **書き起こし (Transcription)** — メディア資料（画像/動画/音声/PDF）に手動の文字起こしを 1 件ずつ紐づけ、未着手 / 作業中 / 完了 の進捗を管理（`/transcriptions` ダッシュボード）。
 - **引用** — 本文中の `[[ref:<slug>]]` で資料を脚注として参照。書誌情報を使った体裁で出典一覧を生成。
 - **Wiki リンク** — 本文中の `[[記事タイトル]]` で記事間リンク（未作成リンクは赤表示）。
-- **タグ / 検索 / 年表 (chronicle)** — タグ分類、全文検索、あいまい日付（年だけ等）対応の年表表示。
+- **タグ / 検索 / 年表 (chronicle)** — タグ分類、検索、あいまい日付（年だけ等）対応の年表表示。
 - **アクティビティ** — 作成・編集・削除のタイムライン。
-- **ユーザー** — プロフィール、アバター、アカウント設定。
+- **ユーザーと権限** — プロフィール・アバター・アカウント設定。ロールは Discord ロールから判定（editor / admin）。admin はメンバー管理や資料の信頼度確定が可能。
+- **サイト設定（管理者）** — ブランド名・ロゴ・アプリアイコン（favicon / apple-touch）・「このサイトについて」ページ・全ページ共通フッタを管理画面から編集。
 
 ## 技術スタック
 
@@ -21,7 +23,7 @@ Discord サーバーのメンバー（特定ロール保持者）だけがログ
 - SQLite + Propshaft + importmap-rails
 - Hotwire（Turbo / Stimulus）、Markdown は commonmarker、ページングは pagy
 - 認証: Discord OAuth（omniauth-discord） — 特定サーバー所属＋ロールでゲート
-- ストレージ: Active Storage（dev/test = ローカルディスク、本番 = Cloudflare R2 / aws-sdk-s3）。サムネ生成に image_processing（libvips）
+- ストレージ: Active Storage。保存先は `ACTIVE_STORAGE_SERVICE` で選択（既定はローカル Disk。R2 等の S3 互換へ切替可）。サムネ生成に image_processing（libvips）
 - ジョブ/キャッシュ: Solid Queue / Solid Cache / Solid Cable
 - デプロイ: Kamal + Docker
 
@@ -51,6 +53,7 @@ Discord ログインを実際に通すには `.env` に以下を設定する。
 | `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` | Discord アプリの OAuth2 認証情報 |
 | `DISCORD_GUILD_ID` | ログインを許可するサーバー（ギルド）ID |
 | `DISCORD_REQUIRED_ROLE_ID` | 必須ロール ID（このロール保持者のみ許可） |
+| `DISCORD_ADMIN_ROLE_ID` | admin ロール ID（任意。保持者を admin に昇格。未設定だと全員 editor） |
 | `APP_BASE_URL` | redirect_uri を固定（例: `http://team-wiki.test`）。Discord 側に登録したコールバックと scheme/host を一致させる |
 
 > Discord 開発者ポータルのリダイレクト URI には `<APP_BASE_URL>/auth/discord/callback` をフルパスで登録する。
@@ -62,13 +65,18 @@ macOS で `.test` の名前解決が効かない場合は `/etc/hosts` に `127.
 
 ## デプロイ
 
-Kamal でコンテナデプロイする。シークレットは `.kamal/secrets`（1Password から取得）経由で注入。
+Kamal でコンテナデプロイする。シークレットは `.kamal/secrets`（1Password 等から取得）経由で注入。
 
-- **secret**（`.kamal/secrets`）: `RAILS_MASTER_KEY`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`
-- **clear**（`config/deploy.yml`）: `R2_BUCKET` など
+- **secret**（`.kamal/secrets`）: `RAILS_MASTER_KEY`、Discord 各種（`DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` / `DISCORD_GUILD_ID` / `DISCORD_REQUIRED_ROLE_ID` / `DISCORD_ADMIN_ROLE_ID`）
+- **clear**（`config/deploy.yml`）: `APP_BASE_URL` など
 
 ```bash
-bin/kamal deploy
+bin/kamal setup    # 初回（以降は bin/kamal deploy）
 ```
 
-ストレージは Cloudflare R2（S3 互換）。`config/storage.yml` の `r2` サービスを使用し、aws-sdk-s3 のチェックサム設定（`when_required`）で R2 に対応している。
+### ストレージ
+
+`config/active_storage.service` は `ACTIVE_STORAGE_SERVICE`（ENV）で選択し、既定はローカル Disk。
+Kamal の永続ボリューム（`/rails/storage`）に保存されるためデプロイをまたいでも残る。
+
+オブジェクトストレージに移す場合は、`config/storage.yml` にサービスを追加し（R2 などの S3 互換）、`ACTIVE_STORAGE_SERVICE` を設定、対応するシークレット（`R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` 等）を `.kamal/secrets` と `config/deploy.yml` の env に追加する。Active Storage の blob キーは保存先非依存なので、移行はキーを保ったまま実体をコピーして `service_name` を更新するだけでよい。
