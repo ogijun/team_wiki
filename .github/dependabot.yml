@@ -9,6 +9,11 @@ updates:
     # kamal は同居の reserve_app と共有 kamal-proxy のバージョンを合わせるため 2.10.x に固定。
     # 上げるときは両アプリ同時＋proxy reboot を計画する（自動 bump させない）。
     - dependency-name: "kamal"
+    # メジャー昇格は移行作業が要るので自動 bump しない（minor/patch は受ける）。後日まとめて対応。
+    - dependency-name: "pagy"
+      update-types: ["version-update:semver-major"]
+    - dependency-name: "image_processing"
+      update-types: ["version-update:semver-major"]
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
