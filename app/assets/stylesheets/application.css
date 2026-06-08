@@ -292,3 +292,8 @@ form.button_to { display: inline; }
 .dashboard-card ul { margin: 0; padding-left: 1.1rem; }
 .dashboard-card li { margin-bottom: 0.35rem; }
 .transcription-body { white-space: pre-wrap; }
+
+.preview-placeholder {
+  margin: 1rem 0; padding: 2rem 1rem; text-align: center;
+  border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem;
+}

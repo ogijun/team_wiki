@@ -16,6 +16,8 @@
   <%= button_to "削除", @material, method: :delete, class: "secondary outline btn-sm", data: { turbo_confirm: "削除しますか?" } %>
 </div>
 
+<div class="preview-placeholder muted">ここには資料のサムネイルなどが表示される予定です（開発中）</div>
+
 <% if @material.author.present? || @material.source.present? || @material.published %>
   <dl class="bibliography">
     <% if @material.author.present? %><dt>著者・発言者</dt><dd><%= @material.author %></dd><% end %>

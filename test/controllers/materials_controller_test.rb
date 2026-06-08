@@ -27,6 +27,22 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "資料A"
   end
 
+  test "index shows transcription status column instead of the citation tag" do
+    media = Material.new(user: @user, title: "音声X")
+    media.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
+    media.save!
+    get materials_url
+    assert_select "th", text: "書き起こし"
+    assert_select "th", text: "引用", count: 0
+    assert_select "td", text: /未着手/
+  end
+
+  test "material detail shows the preview placeholder" do
+    m = Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
+    get material_url(m)
+    assert_select ".preview-placeholder"
+  end
+
   test "index json returns slug and title" do
     m = Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
     get materials_url(format: :json)
