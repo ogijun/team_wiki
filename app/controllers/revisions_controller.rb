@@ -17,9 +17,9 @@ class RevisionsController < ApplicationController
 
   def restore
     old = @article.revisions.find(params[:id])
+    @article.tag_names = @article.tags.pluck(:name) # 現在のタグを引き継ぐ
     ArticleRevisionCreator.call(article: @article, body: old.body, author: Current.user,
-                                edit_summary: "リビジョン##{old.id} を復元",
-                                tag_names: @article.tags.pluck(:name))
+                                edit_summary: "リビジョン##{old.id} を復元")
     ActivityRecorder.record(actor: Current.user, action: "article.edited", subject: @article)
     redirect_to @article
   end

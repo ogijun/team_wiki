@@ -5,48 +5,38 @@
 module ArticleSaver
   module_function
 
-  # action: "created" | "edited"
   def call(article:, params:, author:, action:)
-    assign_attributes(article, params)
+    # Article 実体の属性のみ代入（body/edit_summary は Revision 側＝RevisionCreator へ渡す）。
+    article.assign_attributes(
+      title: params[:title],
+      tag_names: params[:tag_names],
+      kind: params[:kind].presence,
+      status: params[:status].presence || article.status || "stub",
+      start_year: params[:start_year],
+      start_month: params[:start_month],
+      start_day: params[:start_day],
+      start_hour: params[:start_hour],
+      start_minute: params[:start_minute],
+      end_year: params[:end_year],
+      end_month: params[:end_month],
+      end_day: params[:end_day],
+      end_hour: params[:end_hour],
+      end_minute: params[:end_minute]
+    )
+
     if params[:body].blank?
       article.errors.add(:body, "を入力してください")
       return false
     end
+
     Article.transaction do
       article.save!
       ArticleRevisionCreator.call(article: article, body: params[:body], author: author,
-                                  tag_names: split_tags(params[:tag_names]), edit_summary: params[:edit_summary])
+                                  edit_summary: params[:edit_summary])
     end
     ActivityRecorder.record(actor: author, action: "article.#{action}", subject: article)
     true
   rescue ActiveRecord::RecordInvalid
     false
-  end
-
-  def assign_attributes(article, params)
-    article.title = params[:title]
-    article.kind = params[:kind].presence
-    article.status = params[:status].presence || article.status || "stub"
-    assign_fuzzy_dates(article, params)
-  end
-
-  def assign_fuzzy_dates(article, params)
-    starts = FuzzyDate.from_parts(
-      year: params[:start_year], month: params[:start_month],
-      day: params[:start_day], hour: params[:start_hour], minute: params[:start_minute]
-    )
-    ends = FuzzyDate.from_parts(
-      year: params[:end_year], month: params[:end_month],
-      day: params[:end_day], hour: params[:end_hour], minute: params[:end_minute]
-    )
-    article.starts_at = starts&.at
-    article.starts_precision = starts&.precision
-    article.ends_at = ends&.at
-    article.ends_precision = ends&.precision
-  end
-
-  # 区切り分割のみ。strip/reject/uniq は ArticleRevisionCreator.sync_tags が行う。
-  def split_tags(str)
-    str.to_s.split(/[,、]/)
   end
 end

@@ -1,12 +1,13 @@
 class Article < ApplicationRecord
+  include FuzzyDateAttributable
+  include Taggable
+
   KINDS = { "work" => "作品", "person" => "人物", "event" => "出来事" }.freeze
   STATUSES = { "stub" => "スタブ", "writing" => "執筆中", "done" => "完成" }.freeze
 
   belongs_to :created_by, class_name: "User"
   belongs_to :current_revision, class_name: "Revision", optional: true
   has_many :revisions, dependent: :destroy
-  has_many :taggings, as: :taggable, dependent: :destroy
-  has_many :tags, through: :taggings
   has_many :outgoing_links, class_name: "Link", foreign_key: :source_article_id, dependent: :destroy
   has_many :inbound_links, class_name: "Link", foreign_key: :target_article_id, dependent: :nullify
   has_many :materials, dependent: :nullify
@@ -18,20 +19,17 @@ class Article < ApplicationRecord
   validates :kind, inclusion: { in: KINDS.keys }, allow_nil: true
   validates :status, inclusion: { in: STATUSES.keys }
 
+  fuzzy_date_attribute :starts_at, accessor: :start
+  fuzzy_date_attribute :ends_at, accessor: :end
+
   before_validation :assign_slug, on: :create
 
   scope :chronicled, -> { where.not(starts_at: nil).order(:starts_at) }
 
   validates :starts_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
   validates :ends_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
-  validate :date_columns_consistent
 
-  # フォーム入力用の仮想アクセサ（ArticlesController が FuzzyDate に変換して保存）
-  attr_accessor :start_year, :start_month, :start_day, :start_hour, :start_minute,
-                :end_year, :end_month, :end_day, :end_hour, :end_minute
-
-  def starts = FuzzyDate.wrap(starts_at, starts_precision)
-  def ends = FuzzyDate.wrap(ends_at, ends_precision)
+  validate :date_range_consistent
 
   def to_param = slug
 
@@ -47,9 +45,7 @@ class Article < ApplicationRecord
 
   private
 
-  def date_columns_consistent
-    errors.add(:starts_precision, "が必要です") if starts_at.present? ^ starts_precision.present?
-    errors.add(:ends_precision, "が必要です") if ends_at.present? ^ ends_precision.present?
+  def date_range_consistent
     errors.add(:starts_at, "が必要です") if ends_at.present? && starts_at.blank?
     if starts_at.present? && ends_at.present? && ends_at < starts_at
       errors.add(:ends_at, "は開始以降にしてください")
