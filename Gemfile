@@ -36,9 +36,7 @@ gem "solid_cable"
 gem "bootsnap", require: false
 
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
-# Pinned to match another-app (co-hosted on the same VPS) so we share the same
-# kamal-proxy version and never need to reboot the proxy out from under it.
-gem "kamal", "2.10.1", require: false
+gem "kamal", require: false
 
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
