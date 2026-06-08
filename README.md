@@ -21,7 +21,7 @@ Discord サーバーのメンバー（特定ロール保持者）だけがログ
 
 ## 技術スタック
 
-- Ruby 4.0.1（`mise` 管理） / Rails 8.1
+- Ruby 4.0.5（`mise` 管理） / Rails 8.1
 - SQLite + Propshaft + importmap-rails
 - Hotwire（Turbo / Stimulus）、Markdown は commonmarker、ページングは pagy
 - 認証: Discord OAuth（omniauth-discord） — 特定サーバー所属＋ロールでゲート
@@ -32,7 +32,7 @@ Discord サーバーのメンバー（特定ロール保持者）だけがログ
 ## セットアップ（開発）
 
 ```bash
-mise install                 # Ruby 4.0.1
+mise install                 # Ruby 4.0.5
 bundle install
 bin/rails db:prepare         # スキーマ作成
 cp .env.example .env         # 環境変数を用意（下記）
