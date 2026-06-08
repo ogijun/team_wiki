@@ -65,7 +65,15 @@ macOS で `.test` の名前解決が効かない場合は `/etc/hosts` に `127.
 
 ## デプロイ
 
-Kamal でコンテナデプロイする。シークレットは `.kamal/secrets`（1Password 等から取得）経由で注入。
+Kamal でコンテナデプロイする。デプロイ設定はインスタンス固有のため `config/deploy.yml` は
+gitignore してあり、テンプレートの `config/deploy.sample.yml` をコピーして自分の値（ホスト名・
+サーバ・レジストリ等）を埋める。
+
+```bash
+cp config/deploy.sample.yml config/deploy.yml   # 自分の値に編集
+```
+
+シークレットは `.kamal/secrets`（1Password 等から取得）経由で注入。
 
 - **secret**（`.kamal/secrets`）: `RAILS_MASTER_KEY`、Discord 各種（`DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` / `DISCORD_GUILD_ID` / `DISCORD_REQUIRED_ROLE_ID` / `DISCORD_ADMIN_ROLE_ID`）
 - **clear**（`config/deploy.yml`）: `APP_BASE_URL` など
