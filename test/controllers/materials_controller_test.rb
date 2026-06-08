@@ -201,4 +201,18 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     patch material_url(m), params: { material: { url: "https://x.test/a2", confidence: "confirmed" } }
     assert_equal "confirmed", m.reload.confidence
   end
+
+  test "media material shows a transcription section" do
+    m = Material.new(user: @user, title: "音声")
+    m.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
+    m.save!
+    get material_url(m)
+    assert_select "a[href=?]", edit_material_transcription_path(m)
+  end
+
+  test "non-media material has no transcription section" do
+    link = Material.create!(user: @user, title: "外部", url: "https://example.com/x")
+    get material_url(link)
+    assert_select "a[href=?]", edit_material_transcription_path(link), count: 0
+  end
 end

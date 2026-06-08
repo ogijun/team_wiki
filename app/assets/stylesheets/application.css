@@ -291,3 +291,4 @@ form.button_to { display: inline; }
 .dashboard-card h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
 .dashboard-card ul { margin: 0; padding-left: 1.1rem; }
 .dashboard-card li { margin-bottom: 0.35rem; }
+.transcription-body { white-space: pre-wrap; }
