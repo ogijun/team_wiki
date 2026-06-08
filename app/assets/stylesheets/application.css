@@ -299,9 +299,28 @@ form.button_to { display: inline; }
 .dashboard-card h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
 .dashboard-card ul { margin: 0; padding-left: 1.1rem; }
 .dashboard-card li { margin-bottom: 0.35rem; }
-.transcription-body { white-space: pre-wrap; }
+/* ── 汎用レイアウト語彙 ───────────────────────────
+   画面ごとに専用クラスを足さず、各画面はこの汎用クラスを
+   組み合わせて使う。新しい見た目が要るときは、画面固有名では
+   なく「再利用できる一般ルール」としてここに足す。 */
 
-.preview-placeholder {
-  margin: 1rem 0; padding: 2rem 1rem; text-align: center;
-  border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem;
-}
+/* 改行を保持して表示（トランスクリプト本文など） */
+.prewrap { white-space: pre-wrap; }
+
+/* 行リスト: メイン(.row__main)を左に伸ばし、末尾に meta・アクションを並べる。ヘアライン区切り。 */
+.rows { list-style: none; padding: 0; margin: 0; }
+.row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.2rem; border-bottom: 1px solid var(--hairline); }
+.row__main { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 補足メタ（アバター＋名前＋日時など）: ミュート小・横並び */
+.meta { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.meta img { border-radius: 50%; vertical-align: middle; }
+
+/* 件数・ラベルの小チップ */
+.pill { font-size: 0.75rem; color: var(--ink-soft); background: var(--accent-weak); border-radius: 999px; padding: 0.05rem 0.55rem; }
+
+/* 見出し＋付随要素（件数バッジ等） */
+.section-head { display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; margin: 0 0 0.5rem; }
+
+/* 「未実装/予定」を示す破線プレースホルダー */
+.placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
