@@ -6,8 +6,8 @@ updates:
     interval: weekly
   open-pull-requests-limit: 10
   ignore:
-    # kamal は同居の別アプリと共有 kamal-proxy のバージョンを合わせるため 2.10.x に固定。
-    # 上げるときは両アプリ同時＋proxy reboot を計画する（自動 bump させない）。
+    # kamal は同じホストに同居する別アプリと kamal-proxy を共有しているため、
+    # proxy のバージョン整合が要る。自動 bump させず、proxy 更新と歩調を合わせて手動で上げる。
     - dependency-name: "kamal"
     # メジャー昇格は移行作業が要るので自動 bump しない（minor/patch は受ける）。後日まとめて対応。
     - dependency-name: "pagy"

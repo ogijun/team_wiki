@@ -36,3 +36,7 @@
 
 # Instance-specific Kamal deploy config; commit config/deploy.sample.yml instead.
 /config/deploy.yml
+
+# Instance-specific Kamal secrets (password-manager fetch commands, not raw creds);
+# commit .kamal/secrets.sample instead.
+/.kamal/secrets
