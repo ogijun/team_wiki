@@ -5,6 +5,10 @@ updates:
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
+  ignore:
+    # kamal は同居の別アプリと共有 kamal-proxy のバージョンを合わせるため 2.10.x に固定。
+    # 上げるときは両アプリ同時＋proxy reboot を計画する（自動 bump させない）。
+    - dependency-name: "kamal"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
