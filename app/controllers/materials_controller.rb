@@ -24,7 +24,7 @@ class MaterialsController < ApplicationController
         per = [25, 50, 100].include?(params[:per].to_i) ? params[:per].to_i : 25
         @pagy, @materials = pagy(scope, limit: per)
       end
-      format.json { render json: scope.map { |m| { slug: m.slug, title: m.display_title, thumb_url: material_thumb_url(m) } } }
+      format.json { render json: scope.map { |m| { slug: m.slug, title: m.title, thumb_url: material_thumb_url(m) } } }
     end
   end
 
@@ -38,6 +38,7 @@ class MaterialsController < ApplicationController
   def create
     @material = Material.new(material_params.merge(user: Current.user))
     assign_published(@material)
+    autofill_title(@material)
     Material.transaction do
       @material.save!
       sync_tags(@material, params.dig(:material, :tag_names))
@@ -64,7 +65,7 @@ class MaterialsController < ApplicationController
   end
 
   def destroy
-    label = @material.display_title
+    label = @material.title
     @material.destroy
     ActivityRecorder.record(actor: Current.user, action: "material.deleted", subject_label: label)
     redirect_to materials_url
@@ -104,5 +105,13 @@ class MaterialsController < ApplicationController
   def sync_tags(material, str)
     names = str.to_s.split(/[,、]/).map(&:strip).reject(&:empty?).uniq
     material.tags = names.map { |name| Tag.find_or_create_by!(name: name) }
+  end
+
+  # title 未記入の URL 資料に、より良い title を入れる（YouTube は oEmbed、その他は og:title）。
+  # 取得できなければ何もしない＝モデルの ensure_title が url/ファイル名で必ず埋める。ファイルも同様。
+  def autofill_title(material)
+    return if material.title.present? || material.file.attached? || material.url.blank?
+
+    material.title = YoutubeOembed.title(material.url) || OgTitleFetcher.call(material.url)
   end
 end

@@ -38,7 +38,9 @@ class Material < ApplicationRecord
   attr_accessor :tag_names, :published_year, :published_month, :published_day
 
   before_validation :assign_slug, on: :create
+  before_validation :ensure_title, on: :create
   validates :slug, presence: true, uniqueness: true
+  validates :title, presence: true
 
   def file? = file.attached?
   def link? = url.present?
@@ -69,12 +71,6 @@ class Material < ApplicationRecord
 
   def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)
 
-  def display_title
-    return title if title.present?
-    return file.filename.to_s if file.attached?
-    url
-  end
-
   def confidence_label = CONFIDENCE_LEVELS[confidence]
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
 
@@ -87,6 +83,18 @@ class Material < ApplicationRecord
 
   def assign_slug
     self.slug ||= Slug.unique_token { |c| Material.exists?(slug: c) }
+  end
+
+  # 作成時、title 未記入なら url かファイル名（拡張子抜き）で必ず埋める（HTTP は行わない）。
+  # コントローラはこれより先に oEmbed/og:title でより良い title を入れるので、ここは最終保険。
+  def ensure_title
+    return if title.present?
+    self.title = url.presence || attached_basename
+  end
+
+  def attached_basename
+    return unless file.attached?
+    file.filename.base.presence || file.filename.to_s
   end
 
   def exactly_one_source

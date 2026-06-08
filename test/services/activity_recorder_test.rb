@@ -22,7 +22,7 @@ class ActivityRecorderTest < ActiveSupport::TestCase
     assert_equal "導出", Activity.order(:id).last.subject_label
   end
 
-  test "derives label from display_title then name" do
+  test "derives label from subject title then name" do
     material = Material.create!(user: @user, url: "https://example.com/x", title: "資料X")
     ActivityRecorder.record(actor: @user, action: "material.added", subject: material)
     assert_equal "資料X", Activity.order(:id).last.subject_label

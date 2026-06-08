@@ -52,7 +52,7 @@
       <h2>資料</h2>
       <ul>
         <% materials.each do |m| %>
-          <li><%= media_icon(m) %> <%= link_to m.display_title, material_path(m) %></li>
+          <li><%= media_icon(m) %> <%= link_to m.title, material_path(m) %></li>
         <% end %>
       </ul>
     </section>

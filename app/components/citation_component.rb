@@ -8,7 +8,7 @@ class CitationComponent < ViewComponent::Base
   def call
     segments = []
     segments << "#{lead}. " if lead.present?
-    segments << helpers.link_to(@material.display_title, @material)
+    segments << helpers.link_to(@material.title, @material)
     safe_join(segments)
   end
 

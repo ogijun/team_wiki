@@ -32,7 +32,7 @@
     <% @materials.each do |m| %>
       <tr>
         <td><%= render MaterialThumbComponent.new(material: m) %></td>
-        <td><%= link_to m.display_title, material_path(m) %><% if m.article %> <%= link_to "📚", m.article, title: m.article.title %><% end %></td>
+        <td><%= link_to m.title, material_path(m) %><% if m.article %> <%= link_to "📚", m.article, title: m.article.title %><% end %></td>
         <td><%= link_to display_name(m.user), m.user %></td>
         <td><%= m.created_at.to_fs(:jp) %></td>
         <td><% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></td>

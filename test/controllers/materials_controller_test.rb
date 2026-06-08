@@ -14,6 +14,15 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     { material: { url: "https://youtu.be/dQw4w9WgXcQ", title: "動画", tag_names: "ruby, rails" }.merge(extra) }
   end
 
+  # minitest 6 に Object#stub が無いので、モジュールメソッドを一時的に差し替える。
+  def stub_singleton(mod, method_name, value)
+    original = mod.method(method_name)
+    mod.define_singleton_method(method_name) { |*| value }
+    yield
+  ensure
+    mod.define_singleton_method(method_name, original)
+  end
+
   test "index requires login" do
     delete session_url
     get materials_url
@@ -73,6 +82,43 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "https://youtu.be/dQw4w9WgXcQ", m.url
     assert_equal %w[rails ruby], m.tags.pluck(:name).sort
     assert_redirected_to material_url(m)
+  end
+
+  test "create autofills title from filename (sans extension) when blank" do
+    file = fixture_file_upload("example-photo.png", "image/png")
+    assert_difference("Material.count", 1) do
+      post materials_url, params: { material: { file: file } }
+    end
+    assert_equal "example-photo", Material.order(:id).last.title
+  end
+
+  test "create autofills title from og title for a (non-youtube) url when blank" do
+    stub_singleton(OgTitleFetcher, :call, "取得したページ題名") do
+      post materials_url, params: { material: { url: "https://example.com/page" } }
+    end
+    assert_equal "取得したページ題名", Material.order(:id).last.title
+  end
+
+  test "create autofills title from YouTube oEmbed for a youtube url when blank" do
+    stub_singleton(YoutubeOembed, :title, "動画タイトル") do
+      post materials_url, params: { material: { url: "https://www.youtube.com/watch?v=oxCt6HYg4bo" } }
+    end
+    assert_equal "動画タイトル", Material.order(:id).last.title
+  end
+
+  test "create falls back to the url as title when no title can be fetched" do
+    stub_singleton(YoutubeOembed, :title, nil) do
+      stub_singleton(OgTitleFetcher, :call, nil) do
+        post materials_url, params: { material: { url: "https://example.com/no-title" } }
+      end
+    end
+    assert_equal "https://example.com/no-title", Material.order(:id).last.title
+  end
+
+  test "create keeps a given title (autofill does not run, no fetch)" do
+    # title があれば autofill は早期 return＝OgTitleFetcher は呼ばれない（外部取得なし）。
+    post materials_url, params: { material: { url: "https://example.com/page", title: "手入力" } }
+    assert_equal "手入力", Material.order(:id).last.title
   end
 
   test "create with neither file nor url re-renders" do
