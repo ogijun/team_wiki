@@ -27,16 +27,19 @@ class ArticleRevisionCreatorTest < ActiveSupport::TestCase
     assert_nil broken.target_article_id
   end
 
-  test "syncs tags from names" do
+  test "syncs tags from names (via Taggable on save)" do
     article = create_article("Tagged")
-    ArticleRevisionCreator.call(article: article, body: "x", author: @user, tag_names: ["ruby", "rails"])
+    article.tag_names = "ruby, rails"
+    ArticleRevisionCreator.call(article: article, body: "x", author: @user)
     assert_equal %w[rails ruby], article.reload.tags.pluck(:name).sort
   end
 
   test "removes tags no longer present on next save" do
     article = create_article("Retag")
-    ArticleRevisionCreator.call(article: article, body: "x", author: @user, tag_names: ["a", "b"])
-    ArticleRevisionCreator.call(article: article, body: "x", author: @user, tag_names: ["a"])
+    article.tag_names = "a, b"
+    ArticleRevisionCreator.call(article: article, body: "x", author: @user)
+    article.tag_names = "a"
+    ArticleRevisionCreator.call(article: article, body: "x", author: @user)
     assert_equal ["a"], article.reload.tags.pluck(:name)
   end
 

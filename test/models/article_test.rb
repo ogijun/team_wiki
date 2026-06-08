@@ -9,6 +9,20 @@ class ArticleTest < ActiveSupport::TestCase
     assert_nil a.kind
   end
 
+  test "clearing all date parts removes the fuzzy date" do
+    a = Article.create!(title: "日付クリア", created_by: @user, start_year: 1998)
+    assert a.starts.present?
+    a.update!(start_year: "", start_month: "", start_day: "", start_hour: "", start_minute: "")
+    assert_nil a.reload.starts_at
+    assert_nil a.starts_precision
+  end
+
+  test "a save that does not touch date parts keeps the stored date" do
+    a = Article.create!(title: "日付保持", created_by: @user, start_year: 1998)
+    Article.find(a.id).update!(status: "done") # 仮想アクセサ未代入(=nil)の save
+    assert a.reload.starts.present?
+  end
+
   test "contributors are distinct revision authors in first-appearance order" do
     bob = User.create!(email_address: "bob@example.com", password: "password123", name: "Bob")
     article = Article.create!(title: "共同編集", created_by: @user)

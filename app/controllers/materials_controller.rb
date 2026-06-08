@@ -37,31 +37,24 @@ class MaterialsController < ApplicationController
 
   def create
     @material = Material.new(material_params.merge(user: Current.user))
-    assign_published(@material)
     autofill_title(@material)
-    Material.transaction do
-      @material.save!
-      sync_tags(@material, params.dig(:material, :tag_names))
+    if @material.save
+      ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
+      redirect_to @material
+    else
+      render :new, status: :unprocessable_entity
     end
-    ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
-    redirect_to @material
-  rescue ActiveRecord::RecordInvalid
-    render :new, status: :unprocessable_entity
   end
 
   def edit
   end
 
   def update
-    @material.assign_attributes(material_params)
-    assign_published(@material)
-    Material.transaction do
-      @material.save!
-      sync_tags(@material, params.dig(:material, :tag_names))
+    if @material.update(material_params)
+      redirect_to @material
+    else
+      render :edit, status: :unprocessable_entity
     end
-    redirect_to @material
-  rescue ActiveRecord::RecordInvalid
-    render :edit, status: :unprocessable_entity
   end
 
   def destroy
@@ -84,27 +77,12 @@ class MaterialsController < ApplicationController
 
   def material_params
     permitted = [:title, :description, :article_id, :memo,
-                 :source, :author, :rights,
+                 :source, :author, :rights, :tag_names,
                  :published_year, :published_month, :published_day]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。
     permitted += [:file, :url] unless @material&.persisted?
     permitted << :confidence if Current.user&.admin?
     params.require(:material).permit(*permitted)
-  end
-
-  # material は assign 済みなので、再 permit せず仮想アクセサから純粋に組み立てる。
-  def assign_published(material)
-    fd = FuzzyDate.from_parts(
-      year: material.published_year, month: material.published_month,
-      day: material.published_day, hour: nil, minute: nil
-    )
-    material.published_at = fd&.at
-    material.published_precision = fd&.precision
-  end
-
-  def sync_tags(material, str)
-    names = str.to_s.split(/[,、]/).map(&:strip).reject(&:empty?).uniq
-    material.tags = names.map { |name| Tag.find_or_create_by!(name: name) }
   end
 
   # title 未記入の URL 資料に、より良い title を入れる（YouTube は oEmbed、その他は og:title）。

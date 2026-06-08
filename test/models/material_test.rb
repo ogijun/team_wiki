@@ -16,6 +16,17 @@ class MaterialTest < ActiveSupport::TestCase
     assert_nil m.rights
   end
 
+  test "tag_names: clears all tags on '', preserves tags when not assigned (nil)" do
+    m = Material.create!(user: @user, url: "https://x.test/a", title: "t", tag_names: "ruby, rails")
+    assert_equal %w[rails ruby], m.tags.pluck(:name).sort
+
+    Material.find(m.id).update!(title: "kept") # tag_names 未代入(nil) -> 既存タグ維持
+    assert_equal %w[rails ruby], m.reload.tags.pluck(:name).sort
+
+    m.update!(tag_names: "") # 明示的な空 -> 全クリア
+    assert_empty m.reload.tags
+  end
+
   test "file-type material is valid" do
     m = attach_png(Material.new(user: @user, title: "図"))
     assert m.valid?, m.errors.full_messages.join(", ")

@@ -1,10 +1,11 @@
 class Material < ApplicationRecord
+  include FuzzyDateAttributable
+  include Taggable
+
   belongs_to :user
   belongs_to :article, optional: true
   has_one_attached :file
   has_one :transcription, dependent: :destroy
-  has_many :taggings, as: :taggable, dependent: :destroy
-  has_many :tags, through: :taggings
 
   ALLOWED_CONTENT_TYPES = %w[
     application/pdf
@@ -25,8 +26,10 @@ class Material < ApplicationRecord
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
+
+  fuzzy_date_attribute :published_at
+
   validates :published_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
-  validate :published_columns_consistent
   validates :url, format: { with: %r{\Ahttps?://},
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
@@ -35,8 +38,6 @@ class Material < ApplicationRecord
   normalizes :rights, with: ->(v) { v.presence }
   validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
 
-  attr_accessor :tag_names, :published_year, :published_month, :published_day
-
   before_validation :assign_slug, on: :create
   before_validation :ensure_title, on: :create
   validates :slug, presence: true, uniqueness: true
@@ -44,7 +45,6 @@ class Material < ApplicationRecord
 
   def file? = file.attached?
   def link? = url.present?
-  def published = FuzzyDate.wrap(published_at, published_precision)
 
   def thumbnailable_file?
     file.attached? && THUMBNAIL_TYPES.include?(file.content_type)
@@ -75,11 +75,6 @@ class Material < ApplicationRecord
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
 
   private
-
-  def published_columns_consistent
-    return unless published_at.present? ^ published_precision.present?
-    errors.add(:published_precision, "が必要です")
-  end
 
   def assign_slug
     self.slug ||= Slug.unique_token { |c| Material.exists?(slug: c) }

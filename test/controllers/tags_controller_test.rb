@@ -5,7 +5,8 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     @user = User.create!(email_address: "tg@example.com", name: "TG", provider: "discord", uid: "tag-user")
     sign_in_as(@user)
     @article = Article.create!(title: "Tagged", created_by: @user)
-    ArticleRevisionCreator.call(article: @article, body: "x", author: @user, tag_names: ["ruby"])
+    @article.tag_names = "ruby"
+    ArticleRevisionCreator.call(article: @article, body: "x", author: @user)
     @tag = Tag.find_by(name: "ruby")
   end
 
