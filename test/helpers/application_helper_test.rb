@@ -27,6 +27,21 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_nil fuzzy_part(nil, :year)
   end
 
+  test "article_meta joins status, kind, date and comment count" do
+    user = User.create!(email_address: "am@example.com", name: "AM", provider: "discord", uid: "am")
+    a = Article.create!(title: "メタ記事", created_by: user, kind: "work", status: "stub")
+    assert_equal "スタブ・作品 / #{a.updated_at.to_date.to_fs(:jp)}", article_meta(a)
+
+    a.comments.create!(body: "x", author: user)
+    assert_includes article_meta(a), "・💬1"
+  end
+
+  test "article_meta omits kind when unset" do
+    user = User.create!(email_address: "am2@example.com", name: "AM2", provider: "discord", uid: "am2")
+    a = Article.create!(title: "種別なし", created_by: user, status: "writing")
+    assert_equal "執筆中 / #{a.updated_at.to_date.to_fs(:jp)}", article_meta(a)
+  end
+
   test "brand_name falls back to default when setting blank" do
     SiteSetting.instance.update!(brand_name: nil)
     assert_equal "Team Wiki", brand_name

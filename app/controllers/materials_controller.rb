@@ -72,7 +72,7 @@ class MaterialsController < ApplicationController
   def save_material_with_stub(material)
     Material.transaction do
       material.save!
-      add_first_comment(material)
+      add_first_comment(material, params[:first_comment])
       StubArticleForMaterial.call(material: material, author: Current.user)
     end
     true

@@ -23,4 +23,12 @@ class UsersHelperTest < ActionView::TestCase
                      avatar_url: "https://cdn.discordapp.com/avatars/1/abc.png")
     assert_includes avatar_tag(u), "https://cdn.discordapp.com/avatars/1/abc.png"
   end
+
+  test "avatar_link wraps the avatar in a profile link with a name tooltip" do
+    u = User.create!(name: "花子", email_address: "hk@example.com", provider: "discord", uid: "hk")
+    html = avatar_link(u, size: 24)
+    assert_match %r{<a [^>]*title="花子"}, html
+    assert_includes html, %(href="#{user_path(u)}")
+    assert_includes html, "avatar"
+  end
 end

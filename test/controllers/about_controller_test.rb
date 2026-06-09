@@ -19,6 +19,14 @@ class AboutControllerTest < ActionDispatch::IntegrationTest
     assert_select "strong", text: "本文"
   end
 
+  test "renders wiki links in the about markdown" do
+    Article.create!(title: "リンク先", created_by: @user)
+    SiteSetting.instance.update!(about: "詳しくは [[リンク先]] を参照")
+    sign_in_as(@user)
+    get about_url
+    assert_select "a.wikilink", text: "リンク先"
+  end
+
   test "shows an empty state when about is blank" do
     sign_in_as(@user)
     get about_url

@@ -21,4 +21,9 @@ module UsersHelper
                   style: "width:#{size}px;height:#{size}px;line-height:#{size}px;background:#{avatar_color(user)};")
     end
   end
+
+  # アバターをユーザのプロフィールへのリンクにし、ツールチップに表示名を出す（一覧・コメント等で共用）。
+  def avatar_link(user, size: 40)
+    link_to avatar_tag(user, size: size), user, title: display_name(user)
+  end
 end

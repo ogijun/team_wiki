@@ -10,7 +10,7 @@
   <% if contributors.any? %>
     <section class="contributors">
       <% contributors.each do |u| %>
-        <%= link_to avatar_tag(u, size: 24), u, title: display_name(u) %>
+        <%= avatar_link(u, size: 24) %>
       <% end %>
     </section>
   <% end %>
