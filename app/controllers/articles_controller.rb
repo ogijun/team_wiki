@@ -9,9 +9,8 @@ class ArticlesController < ApplicationController
 
   def show
     body = @article.current_revision&.body.to_s
-    links = WikiLinkResolver.resolve_all(WikiLinkExtractor.call(body))
     @renderer = MarkdownRenderer.new(
-      link_resolver: ->(title) { links[title] || WikiLinkResolver.call(title) },
+      link_resolver: WikiLinkResolver.resolver_for(body),
       ref_resolver: ->(handle) { Material.find_by(slug: handle) }
     )
     @rendered = @renderer.render(body)
@@ -25,7 +24,7 @@ class ArticlesController < ApplicationController
   def create
     @article = Article.new(created_by: Current.user)
     if ArticleSaver.call(article: @article, params: article_params, author: Current.user, action: "created")
-      add_first_comment(@article)
+      add_first_comment(@article, params[:first_comment])
       redirect_to @article
     else
       render :new, status: :unprocessable_entity

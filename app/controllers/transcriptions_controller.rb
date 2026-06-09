@@ -1,5 +1,6 @@
 class TranscriptionsController < ApplicationController
   before_action :set_material, only: %i[edit update]
+  before_action :set_transcription, only: %i[edit update]
 
   def index
     materials = Material.includes(file_attachment: :blob, transcription: :author).select(&:transcribable?)
@@ -7,11 +8,9 @@ class TranscriptionsController < ApplicationController
   end
 
   def edit
-    @transcription = @material.transcription || @material.build_transcription
   end
 
   def update
-    @transcription = @material.transcription || @material.build_transcription
     @transcription.assign_attributes(transcription_params)
     @transcription.author = Current.user
     if @transcription.save
@@ -26,6 +25,10 @@ class TranscriptionsController < ApplicationController
   def set_material
     @material = Material.find(params[:material_id])
     redirect_to @material, alert: "この資料は文字起こし対象ではありません。" unless @material.transcribable?
+  end
+
+  def set_transcription
+    @transcription = @material.transcription || @material.build_transcription
   end
 
   def transcription_params

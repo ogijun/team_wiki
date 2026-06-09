@@ -13,6 +13,14 @@ module WikiLinkResolver
     end
   end
 
+  # 本文から [[リンク]] を抽出し、MarkdownRenderer に渡せる link_resolver(callable) を返す。
+  # 本文内タイトルは resolve_all で1クエリ解決し、想定外のタイトルは単発 call にフォールバック。
+  # 「抽出→一括解決→フォールバック」の二段戦略を呼び出し側から隠す。
+  def resolver_for(body)
+    links = resolve_all(WikiLinkExtractor.call(body))
+    ->(title) { links[title] || call(title) }
+  end
+
   # 複数タイトルを1クエリで解決し、title => { href:, exists: } の Hash を返す。
   # MarkdownRenderer の link_resolver に「本文から抽出した全タイトル」分を前もって渡し、
   # [[リンク]] ごとの find_by（N+1）を避ける。

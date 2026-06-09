@@ -7,7 +7,7 @@
       <% comments.each do |c| %>
         <li class="comment">
           <div class="comment__head">
-            <%= link_to avatar_tag(c.author, size: 24), c.author, title: display_name(c.author) %>
+            <%= avatar_link(c.author, size: 24) %>
             <%= link_to display_name(c.author), c.author, class: "comment__author" %>
             <span class="muted"><%= local_time_ago(c.created_at) %></span>
             <% if c.deletable_by?(Current.user) %>

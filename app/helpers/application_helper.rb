@@ -16,9 +16,8 @@ module ApplicationHelper
   def render_site_markdown(text)
     return if text.blank?
 
-    links = WikiLinkResolver.resolve_all(WikiLinkExtractor.call(text))
     MarkdownRenderer.new(
-      link_resolver: ->(title) { links[title] || WikiLinkResolver.call(title) },
+      link_resolver: WikiLinkResolver.resolver_for(text),
       ref_resolver: ->(handle) { Material.find_by(slug: handle) }
     ).render(text)
   end
@@ -26,6 +25,13 @@ module ApplicationHelper
   # ── フォームの必須/任意バッジ（ラベル横に置く）──
   def required_badge = tag.span("必須", class: "field-badge field-badge--req")
   def optional_badge = tag.span("任意", class: "field-badge field-badge--opt")
+
+  # 記事一覧の小さなメタ行（状態・種別 / 更新日 ・💬件数）を組み立てる。
+  def article_meta(article)
+    kind = "・#{article.kind_label}" if article.kind
+    comments = " ・💬#{article.comments_count}" if article.comments_count.positive?
+    "#{article.status_label}#{kind} / #{article.updated_at.to_date.to_fs(:jp)}#{comments}"
+  end
 
   # ── ブランド表示 ──
   def site_setting

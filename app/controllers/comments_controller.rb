@@ -28,8 +28,10 @@ class CommentsController < ApplicationController
     @commentable =
       if params[:article_id]
         Article.find_by!(slug: params[:article_id])
-      else
+      elsif params[:material_id]
         Material.find(params[:material_id])
+      else
+        raise ActionController::RoutingError, "commentable not specified"
       end
   end
 end

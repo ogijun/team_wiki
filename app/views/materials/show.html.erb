@@ -29,17 +29,16 @@
 <% end %>
 
 <% if @material.transcribable? %>
+  <% t = @material.transcription %>
   <section class="transcription">
     <h2>文字起こし
-      <% if @material.transcription %>
-        <%= render BadgeComponent.new(text: @material.transcription.status_label, variant: :status) %>
-      <% end %>
+      <% if t %><%= render BadgeComponent.new(text: t.status_label, variant: :status) %><% end %>
     </h2>
-    <% if @material.transcription %>
-      <% if @material.transcription.creation_summary %>
-        <p class="meta">作成: <%= @material.transcription.creation_summary %></p>
+    <% if t %>
+      <% if t.creation_summary %>
+        <p class="meta">作成: <%= t.creation_summary %></p>
       <% end %>
-      <div class="prewrap"><%= @material.transcription.body %></div>
+      <div class="prewrap"><%= t.body %></div>
       <p><%= link_to "編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
     <% else %>
       <p class="muted">まだ文字起こしがありません。</p>
