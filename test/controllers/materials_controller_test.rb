@@ -59,6 +59,26 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /未着手/
   end
 
+  test "index shows uploader as an avatar link with a name tooltip, plus 投稿日時 and 発行日 columns" do
+    m = Material.create!(user: @user, url: "https://example.com/p", title: "資料P",
+                         published_year: 2020, published_month: 3)
+    get materials_url
+    assert_response :success
+    assert_select "a.sort-link", text: /By/
+    assert_select "a.sort-link", text: /投稿日時/
+    assert_select "a.sort-link", text: /発行日/
+    # アップローダー欄は名前テキストではなくアイコン＋title 属性（tooltip）
+    assert_select "table tbody a[title=?]", @user.name
+    assert_select "table tbody a", text: @user.name, count: 0
+    # 発行日が一覧に出る（FuzzyDate label）
+    assert_select "td", text: /2020年3月/
+  end
+
+  test "timestamps display in JST" do
+    m = Material.create!(user: @user, url: "https://example.com/tz", title: "TZ")
+    assert_equal "+09:00", m.created_at.formatted_offset
+  end
+
   test "material detail shows the preview placeholder" do
     m = Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
     get material_url(m)

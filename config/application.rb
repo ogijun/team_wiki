@@ -21,7 +21,8 @@ module TeamWiki
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # 表示は日本時間に。保存は UTC のまま（active_record.default_timezone の既定）。
+    config.time_zone = "Tokyo"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

@@ -7,11 +7,12 @@ class MaterialsController < ApplicationController
     "name"       => "materials.title",
     "type"       => "(materials.url IS NULL)", # 種別＝リンク/ファイルでグルーピング（URL文字列順ではない）
     "uploader"   => "users.name",
-    "created_at" => "materials.created_at"
+    "created_at" => "materials.created_at",
+    "published"  => "materials.published_at"
   }.freeze
 
   def index
-    scope = Material.includes(:user, :tags, :transcription).with_attached_file
+    scope = Material.includes(:tags, :transcription, user: { avatar_attachment: :blob }).with_attached_file
     scope = scope.joins(:tags).where(tags: { slug: params[:tag] }) if params[:tag].present?
 
     sort_key = SORTS.key?(params[:sort]) ? params[:sort] : "created_at"

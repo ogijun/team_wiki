@@ -22,8 +22,9 @@
     <tr>
       <th><%= sortable("type", "種別") %></th>
       <th><%= sortable("name", "タイトル") %></th>
-      <th><%= sortable("uploader", "アップローダー") %></th>
-      <th><%= sortable("created_at", "作成日時") %></th>
+      <th><%= sortable("uploader", "By") %></th>
+      <th><%= sortable("created_at", "投稿日時") %></th>
+      <th><%= sortable("published", "発行日") %></th>
       <th>タグ</th>
       <th>トランスクリプト</th>
     </tr>
@@ -33,8 +34,9 @@
       <tr>
         <td><%= render MaterialThumbComponent.new(material: m) %></td>
         <td><%= link_to m.title, material_path(m) %></td>
-        <td><%= link_to display_name(m.user), m.user %></td>
+        <td><%= link_to avatar_tag(m.user, size: 24), m.user, title: display_name(m.user) %></td>
         <td><%= m.created_at.to_fs(:jp) %></td>
+        <td><% if m.published %><%= m.published.label %><% else %><span class="muted">—</span><% end %></td>
         <td><% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></td>
         <td>
           <% if (st = transcription_status_label(m)) %>
