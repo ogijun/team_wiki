@@ -14,10 +14,11 @@ module ActivitiesHelper
   def activity_phrase(activity)
     prefix, suffix = PHRASES.fetch(activity.action, [ "", "が操作しました" ])
     label = activity.subject_label
-    if label.present?
-      "#{prefix}「#{label}」#{suffix}"
-    else
-      "#{prefix}#{suffix}"
-    end
+    return "#{prefix}#{suffix}" if label.blank?
+
+    # 対象が存命ならタイトル自体をリンクに（末尾に同じタイトルを再掲しないため）。
+    # 削除済み（subject が無い）ならプレーンテキスト。
+    shown = activity.subject ? link_to(label, activity.subject) : label
+    safe_join([ prefix, "「", shown, "」", suffix ])
   end
 end
