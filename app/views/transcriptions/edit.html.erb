@@ -13,6 +13,22 @@
     <%= f.select :status, Transcription::STATUSES.map { |slug, label| [label, slug] } %>
   </div>
   <div class="field">
+    <%= f.label :creation_method, "作成方法" %>
+    <%= f.select :creation_method,
+                 Transcription::CREATION_METHODS.map { |slug, label| [label, slug] },
+                 include_blank: "（未記録）" %>
+  </div>
+  <div class="field">
+    <%= f.label :ai_service, "AIサービス" %>
+    <small class="field__hint">AI（またはAI＋人手修正）で作成した場合に記入。例: OpenAI、Google</small>
+    <%= f.text_field :ai_service, placeholder: "例: OpenAI" %>
+  </div>
+  <div class="field">
+    <%= f.label :ai_model, "AIモデル" %>
+    <small class="field__hint">使ったモデル名がわかれば。例: whisper-large-v3</small>
+    <%= f.text_field :ai_model, placeholder: "例: whisper-large-v3" %>
+  </div>
+  <div class="field">
     <%= f.label :body, "本文" %>
     <small class="field__hint">改行はそのまま保持されます。長尺は「p.3」「0:12:34」などの見出しを本文内に書いてください。</small>
     <%= f.text_area :body, rows: 18 %>
