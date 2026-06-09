@@ -5,9 +5,7 @@
   <%= button_tag "引用タグをコピー", type: "button", class: "secondary outline btn-sm", data: { action: "clipboard#copy" } %>
 </p>
 <small class="muted">この <code>[[ref:…]]</code> を記事本文に貼ると、この資料を出典として脚注に表示できます。</small>
-<p class="muted">by <%= display_name(@material.user) %> / <%= @material.created_at.to_fs(:jp) %>
-  <% if @material.article %> — <%= link_to "📚#{@material.article.title}", @material.article %><% end %>
-</p>
+<p class="muted">by <%= display_name(@material.user) %> / <%= @material.created_at.to_fs(:jp) %></p>
 <p class="badges">
   <%= render BadgeComponent.new(text: @material.confidence_label, variant: :status) %>
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
@@ -74,6 +72,18 @@
 <% tags = @material.tags.to_a %>
 <% if tags.any? %>
   <p>タグ: <% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
+<% end %>
+
+<% citing = @material.citing_articles.order(:title).to_a %>
+<% if citing.any? %>
+  <section class="citing-articles">
+    <h2>この資料を引用している記事</h2>
+    <ul>
+      <% citing.each do |a| %>
+        <li><%= link_to a.title, a %></li>
+      <% end %>
+    </ul>
+  </section>
 <% end %>
 
 <div class="danger-zone">

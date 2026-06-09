@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_09_103809) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_09_145532) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -73,6 +73,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_103809) do
     t.index ["title"], name: "index_articles_on_title", unique: true
   end
 
+  create_table "citations", force: :cascade do |t|
+    t.integer "article_id", null: false
+    t.datetime "created_at", null: false
+    t.string "material_handle", null: false
+    t.integer "material_id"
+    t.datetime "updated_at", null: false
+    t.index ["article_id", "material_handle"], name: "index_citations_on_article_id_and_material_handle", unique: true
+    t.index ["article_id"], name: "index_citations_on_article_id"
+    t.index ["material_id"], name: "index_citations_on_material_id"
+  end
+
   create_table "links", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "source_article_id", null: false
@@ -86,7 +97,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_103809) do
   end
 
   create_table "materials", force: :cascade do |t|
-    t.integer "article_id"
     t.string "author"
     t.string "confidence", default: "unconfirmed", null: false
     t.datetime "created_at", null: false
@@ -101,7 +111,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_103809) do
     t.datetime "updated_at", null: false
     t.string "url"
     t.integer "user_id", null: false
-    t.index ["article_id"], name: "index_materials_on_article_id"
     t.index ["confidence"], name: "index_materials_on_confidence"
     t.index ["rights"], name: "index_materials_on_rights"
     t.index ["slug"], name: "index_materials_on_slug", unique: true
@@ -195,8 +204,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_103809) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activities", "users"
   add_foreign_key "articles", "users", column: "created_by_id"
+  add_foreign_key "citations", "articles"
+  add_foreign_key "citations", "materials"
   add_foreign_key "links", "articles", column: "source_article_id"
-  add_foreign_key "materials", "articles"
   add_foreign_key "materials", "users"
   add_foreign_key "revisions", "articles"
   add_foreign_key "revisions", "users", column: "author_id"

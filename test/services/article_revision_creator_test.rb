@@ -43,6 +43,35 @@ class ArticleRevisionCreatorTest < ActiveSupport::TestCase
     assert_equal [ "a" ], article.reload.tags.pluck(:name)
   end
 
+  test "rebuilds citations resolving material handles" do
+    material = Material.create!(user: @user, url: "https://example.com/s", title: "出典")
+    article = create_article("Cit")
+    ArticleRevisionCreator.call(article: article, body: "主張[[ref:#{material.slug}]] と [[ref:nope404]]", author: @user)
+
+    cites = article.reload.citations
+    resolved = cites.find { |c| c.material_handle == material.slug }
+    broken = cites.find { |c| c.material_handle == "nope404" }
+    assert_equal material.id, resolved.material_id
+    assert_nil broken.material_id
+  end
+
+  test "material knows which articles cite it (many-to-many)" do
+    material = Material.create!(user: @user, url: "https://example.com/s2", title: "出典2")
+    a1 = create_article("A1")
+    a2 = create_article("A2")
+    ArticleRevisionCreator.call(article: a1, body: "[[ref:#{material.slug}]]", author: @user)
+    ArticleRevisionCreator.call(article: a2, body: "[[ref:#{material.slug}]]", author: @user)
+    assert_equal %w[A1 A2], material.reload.citing_articles.order(:title).pluck(:title)
+  end
+
+  test "removes citations no longer present on next save" do
+    material = Material.create!(user: @user, url: "https://example.com/s3", title: "出典3")
+    article = create_article("C2")
+    ArticleRevisionCreator.call(article: article, body: "[[ref:#{material.slug}]]", author: @user)
+    ArticleRevisionCreator.call(article: article, body: "参照なし", author: @user)
+    assert_equal 0, article.reload.citations.count
+  end
+
   test "backfills inbound broken links when target article is created" do
     src = create_article("Linker")
     ArticleRevisionCreator.call(article: src, body: "[[あとで作る]]", author: @user)

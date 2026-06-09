@@ -46,18 +46,6 @@
       </ul>
     </section>
   <% end %>
-  <% materials = @article.materials.order(created_at: :desc).to_a %>
-  <% if materials.any? %>
-    <section class="materials">
-      <h2>資料</h2>
-      <ul>
-        <% materials.each do |m| %>
-          <li><%= media_icon(m) %> <%= link_to m.title, material_path(m) %></li>
-        <% end %>
-      </ul>
-    </section>
-  <% end %>
-
   <div class="danger-zone">
     <span class="danger-zone__label">危険な操作</span>
     <%= button_to "削除", @article, method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "削除しますか?" } %>

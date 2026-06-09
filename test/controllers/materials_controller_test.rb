@@ -91,6 +91,17 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to material_url(m)
   end
 
+  test "creating a material auto-creates a stub article that cites it" do
+    assert_difference("Article.count", 1) do
+      post materials_url, params: link_params(title: "新資料Z")
+    end
+    material = Material.find_by!(title: "新資料Z")
+    stub = material.citing_articles.first
+    assert_equal "stub", stub.status
+    assert_equal "新資料Z", stub.title
+    assert_includes stub.current_revision.body, "[[ref:#{material.slug}]]"
+  end
+
   test "create autofills title from filename (sans extension) when blank" do
     file = fixture_file_upload("example-photo.png", "image/png")
     assert_difference("Material.count", 1) do
@@ -135,13 +146,6 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "new prefills article_id from query" do
-    article = Article.create!(title: "PP", created_by: @user)
-    get new_material_url(article_id: article.id)
-    assert_response :success
-    assert_select "input[name=?][value=?]", "material[article_id]", article.id.to_s
-  end
-
   test "destroy removes material" do
     m = Material.create!(user: @user, url: "https://example.com/a")
     assert_difference("Material.count", -1) do
@@ -164,13 +168,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "資料Z", Activity.where(action: "material.deleted").order(:id).last.subject_label
   end
 
-  test "article show lists its associated materials" do
-    article = Article.create!(title: "Docs", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
-    Material.create!(user: @user, url: "https://example.com/d", title: "資料A", article: article)
-    get article_url(article)
+  test "material page lists articles that cite it" do
+    m = Material.create!(user: @user, url: "https://example.com/d", title: "出典資料")
+    article = Article.create!(title: "引用する記事", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "本文[[ref:#{m.slug}]]", author: @user)
+    get material_url(m)
     assert_response :success
-    assert_select "a", text: "資料A"
+    assert_select "a", text: "引用する記事"
   end
 
   test "index paginates with per param" do

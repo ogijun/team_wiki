@@ -61,11 +61,15 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal article.slug, article.to_param
   end
 
-  test "destroying an article nullifies its materials" do
+  test "destroying an article removes its citations but keeps the cited material" do
     article = Article.create!(title: "NullifyMe", created_by: @user)
-    m = Material.create!(user: @user, url: "https://example.com/x", article: article)
+    m = Material.create!(user: @user, url: "https://example.com/x", title: "被引用資料")
+    ArticleRevisionCreator.call(article: article, body: "[[ref:#{m.slug}]]", author: @user)
+    assert_equal 1, m.reload.citing_articles.count
+
     article.destroy
-    assert_nil m.reload.article_id
+    assert Material.exists?(m.id)
+    assert_equal 0, Citation.where(material_id: m.id).count
   end
 
   test "starts reader wraps stored columns into FuzzyDate" do
