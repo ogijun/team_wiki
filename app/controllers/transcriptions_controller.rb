@@ -15,7 +15,7 @@ class TranscriptionsController < ApplicationController
     @transcription.assign_attributes(transcription_params)
     @transcription.author = Current.user
     if @transcription.save
-      redirect_to @material, notice: "トランスクリプトを保存しました。"
+      redirect_to @material, notice: "文字起こしを保存しました。"
     else
       render :edit, status: :unprocessable_entity
     end
@@ -25,7 +25,7 @@ class TranscriptionsController < ApplicationController
 
   def set_material
     @material = Material.find(params[:material_id])
-    redirect_to @material, alert: "この資料はトランスクリプト対象ではありません。" unless @material.transcribable?
+    redirect_to @material, alert: "この資料は文字起こし対象ではありません。" unless @material.transcribable?
   end
 
   def transcription_params
