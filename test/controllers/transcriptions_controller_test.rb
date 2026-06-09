@@ -19,6 +19,29 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "drafting", t.status
   end
 
+  test "records AI creation method with service and model" do
+    patch material_transcription_url(@media), params: { transcription: {
+      body: "AIで起こした", status: "drafting",
+      creation_method: "ai", ai_service: "OpenAI", ai_model: "whisper-large-v3"
+    } }
+    assert_redirected_to material_url(@media)
+    t = @media.reload.transcription
+    assert_equal "ai", t.creation_method
+    assert_equal "OpenAI", t.ai_service
+    assert_equal "whisper-large-v3", t.ai_model
+  end
+
+  test "manual creation method clears AI service and model" do
+    patch material_transcription_url(@media), params: { transcription: {
+      body: "手書き", status: "drafting",
+      creation_method: "manual", ai_service: "OpenAI", ai_model: "whisper"
+    } }
+    t = @media.reload.transcription
+    assert_equal "manual", t.creation_method
+    assert_nil t.ai_service
+    assert_nil t.ai_model
+  end
+
   test "updates existing transcription and records last author" do
     Transcription.create!(material: @media, author: @user, body: "v1", status: "drafting")
     other = User.create!(email_address: "o@example.com", name: "O", provider: "discord", uid: "o-user")

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_062949) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_09_103809) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -157,9 +157,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_062949) do
   end
 
   create_table "transcriptions", force: :cascade do |t|
+    t.string "ai_model"
+    t.string "ai_service"
     t.integer "author_id", null: false
     t.text "body"
     t.datetime "created_at", null: false
+    t.string "creation_method"
     t.integer "material_id", null: false
     t.string "status", default: "drafting", null: false
     t.datetime "updated_at", null: false

@@ -29,6 +29,6 @@ class TranscriptionsController < ApplicationController
   end
 
   def transcription_params
-    params.require(:transcription).permit(:body, :status)
+    params.require(:transcription).permit(:body, :status, :creation_method, :ai_service, :ai_model)
   end
 end

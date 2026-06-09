@@ -45,6 +45,9 @@
       <% end %>
     </h2>
     <% if @material.transcription %>
+      <% if @material.transcription.creation_summary %>
+        <p class="meta">作成: <%= @material.transcription.creation_summary %></p>
+      <% end %>
       <div class="prewrap"><%= @material.transcription.body %></div>
       <p><%= link_to "編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
     <% else %>
