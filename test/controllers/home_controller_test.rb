@@ -22,4 +22,13 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".dashboard-stats"
     assert_select "a", text: /ダッシュ記事/
   end
+
+  test "renders relative timestamps as auto-updating local-time elements" do
+    article = Article.create!(title: "時刻記事", created_by: @user, status: "stub")
+    ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
+    get root_url
+    assert_response :success
+    # 最近更新された記事 と 最近の動き の両方に time-ago 要素が出る
+    assert_select "time[data-local=?]", "time-ago", minimum: 2
+  end
 end
