@@ -17,7 +17,7 @@
         <% @recent_articles.each do |article| %>
           <li>
             <%= link_to article.title, article %>
-            <small><%= article.updated_at.to_date.to_fs(:jp) %></small>
+            <small><%= local_time_ago(article.updated_at) %></small>
           </li>
         <% end %>
       </ul>

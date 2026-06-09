@@ -5,7 +5,7 @@
       <% if a.subject && a.subject_label.present? %>
         （<%= link_to a.subject_label, a.subject %>）
       <% end %>
-      <span class="muted"><%= a.created_at.to_fs(:jp) %></span>
+      <span class="muted"><%= local_time_ago(a.created_at) %></span>
     </li>
   <% end %>
 </ul>
