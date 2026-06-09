@@ -3,9 +3,10 @@ class Material < ApplicationRecord
   include Taggable
 
   belongs_to :user
-  belongs_to :article, optional: true
   has_one_attached :file
   has_one :transcription, dependent: :destroy
+  has_many :citations, dependent: :nullify
+  has_many :citing_articles, -> { distinct }, through: :citations, source: :article
 
   ALLOWED_CONTENT_TYPES = %w[
     application/pdf

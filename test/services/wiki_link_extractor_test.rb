@@ -21,4 +21,8 @@ class WikiLinkExtractorTest < ActiveSupport::TestCase
   test "returns empty for no links" do
     assert_equal [], WikiLinkExtractor.call("リンクなし")
   end
+
+  test "ignores citation refs so they are not treated as wiki links" do
+    assert_equal [ "記事" ], WikiLinkExtractor.call("[[記事]] と [[ref:abc123]]")
+  end
 end

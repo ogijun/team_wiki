@@ -11,7 +11,7 @@ class MaterialsController < ApplicationController
   }.freeze
 
   def index
-    scope = Material.includes(:user, :article, :tags, :transcription).with_attached_file
+    scope = Material.includes(:user, :tags, :transcription).with_attached_file
     scope = scope.joins(:tags).where(tags: { slug: params[:tag] }) if params[:tag].present?
 
     sort_key = SORTS.key?(params[:sort]) ? params[:sort] : "created_at"
@@ -32,13 +32,13 @@ class MaterialsController < ApplicationController
   end
 
   def new
-    @material = Material.new(article_id: params[:article_id])
+    @material = Material.new
   end
 
   def create
     @material = Material.new(material_params.merge(user: Current.user))
     autofill_title(@material)
-    if @material.save
+    if save_material_with_stub(@material)
       ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
       redirect_to @material
     else
@@ -66,6 +66,18 @@ class MaterialsController < ApplicationController
 
   private
 
+  # 資料保存と、その資料を引用するスタブ記事の自動生成を1トランザクションで行う。
+  # 資料が無効なら save! が RecordInvalid を投げ、ロールバックして new を再描画する。
+  def save_material_with_stub(material)
+    Material.transaction do
+      material.save!
+      StubArticleForMaterial.call(material: material, author: Current.user)
+    end
+    true
+  rescue ActiveRecord::RecordInvalid
+    false
+  end
+
   def set_material
     @material = Material.find(params[:id])
   end
@@ -76,7 +88,7 @@ class MaterialsController < ApplicationController
   end
 
   def material_params
-    permitted = [ :title, :description, :article_id, :memo,
+    permitted = [ :title, :description, :memo,
                  :source, :author, :rights, :tag_names,
                  :published_year, :published_month, :published_day ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。

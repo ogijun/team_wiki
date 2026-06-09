@@ -10,7 +10,8 @@ class Article < ApplicationRecord
   has_many :revisions, dependent: :destroy
   has_many :outgoing_links, class_name: "Link", foreign_key: :source_article_id, dependent: :destroy
   has_many :inbound_links, class_name: "Link", foreign_key: :target_article_id, dependent: :nullify
-  has_many :materials, dependent: :nullify
+  has_many :citations, dependent: :destroy
+  has_many :cited_materials, -> { distinct }, through: :citations, source: :material
 
   validates :title, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true

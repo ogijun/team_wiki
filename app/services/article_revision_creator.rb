@@ -6,8 +6,20 @@ module ArticleRevisionCreator
       revision = article.revisions.create!(body: body, author: author, edit_summary: edit_summary)
       article.update!(current_revision: revision)
       sync_links(article, body)
+      sync_citations(article, body)
       backfill_inbound_links(article)
       revision
+    end
+  end
+
+  # 本文の [[ref:handle]] を citations に張り直す（Link と同じ方式）。
+  # handle(=資料slug) を解決し、未解決なら material_id=null で残す。
+  def sync_citations(article, body)
+    handles = RefExtractor.call(body)
+    article.citations.destroy_all
+    by_slug = Material.where(slug: handles).index_by(&:slug)
+    handles.each do |handle|
+      article.citations.create!(material_handle: handle, material: by_slug[handle])
     end
   end
 
