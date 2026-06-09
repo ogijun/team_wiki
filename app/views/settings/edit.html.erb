@@ -5,12 +5,12 @@
   <%= render "shared/error_messages", record: @setting %>
 
   <div class="field">
-    <%= f.label :brand_name, "ブランド名（ロゴ未設定時に表示）" %>
+    <%= f.label :brand_name, "ブランド名（ロゴ未設定時に表示）" %><%= optional_badge %>
     <%= f.text_field :brand_name, placeholder: "Team Wiki" %>
   </div>
 
   <div class="field">
-    <%= f.label :logo, "ロゴ画像（任意・あれば名称より優先）" %>
+    <%= f.label :logo, "ロゴ画像（あれば名称より優先）" %><%= optional_badge %>
     <small class="field__hint">サイドバーに高さ28pxで表示されます。横長のロゴ向け。背景透過のPNG/WebP・高さ56px程度（横幅は自由）が目安です。</small>
     <% if @setting.logo.attached? %>
       <%= image_tag @setting.logo, class: "brand-logo" %>
@@ -20,7 +20,7 @@
   </div>
 
   <div class="field">
-    <%= f.label :icon, "アプリアイコン（正方形・任意）" %>
+    <%= f.label :icon, "アプリアイコン（正方形）" %><%= optional_badge %>
     <small class="field__hint">favicon とスマホのホーム追加アイコンに使われます。正方形の画像を1枚どうぞ。</small>
     <% if @setting.icon.attached? %>
       <div class="media-preview"><%= image_tag @setting.icon.variant(resize_to_fill: [48, 48]) %></div>
@@ -30,13 +30,13 @@
   </div>
 
   <div class="field">
-    <%= f.label :about, "このサイトについて（Markdown）" %>
+    <%= f.label :about, "このサイトについて（Markdown）" %><%= optional_badge %>
     <small class="field__hint"><%= link_to "公開ページ", about_path %>に表示されます。記法は記事と同じ Markdown（<code>[[記事名]]</code> や <code>[ref:資料]</code> も使えます）。</small>
     <%= f.text_area :about, rows: 12, placeholder: "このウィキの目的、使い方、編集ルールなどを書いてください。" %>
   </div>
 
   <div class="field">
-    <%= f.label :footer, "共通フッタ（Markdown）" %>
+    <%= f.label :footer, "共通フッタ（Markdown）" %><%= optional_badge %>
     <small class="field__hint">全ページの最下部に表示されます。著作権表示や「困ったら Discord へ」などの常設案内に。</small>
     <%= f.text_area :footer, rows: 4, placeholder: "© 2026 〇〇 — 困ったら [Discord](https://discord.gg/...) へ" %>
   </div>

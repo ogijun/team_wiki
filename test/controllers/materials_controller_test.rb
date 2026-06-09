@@ -29,6 +29,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
+  test "new form marks required and optional fields with badges" do
+    get new_material_url
+    assert_response :success
+    assert_select ".field-badge--req", minimum: 1
+    assert_select ".field-badge--opt", minimum: 1
+  end
+
   test "index renders when logged in with a material" do
     Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
     get materials_url

@@ -247,6 +247,10 @@ body { padding-left: var(--sidebar-width); }
 .field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
 .field__hint code { font-size: 0.85em; }
 .field__check { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0; font-weight: 400; }
+/* Required / optional markers on form labels and fieldset legends */
+.field-badge { display: inline-block; margin-left: 0.4rem; padding: 0.05rem 0.4rem; border-radius: 999px; font-size: 0.68rem; font-weight: 600; line-height: 1.5; vertical-align: middle; letter-spacing: 0.02em; }
+.field-badge--req { color: var(--danger); background: var(--danger-weak); }
+.field-badge--opt { color: var(--muted); background: var(--code-bg); }
 .media-preview { margin: 0.1rem 0 0.6rem; }
 
 /* Compact, inline per-page selector */

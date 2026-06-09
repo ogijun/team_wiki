@@ -23,6 +23,10 @@ module ApplicationHelper
     ).render(text)
   end
 
+  # ── フォームの必須/任意バッジ（ラベル横に置く）──
+  def required_badge = tag.span("必須", class: "field-badge field-badge--req")
+  def optional_badge = tag.span("任意", class: "field-badge field-badge--opt")
+
   # ── ブランド表示 ──
   def site_setting
     @site_setting ||= SiteSetting.instance
