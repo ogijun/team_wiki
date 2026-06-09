@@ -28,13 +28,6 @@
   <p><%= simple_format @material.description %></p>
 <% end %>
 
-<% if @material.memo.present? %>
-  <section class="memo">
-    <h2>メモ</h2>
-    <%= simple_format @material.memo %>
-  </section>
-<% end %>
-
 <% if @material.transcribable? %>
   <section class="transcription">
     <h2>文字起こし
@@ -85,6 +78,8 @@
     </ul>
   </section>
 <% end %>
+
+<%= render "comments/comments", commentable: @material %>
 
 <div class="danger-zone">
   <span class="danger-zone__label">危険な操作</span>

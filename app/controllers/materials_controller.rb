@@ -72,6 +72,7 @@ class MaterialsController < ApplicationController
   def save_material_with_stub(material)
     Material.transaction do
       material.save!
+      add_first_comment(material)
       StubArticleForMaterial.call(material: material, author: Current.user)
     end
     true
@@ -89,7 +90,7 @@ class MaterialsController < ApplicationController
   end
 
   def material_params
-    permitted = [ :title, :description, :memo,
+    permitted = [ :title, :description,
                  :source, :author, :rights, :tag_names,
                  :published_year, :published_month, :published_day ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。

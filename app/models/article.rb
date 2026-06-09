@@ -12,6 +12,7 @@ class Article < ApplicationRecord
   has_many :inbound_links, class_name: "Link", foreign_key: :target_article_id, dependent: :nullify
   has_many :citations, dependent: :destroy
   has_many :cited_materials, -> { distinct }, through: :citations, source: :material
+  has_many :comments, as: :commentable, dependent: :destroy
 
   validates :title, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true

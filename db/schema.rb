@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_09_145532) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_09_162232) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -53,6 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_145532) do
   end
 
   create_table "articles", force: :cascade do |t|
+    t.integer "comments_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
     t.integer "current_revision_id"
@@ -84,6 +85,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_145532) do
     t.index ["material_id"], name: "index_citations_on_material_id"
   end
 
+  create_table "comments", force: :cascade do |t|
+    t.integer "author_id", null: false
+    t.text "body", null: false
+    t.integer "commentable_id", null: false
+    t.string "commentable_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_comments_on_author_id"
+    t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable"
+  end
+
   create_table "links", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "source_article_id", null: false
@@ -98,10 +110,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_145532) do
 
   create_table "materials", force: :cascade do |t|
     t.string "author"
+    t.integer "comments_count", default: 0, null: false
     t.string "confidence", default: "unconfirmed", null: false
     t.datetime "created_at", null: false
     t.text "description"
-    t.text "memo"
     t.datetime "published_at"
     t.string "published_precision"
     t.string "rights"
@@ -206,6 +218,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_145532) do
   add_foreign_key "articles", "users", column: "created_by_id"
   add_foreign_key "citations", "articles"
   add_foreign_key "citations", "materials"
+  add_foreign_key "comments", "users", column: "author_id"
   add_foreign_key "links", "articles", column: "source_article_id"
   add_foreign_key "materials", "users"
   add_foreign_key "revisions", "articles"

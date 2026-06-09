@@ -25,6 +25,7 @@ class ArticlesController < ApplicationController
   def create
     @article = Article.new(created_by: Current.user)
     if ArticleSaver.call(article: @article, params: article_params, author: Current.user, action: "created")
+      add_first_comment(@article)
       redirect_to @article
     else
       render :new, status: :unprocessable_entity

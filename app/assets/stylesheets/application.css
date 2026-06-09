@@ -252,6 +252,15 @@ body { padding-left: var(--sidebar-width); }
 .field-badge--req { color: var(--danger); background: var(--danger-weak); }
 .field-badge--opt { color: var(--muted); background: var(--code-bg); }
 .media-preview { margin: 0.1rem 0 0.6rem; }
+/* Comments (articles / materials) */
+.comments { margin-top: 2rem; }
+.comment-list { list-style: none; padding: 0; margin: 0 0 1.2rem; }
+.comment { padding: 0.6rem 0; border-top: 1px solid var(--hairline); }
+.comment__head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.comment__author { font-weight: 600; }
+.comment__body { margin-top: 0.3rem; }
+.comment__delete-form { margin: 0 0 0 auto; }
+.comment-form textarea { width: 100%; }
 
 /* Compact, inline per-page selector */
 .per-form { margin: 0 0 1rem; }
