@@ -54,7 +54,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     media.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
     media.save!
     get materials_url
-    assert_select "th", text: "トランスクリプト"
+    assert_select "th", text: "文字起こし"
     assert_select "th", text: "引用", count: 0
     assert_select "td", text: /未着手/
   end
