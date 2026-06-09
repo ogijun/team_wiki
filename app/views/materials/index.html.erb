@@ -33,7 +33,7 @@
     <% @materials.each do |m| %>
       <tr>
         <td><%= render MaterialThumbComponent.new(material: m) %></td>
-        <td><%= link_to m.title, material_path(m) %></td>
+        <td><%= link_to m.title, material_path(m) %><% if m.comments_count > 0 %> <span class="muted">💬<%= m.comments_count %></span><% end %></td>
         <td><%= link_to avatar_tag(m.user, size: 24), m.user, title: display_name(m.user) %></td>
         <td><%= m.created_at.to_fs(:jp) %></td>
         <td><% if m.published %><%= m.published.label %><% else %><span class="muted">—</span><% end %></td>

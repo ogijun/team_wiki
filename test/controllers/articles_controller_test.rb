@@ -205,4 +205,19 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "作品A"
     assert_select "a", text: "人物B", count: 0
   end
+
+  test "first_comment on create becomes the article's first comment" do
+    assert_difference "Comment.count", 1 do
+      post articles_url, params: { article: { title: "初コメ記事", body: "本文" }, first_comment: "最初の方針メモ" }
+    end
+    article = Article.find_by!(title: "初コメ記事")
+    assert_equal "最初の方針メモ", article.comments.first.body
+  end
+
+  test "index shows the comment count when present" do
+    article = Article.create!(title: "コメント付き記事", created_by: @user)
+    article.comments.create!(body: "x", author: @user)
+    get articles_url
+    assert_select "li", text: /💬1/
+  end
 end

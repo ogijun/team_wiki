@@ -111,6 +111,24 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to material_url(m)
   end
 
+  test "first_comment on create becomes the material's first comment with no separate activity" do
+    assert_difference "Comment.count", 1 do
+      assert_no_difference "Activity.where(action: 'comment.posted').count" do
+        post materials_url, params: link_params(title: "初コメ資料").merge(first_comment: "最初のメモ")
+      end
+    end
+    m = Material.find_by!(title: "初コメ資料")
+    assert_equal "最初のメモ", m.comments.first.body
+    assert_equal 1, m.comments_count
+  end
+
+  test "index shows the comment count when present" do
+    m = Material.create!(user: @user, url: "https://example.com/cc", title: "コメント資料CC")
+    m.comments.create!(body: "x", author: @user)
+    get materials_url
+    assert_select "td", text: /💬1/
+  end
+
   test "creating a material auto-creates a stub article that cites it" do
     assert_difference("Article.count", 1) do
       post materials_url, params: link_params(title: "新資料Z")
@@ -250,12 +268,11 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   test "create persists bibliographic fields and year-only published date" do
     post materials_url, params: { material: {
       url: "https://x.test/a", source: "サンプル誌", author: "サンプル著者",
-      memo: "自由メモ", published_year: "1998", published_month: "", published_day: ""
+      published_year: "1998", published_month: "", published_day: ""
     } }
     m = Material.order(:created_at).last
     assert_equal "サンプル誌", m.source
     assert_equal "サンプル著者", m.author
-    assert_equal "自由メモ", m.memo
     assert_equal "year", m.published_precision
     assert_equal 1998, m.published_at.year
   end

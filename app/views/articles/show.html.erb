@@ -46,6 +46,8 @@
       </ul>
     </section>
   <% end %>
+  <%= render "comments/comments", commentable: @article %>
+
   <div class="danger-zone">
     <span class="danger-zone__label">危険な操作</span>
     <%= button_to "削除", @article, method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "削除しますか?" } %>

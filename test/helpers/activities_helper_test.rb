@@ -15,6 +15,11 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_equal "が参加しました", activity_phrase(a)
   end
 
+  test "phrase for comment.posted references the subject label" do
+    a = Activity.new(user: @user, action: "comment.posted", subject_label: "対象")
+    assert_equal "が「対象」にコメントしました", activity_phrase(a)
+  end
+
   test "phrase for article.created with nil label omits label" do
     a = Activity.new(user: @user, action: "article.created", subject_label: nil)
     assert_equal "が記事を作成しました", activity_phrase(a)

@@ -52,5 +52,13 @@
     <%= f.text_area :edit_summary, rows: 2 %>
   </div>
 
+  <% if article.new_record? %>
+    <div class="field">
+      <%= label_tag :first_comment, "最初のコメント" %><%= optional_badge %>
+      <small class="field__hint">最初のコメントとして残ります（任意）。メモや方針など。あとから詳細画面で追記できます。</small>
+      <%= text_area_tag :first_comment, nil, rows: 2 %>
+    </div>
+  <% end %>
+
   <%= f.submit %>
 <% end %>

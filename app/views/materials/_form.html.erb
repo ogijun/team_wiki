@@ -58,11 +58,13 @@
     </div>
   </fieldset>
 
-  <div class="field">
-    <%= f.label :memo, "メモ（自由記述）" %><%= optional_badge %>
-    <small class="field__hint">使い方は自由。気づいたこと・補足など。</small>
-    <%= f.text_area :memo, rows: 3 %>
-  </div>
+  <% if material.new_record? %>
+    <div class="field">
+      <%= label_tag :first_comment, "最初のコメント" %><%= optional_badge %>
+      <small class="field__hint">最初のコメントとして残ります（任意）。気づいたこと・出典メモなど。あとから詳細画面で追記できます。</small>
+      <%= text_area_tag :first_comment, nil, rows: 3 %>
+    </div>
+  <% end %>
 
   <%= f.submit %>
 <% end %>

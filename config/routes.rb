@@ -6,7 +6,9 @@ Rails.application.routes.draw do
     resources :revisions, only: %i[index show] do
       post :restore, on: :member
     end
+    resources :comments, only: :create
   end
+  resources :comments, only: :destroy
   resources :tags, only: %i[index show create destroy]
   resources :activities, only: :index
   get "chronicle", to: "chronicle#index"
@@ -16,6 +18,7 @@ Rails.application.routes.draw do
   get "search", to: "search#index"
   resources :materials do
     resource :transcription, only: %i[edit update]
+    resources :comments, only: :create
   end
   get "transcriptions", to: "transcriptions#index"
   resources :uploads, only: :create
