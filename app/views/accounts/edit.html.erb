@@ -5,16 +5,16 @@
   <%= render "shared/error_messages", record: @user %>
 
   <div class="field">
-    <%= f.label :avatar, "アイコン画像" %>
+    <%= f.label :avatar, "アイコン画像" %><%= optional_badge %>
     <div class="media-preview"><%= avatar_tag(@user, size: 64) %></div>
     <%= f.file_field :avatar, accept: "image/*" %>
   </div>
   <div class="field">
-    <%= f.label :name, "表示名" %>
+    <%= f.label :name, "表示名" %><%= optional_badge %>
     <%= f.text_field :name %>
   </div>
   <div class="field">
-    <%= f.label :email_address, "メール" %>
+    <%= f.label :email_address, "メール" %><%= required_badge %>
     <%= f.email_field :email_address %>
   </div>
 

@@ -5,7 +5,7 @@
     <div class="admin-box">
       <span class="admin-box__label">管理者操作</span>
       <div class="field">
-        <%= f.label :confidence, "信頼度（出典検証の確定）" %>
+        <%= f.label :confidence, "信頼度（出典検証の確定）" %><%= optional_badge %>
         <small class="field__hint">原本そのものを確認できたら「原本確認済」、できていなければ「未確認」のままで。</small>
         <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
       </div>
@@ -15,15 +15,15 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :title, "タイトル" %>
+    <%= f.label :title, "タイトル" %><%= optional_badge %>
     <small class="field__hint">空のままなら、ファイル名や YouTube・ページのタイトルから自動で入ります。</small>
     <%= f.text_field :title %>
   </div>
-  <div class="field"><%= f.label :description, "説明（任意）" %><%= f.text_area :description %></div>
+  <div class="field"><%= f.label :description, "説明" %><%= optional_badge %><%= f.text_area :description %></div>
 
   <% if material.new_record? %>
     <fieldset>
-      <legend>ファイル または URL のどちらか一方（登録後は変更できません）</legend>
+      <legend>ファイル または URL のどちらか一方（登録後は変更できません）<%= required_badge %></legend>
       <div class="field"><%= f.label :file, "ファイル" %><%= f.file_field :file %></div>
       <div class="field"><%= f.label :url, "URL（YouTube等）" %><%= f.url_field :url, value: material.url %></div>
     </fieldset>
@@ -36,12 +36,12 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :tag_names, "タグ（カンマ区切り）" %>
+    <%= f.label :tag_names, "タグ（カンマ区切り）" %><%= optional_badge %>
     <%= f.text_field :tag_names, value: material.tags.map(&:name).join(", ") %>
   </div>
 
   <fieldset>
-    <legend>出典情報（任意・書けるところだけでOK）</legend>
+    <legend>出典情報（書けるところだけでOK）<%= optional_badge %></legend>
     <div class="field"><%= f.label :author, "著者・発言者" %><%= f.text_field :author %></div>
     <div class="field"><%= f.label :source, "出典元（掲載誌・書籍・サイト名）" %><%= f.text_field :source %></div>
     <div class="field">
@@ -59,7 +59,7 @@
   </fieldset>
 
   <div class="field">
-    <%= f.label :memo, "メモ（自由記述）" %>
+    <%= f.label :memo, "メモ（自由記述）" %><%= optional_badge %>
     <small class="field__hint">使い方は自由。気づいたこと・補足など。</small>
     <%= f.text_area :memo, rows: 3 %>
   </div>
