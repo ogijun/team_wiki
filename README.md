@@ -54,8 +54,8 @@ Discord ログインを実際に通すには `.env` に以下を設定する。
 |---|---|
 | `DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` | Discord アプリの OAuth2 認証情報 |
 | `DISCORD_GUILD_ID` | ログインを許可するサーバー（ギルド）ID |
-| `DISCORD_REQUIRED_ROLE_ID` | 必須ロール ID（このロール保持者のみ許可） |
-| `DISCORD_ADMIN_ROLE_ID` | admin ロール ID（任意。保持者を admin に昇格。未設定だと全員 editor） |
+| `DISCORD_REQUIRED_ROLE_ID` | 必須ロール ID（このロール保持者のみ許可）。カンマ区切りで複数指定可（いずれか1つでも保持していれば許可）例: `111,222` |
+| `DISCORD_ADMIN_ROLE_ID` | admin ロール ID（任意。保持者を admin に昇格。未設定だと全員 editor）。同じくカンマ区切りで複数可（いずれか該当で admin） |
 | `APP_BASE_URL` | redirect_uri を固定（例: `http://team-wiki.test`）。Discord 側に登録したコールバックと scheme/host を一致させる |
 
 > Discord 開発者ポータルのリダイレクト URI には `<APP_BASE_URL>/auth/discord/callback` をフルパスで登録する。

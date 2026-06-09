@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
       guild_id: Rails.configuration.x.discord.guild_id
     )
 
-    unless membership.member? && membership.role_ids.include?(Rails.configuration.x.discord.required_role_id.to_s)
+    unless membership.member? && membership.role_ids.intersect?(Rails.configuration.x.discord.required_role_ids)
       return redirect_to new_session_path, alert: "このサービスへのアクセス権がありません。"
     end
 
@@ -56,8 +56,8 @@ class SessionsController < ApplicationController
   end
 
   def role_for(membership)
-    admin_id = Rails.configuration.x.discord.admin_role_id
-    admin_id.present? && membership.role_ids.include?(admin_id.to_s) ? "admin" : "editor"
+    admin_ids = Rails.configuration.x.discord.admin_role_ids
+    admin_ids.present? && membership.role_ids.intersect?(admin_ids) ? "admin" : "editor"
   end
 
   def safe_avatar_url(url)

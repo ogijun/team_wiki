@@ -5,9 +5,12 @@ if Rails.env.production? && ENV["SECRET_KEY_BASE_DUMMY"].blank?
   raise "DISCORD_REQUIRED_ROLE_ID must be set" if ENV["DISCORD_REQUIRED_ROLE_ID"].blank?
 end
 
+# ロール ID はカンマ区切りで複数指定可（いずれか1つでも保持していれば該当）。
+parse_role_ids = ->(value) { value.to_s.split(",").map(&:strip).reject(&:blank?) }
+
 Rails.application.config.x.discord.guild_id = ENV.fetch("DISCORD_GUILD_ID", "test-guild")
-Rails.application.config.x.discord.required_role_id = ENV.fetch("DISCORD_REQUIRED_ROLE_ID", "test-role")
-Rails.application.config.x.discord.admin_role_id = ENV["DISCORD_ADMIN_ROLE_ID"]
+Rails.application.config.x.discord.required_role_ids = parse_role_ids.call(ENV.fetch("DISCORD_REQUIRED_ROLE_ID", "test-role"))
+Rails.application.config.x.discord.admin_role_ids = parse_role_ids.call(ENV["DISCORD_ADMIN_ROLE_ID"])
 
 # admin_role_id は任意（admin 不在のインスタンスもあり得る）ので raise しないが、
 # 本番で未設定だと全員 editor 扱いになり、既存 admin が次回ログインで降格する。
