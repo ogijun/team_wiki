@@ -16,6 +16,8 @@ gem "turbo-rails"
 gem "stimulus-rails"
 # Live, auto-updating relative timestamps ("2分前") [https://github.com/basecamp/local_time]
 gem "local_time"
+# Fetch wrapper with CSRF/Accept handled for Rails [https://github.com/rails/requestjs-rails]
+gem "requestjs-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 

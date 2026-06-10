@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { get, post } from "@rails/request.js"
 
 // toast-ui editor を textarea に重ねて初期化し、保存時に Markdown を textarea へ書き戻す。
 // ツールバーに「出典」ボタンを追加し、資料を選んで [[ref:slug]] を挿入できる。
@@ -50,14 +51,9 @@ export default class extends Controller {
   async upload(blob, callback) {
     const data = new FormData()
     data.append("file", blob)
-    const token = document.querySelector('meta[name="csrf-token"]').content
-    const res = await fetch("/uploads", {
-      method: "POST",
-      headers: { "X-CSRF-Token": token },
-      body: data
-    })
+    const res = await post("/uploads", { body: data })
     if (res.ok) {
-      const json = await res.json()
+      const json = await res.json
       callback(json.url, "uploaded")
     } else {
       alert("アップロードに失敗しました")
@@ -97,8 +93,8 @@ export default class extends Controller {
 
   async loadCitations() {
     try {
-      const res = await fetch("/materials.json", { headers: { Accept: "application/json" } })
-      this.citations = res.ok ? await res.json() : []
+      const res = await get("/materials.json", { responseKind: "json" })
+      this.citations = res.ok ? await res.json : []
     } catch {
       this.citations = []
     }
