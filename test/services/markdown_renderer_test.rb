@@ -85,4 +85,10 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     result = render_full("ただの本文")
     assert_empty result.references
   end
+
+  test "renders nil and non-UTF-8 input without raising" do
+    # nil.to_s は US-ASCII。Commonmarker は UTF-8 必須なので境界で変換される。
+    assert_equal "", render(nil).strip
+    assert_includes render("plain".encode(Encoding::US_ASCII)), "plain"
+  end
 end

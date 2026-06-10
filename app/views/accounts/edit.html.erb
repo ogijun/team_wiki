@@ -1,5 +1,4 @@
 <h1>アカウント設定</h1>
-<% if notice %><p class="notice"><%= notice %></p><% end %>
 
 <%= form_with model: @user, url: account_path, method: :patch, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: @user %>

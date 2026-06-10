@@ -81,6 +81,9 @@
     <div class="backdrop" data-action="click->sidebar#close"></div>
 
     <main>
+      <% flash.each do |type, message| %>
+        <div class="flash flash--<%= type %>"><%= message %></div>
+      <% end %>
       <%= yield %>
       <% if (footer = render_site_markdown(site_setting.footer)) %>
         <footer class="site-footer"><%= footer.html %></footer>
