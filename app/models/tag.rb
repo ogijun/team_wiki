@@ -2,6 +2,7 @@ class Tag < ApplicationRecord
   has_many :taggings, dependent: :destroy
   has_many :articles, through: :taggings, source: :taggable, source_type: "Article"
   has_many :materials, through: :taggings, source: :taggable, source_type: "Material"
+  has_many :activities, as: :subject, dependent: :nullify
 
   validates :name, presence: true, uniqueness: true
   validates :slug, presence: true, uniqueness: true

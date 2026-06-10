@@ -8,6 +8,7 @@ class Material < ApplicationRecord
   has_many :citations, dependent: :nullify
   has_many :citing_articles, -> { distinct }, through: :citations, source: :article
   has_many :comments, as: :commentable, dependent: :destroy
+  has_many :activities, as: :subject, dependent: :nullify
 
   ALLOWED_CONTENT_TYPES = %w[
     application/pdf

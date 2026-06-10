@@ -16,7 +16,7 @@ module ArticleRevisionCreator
   # handle(=資料slug) を解決し、未解決なら material_id=null で残す。
   def sync_citations(article, body)
     handles = RefExtractor.call(body)
-    article.citations.destroy_all
+    article.citations.delete_all # コールバック不要の張り直しなので一括 DELETE で十分
     by_slug = Material.where(slug: handles).index_by(&:slug)
     handles.each do |handle|
       article.citations.create!(material_handle: handle, material: by_slug[handle])
@@ -25,7 +25,7 @@ module ArticleRevisionCreator
 
   def sync_links(article, body)
     titles = WikiLinkExtractor.call(body)
-    article.outgoing_links.destroy_all
+    article.outgoing_links.delete_all # 同上
     by_title = Article.where(title: titles).index_by(&:title)
     titles.each do |title|
       article.outgoing_links.create!(target_title: title, target_article_id: by_title[title]&.id)

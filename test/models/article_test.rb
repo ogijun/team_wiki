@@ -72,6 +72,17 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal 0, Citation.where(material_id: m.id).count
   end
 
+  test "destroying an article nullifies activities that point at it" do
+    article = Article.create!(title: "活動対象", created_by: @user)
+    act = ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
+
+    article.destroy
+    act.reload
+    assert_nil act.subject_id
+    assert_nil act.subject
+    assert_equal "活動対象", act.subject_label # ラベルのスナップショットは残る
+  end
+
   test "starts reader wraps stored columns into FuzzyDate" do
     a = Article.create!(title: "年表記事", created_by: @user,
                         starts_at: Time.zone.local(1979, 1, 1), starts_precision: "year")
