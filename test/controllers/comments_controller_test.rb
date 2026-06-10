@@ -25,6 +25,12 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, @material.reload.comments_count
   end
 
+  test "flash notice is visible on the page after posting" do
+    post material_comments_url(@material), params: { comment: { body: "見えるか" } }
+    follow_redirect!
+    assert_select ".flash--notice", text: "コメントを投稿しました。"
+  end
+
   test "blank comment is rejected" do
     assert_no_difference "Comment.count" do
       post article_comments_url(@article), params: { comment: { body: "" } }
@@ -46,6 +52,9 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference "Comment.count" do
       delete comment_url(c)
     end
+    assert_redirected_to article_url(@article)
+    follow_redirect!
+    assert_select ".flash--alert", text: /権限がありません/
   end
 
   test "admin can delete any comment" do

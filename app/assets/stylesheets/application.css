@@ -247,6 +247,12 @@ body { padding-left: var(--sidebar-width); }
 .field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
 .field__hint code { font-size: 0.85em; }
 .field__check { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0; font-weight: 400; }
+/* Flash messages (rendered once in the layout) */
+.flash { margin: 0 0 1.1rem; padding: 0.55rem 0.9rem; border-radius: 6px; font-size: 0.9rem; }
+.flash--notice { background: var(--accent-weak); color: var(--accent-dark); }
+.flash--alert { background: var(--danger-weak); color: var(--danger); }
+/* Muted text utility (Pico classless has no .muted class of its own) */
+.muted { color: var(--muted); }
 /* Required / optional markers on form labels and fieldset legends */
 .field-badge { display: inline-block; margin-left: 0.4rem; padding: 0.05rem 0.4rem; border-radius: 999px; font-size: 0.68rem; font-weight: 600; line-height: 1.5; vertical-align: middle; letter-spacing: 0.02em; }
 .field-badge--req { color: var(--danger); background: var(--danger-weak); }

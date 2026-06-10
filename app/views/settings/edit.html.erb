@@ -1,5 +1,4 @@
 <div class="page-header"><h1>サイト設定</h1></div>
-<% if notice %><p class="notice"><%= notice %></p><% end %>
 
 <%= form_with model: @setting, url: settings_path, method: :patch, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: @setting %>

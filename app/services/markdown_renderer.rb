@@ -12,8 +12,11 @@ class MarkdownRenderer
   end
 
   def render(markdown)
+    # Commonmarker は UTF-8 以外を拒否する（nil.to_s は US-ASCII）。境界でそろえる。
+    source = markdown.to_s
+    source = source.encode(Encoding::UTF_8) unless source.encoding == Encoding::UTF_8
     # 1. GFM をレンダリング（既定で raw HTML はエスケープ = 安全）
-    html = Commonmarker.to_html(markdown.to_s, options: { extension: { table: true, strikethrough: true, autolink: true } })
+    html = Commonmarker.to_html(source, options: { extension: { table: true, strikethrough: true, autolink: true } })
 
     references = []
     numbers = {}
