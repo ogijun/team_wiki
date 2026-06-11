@@ -90,7 +90,19 @@ bin/kamal setup    # 初回（以降は bin/kamal deploy）
 `config/active_storage.service` は `ACTIVE_STORAGE_SERVICE`（ENV）で選択し、既定はローカル Disk。
 Kamal の永続ボリューム（`/rails/storage`）に保存されるためデプロイをまたいでも残る。
 
-オブジェクトストレージに移す場合は、`config/storage.yml` にサービスを追加し（R2 などの S3 互換）、`ACTIVE_STORAGE_SERVICE` を設定、対応するシークレット（`R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` 等）を `.kamal/secrets` と `config/deploy.yml` の env に追加する。Active Storage の blob キーは保存先非依存なので、移行はキーを保ったまま実体をコピーして `service_name` を更新するだけでよい。
+オブジェクトストレージに移す場合は、`config/storage.yml` にサービスを追加し（R2 などの S3 互換。既に `r2` を定義済み）、対応するシークレット（`R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` 等）を `.kamal/secrets` と `config/deploy.yml` の env に用意する。Active Storage の blob キーは保存先非依存なので、移行はキーを保ったまま実体をコピーして `service_name` を更新するだけでよい。
+
+`local` → `r2` への移行手順（冪等・チェックサム検証つきの `StorageMigrator` を使う）:
+
+1. 投稿・編集を一時停止し、blob が増えない状態にする。
+2. 本番コンテナで移行を流す（実体をコピーするだけで元ファイルは消さない）。
+   ```sh
+   bin/kamal app exec --reuse 'bin/rails storage:migrate FROM=local TO=r2'
+   ```
+   1件失敗しても全体は止めず、最後に失敗一覧を出して非ゼロ終了する。再実行すれば既存キーは skip される。
+3. `config/deploy.yml`（インスタンス側）の env に `ACTIVE_STORAGE_SERVICE=r2` と `R2_*` シークレットを設定し、`bin/kamal deploy` する。
+4. 添付・サムネイル（variant）が表示されることを確認する。variant も blob 行として一緒に移行・再生成されるため個別対応は不要。
+5. 元の `local`（Disk）の実体はそのまま残るので、問題があれば `ACTIVE_STORAGE_SERVICE` を `local` に戻すだけで切り戻せる。安定後に手動で削除する。
 
 ### バックアップ
 
