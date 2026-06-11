@@ -67,13 +67,13 @@ class MaterialsController < ApplicationController
 
   private
 
-  # 資料保存と、その資料を引用するスタブ記事の自動生成を1トランザクションで行う。
+  # 資料保存と、付随作成（初回コメント・チェック時のみのスタブ記事）を1トランザクションで行う。
   # 資料が無効なら save! が RecordInvalid を投げ、ロールバックして new を再描画する。
   def save_material_with_stub(material)
     Material.transaction do
       material.save!
       add_first_comment(material, params[:first_comment])
-      StubArticleForMaterial.call(material: material, author: Current.user)
+      StubArticleForMaterial.call(material: material, author: Current.user) if params[:create_stub_article] == "1"
     end
     true
   rescue ActiveRecord::RecordInvalid
