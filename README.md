@@ -78,7 +78,7 @@ cp config/deploy.sample.yml config/deploy.yml   # 自分の値に編集
 
 シークレットは `.kamal/secrets`（1Password 等から取得）経由で注入。
 
-- **secret**（`.kamal/secrets`）: `RAILS_MASTER_KEY`、Discord 各種（`DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` / `DISCORD_GUILD_ID` / `DISCORD_REQUIRED_ROLE_ID` / `DISCORD_ADMIN_ROLE_ID`）
+- **secret**（`.kamal/secrets`）: `RAILS_MASTER_KEY`、Discord 各種（`DISCORD_CLIENT_ID` / `DISCORD_CLIENT_SECRET` / `DISCORD_GUILD_ID` / `DISCORD_REQUIRED_ROLE_ID` / `DISCORD_ADMIN_ROLE_ID`）。任意で litestream の `LITESTREAM_*`（[バックアップ](#バックアップ)参照）
 - **clear**（`config/deploy.yml`）: `APP_BASE_URL` など
 
 ```bash
@@ -91,6 +91,30 @@ bin/kamal setup    # 初回（以降は bin/kamal deploy）
 Kamal の永続ボリューム（`/rails/storage`）に保存されるためデプロイをまたいでも残る。
 
 オブジェクトストレージに移す場合は、`config/storage.yml` にサービスを追加し（R2 などの S3 互換）、`ACTIVE_STORAGE_SERVICE` を設定、対応するシークレット（`R2_ENDPOINT` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` 等）を `.kamal/secrets` と `config/deploy.yml` の env に追加する。Active Storage の blob キーは保存先非依存なので、移行はキーを保ったまま実体をコピーして `service_name` を更新するだけでよい。
+
+### バックアップ
+
+本番は単一 VPS の SQLite なので、[litestream](https://litestream.io/) で本体 DB（`storage/production.sqlite3`）の WAL を Cloudflare R2 へ継続ストリーミングする。Puma 配下で動き（`config/puma.rb`）、複製対象は `config/litestream.yml`。cache/queue/cable は Solid 系の再生成可能な状態なので複製しない。
+
+`LITESTREAM_REPLICA_BUCKET` が注入された本番でのみ複製プロセスが起動する。未設定（dev/test/CI/アセットプリコンパイル）では何も起きない。必要な ENV は次の通りで、`.kamal/secrets` と `config/deploy.yml` の env に追加する（R2＝S3 互換、endpoint は `https://<account_id>.r2.cloudflarestorage.com`）。
+
+| 変数 | 用途 |
+|---|---|
+| `LITESTREAM_REPLICA_BUCKET` | 複製先 R2 バケット名 |
+| `LITESTREAM_REPLICA_ENDPOINT` | R2 エンドポイント URL |
+| `LITESTREAM_REPLICA_REGION` | R2 では無視されるが S3 クライアントが要求（慣例で `auto`） |
+| `LITESTREAM_ACCESS_KEY_ID` / `LITESTREAM_SECRET_ACCESS_KEY` | R2 アクセスキー |
+
+リストア（復元演習）はコンテナ内で次を実行する。`--database` には `config/litestream.yml` の `path` と一致する値を渡す。
+
+```bash
+# 既存 DB は退避してから（rails が再生成すると "output path already exists" になる）
+bin/rails litestream:restore -- --database=storage/production.sqlite3
+```
+
+レプリカの状態は `bin/rails litestream:databases` / `litestream:snapshots -- --database=...` で確認できる。
+
+> **リストア演習を一度やるまではバックアップは存在しないのと同じ。** 復元手順を実際に通して中身を確認するまで、バックアップが取れている保証はないものとして扱う。
 
 ## ライセンス
 
