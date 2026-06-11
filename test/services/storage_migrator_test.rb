@@ -21,7 +21,12 @@ class StorageMigratorTest < ActiveSupport::TestCase
   end
 
   teardown do
-    FileUtils.rm_rf(Rails.root.join("tmp/storage_secondary"))
+    # 並列テストワーカーは tmp/storage_secondary を共有するため、ディレクトリごと rm_rf すると
+    # 他ワーカーのファイルを巻き込んで flaky になる。自分の DB に見えている blob（=このワーカーが
+    # 作ったもの。キーはランダムで衝突しない）のキーだけを両 service から消す。
+    ActiveStorage::Blob.find_each do |blob|
+      [ source, target ].each { |svc| svc.delete(blob.key) }
+    end
   end
 
   test "copies blob content to the target service and updates service_name" do

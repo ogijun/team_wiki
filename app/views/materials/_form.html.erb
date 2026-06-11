@@ -60,6 +60,10 @@
 
   <% if material.new_record? %>
     <div class="field">
+      <label class="field__check"><%= check_box_tag :create_stub_article, "1", false %> この資料を引用するスタブ記事も作成する</label><%= optional_badge %>
+      <small class="field__hint">記事の種になる1本を自動で用意します。発行日を入れていれば、記事の年表日付にも引き継がれます。</small>
+    </div>
+    <div class="field">
       <%= label_tag :first_comment, "最初のコメント" %><%= optional_badge %>
       <small class="field__hint">最初のコメントとして残ります（任意）。気づいたこと・出典メモなど。あとから詳細画面で追記できます。</small>
       <%= text_area_tag :first_comment, nil, rows: 3 %>

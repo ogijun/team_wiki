@@ -7,7 +7,9 @@ module StubArticleForMaterial
   GUIDANCE = "この資料をもとにしたスタブ記事です。下の出典をもとに加筆してください。".freeze
 
   def call(material:, author:)
-    article = Article.new(title: unique_title(material.title), status: "stub", created_by: author)
+    # 資料に発行日（あいまい日付）があれば、記事の年表日付として精度ごと引き継ぐ。
+    article = Article.new(title: unique_title(material.title), status: "stub", created_by: author,
+                          starts_at: material.published_at, starts_precision: material.published_precision)
     body = "#{GUIDANCE}\n\n[[ref:#{material.slug}]]\n"
     Article.transaction do
       article.save!
