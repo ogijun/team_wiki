@@ -1,5 +1,41 @@
 require "test_helper"
 
+class UserStreakTest < ActiveSupport::TestCase
+  setup { @user = User.create!(email_address: "st@example.com", name: "St", provider: "discord", uid: "streak-u") }
+
+  def act_on(date)
+    Activity.create!(user: @user, action: "user.joined", created_at: date.in_time_zone.change(hour: 12))
+  end
+
+  test "counts consecutive days ending today, plus longest streak and total active days" do
+    act_on(Date.current - 6) # 過去の孤立した1日
+    act_on(Date.current - 2)
+    act_on(Date.current - 1)
+    act_on(Date.current)
+    stats = @user.activity_stats
+    assert_equal 3, stats[:current_streak]
+    assert_equal 3, stats[:longest_streak]
+    assert_equal 4, stats[:active_days]
+  end
+
+  test "a streak ending yesterday is still alive" do
+    act_on(Date.current - 1)
+    assert_equal 1, @user.activity_stats[:current_streak]
+  end
+
+  test "gaps break the current streak but longest remembers the past" do
+    assert_equal({ current_streak: 0, longest_streak: 0, active_days: 0 }, @user.activity_stats)
+    act_on(Date.current - 5)
+    act_on(Date.current - 4)
+    act_on(Date.current - 3)
+    act_on(Date.current)
+    stats = @user.activity_stats
+    assert_equal 1, stats[:current_streak]
+    assert_equal 3, stats[:longest_streak]
+    assert_equal 4, stats[:active_days]
+  end
+end
+
 class UserTest < ActiveSupport::TestCase
   def build_user(**attrs)
     User.new({ email_address: "u#{rand(100000)}@example.com", password: "password123" }.merge(attrs))
