@@ -158,8 +158,8 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     ArticleRevisionCreator.call(article: article, body: "2", author: bob)
     get article_url(article)
     assert_response :success
-    assert_select "section.contributors a[href=?]", user_path(@user)
-    assert_select "section.contributors a[href=?]", user_path(bob)
+    assert_select ".page-meta .contributors a[href=?]", user_path(@user)
+    assert_select ".page-meta .contributors a[href=?]", user_path(bob)
   end
 
   test "show renders citations section linking to materials" do

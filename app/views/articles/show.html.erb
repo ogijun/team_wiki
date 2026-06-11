@@ -1,27 +1,23 @@
 <article>
   <%= link_to "← 記事一覧", articles_path, class: "back-link" %>
   <h1><%= @article.title %></h1>
-  <p class="badges">
+  <p class="page-meta">
     <%= render BadgeComponent.new(text: @article.status_label, variant: :status) %>
     <% if @article.kind %><%= render BadgeComponent.new(text: @article.kind_label, variant: :kind) %><% end %>
+    <%= render FuzzyDateComponent.new(starts: @article.starts, ends: @article.ends, icon: true) %>
+    <% tags = @article.tags.to_a %>
+    <% if tags.any? %>
+      <span><% tags.each do |t| %><%= link_to "##{t.name}", tag_path(t) %> <% end %></span>
+    <% end %>
+    <% contributors = @article.contributors %>
+    <% if contributors.any? %>
+      <span class="contributors"><% contributors.each do |u| %><%= avatar_link(u, size: 20) %><% end %></span>
+    <% end %>
   </p>
-  <%= render FuzzyDateComponent.new(starts: @article.starts, ends: @article.ends, icon: true) %>
-  <% contributors = @article.contributors %>
-  <% if contributors.any? %>
-    <section class="contributors">
-      <% contributors.each do |u| %>
-        <%= avatar_link(u, size: 24) %>
-      <% end %>
-    </section>
-  <% end %>
   <div class="actions">
-    <%= link_to "編集", edit_article_path(@article), role: "button", class: "btn-sm" %>
-    <%= link_to "履歴", article_revisions_path(@article) %>
+    <%= link_to "本文を編集", edit_article_path(@article), role: "button", class: "btn-sm secondary outline" %>
+    <%= link_to "履歴", article_revisions_path(@article), role: "button", class: "btn-sm secondary outline" %>
   </div>
-  <% tags = @article.tags.to_a %>
-  <% if tags.any? %>
-    <p>タグ: <% tags.each do |t| %><%= link_to "##{t.name}", tag_path(t) %> <% end %></p>
-  <% end %>
   <div class="page-body">
     <%= @rendered.html %>
   </div>

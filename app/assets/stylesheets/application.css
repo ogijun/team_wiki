@@ -157,6 +157,10 @@ body { padding-left: var(--sidebar-width); }
 .back-link:hover { color: var(--accent); }
 .page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .actions { display: flex; align-items: center; gap: 0.9rem; margin: 0.6rem 0 1.4rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--hairline); }
+/* h1 直下のメタ1行：バッジ・作成者・日付・タグ・貢献者をここに集約する（詳細ページ共通の文法） */
+.page-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.6rem; margin: 0.25rem 0 0.4rem; font-size: 0.9rem; color: var(--ink-soft); }
+.page-meta .avatar { vertical-align: middle; }
+.page-meta .when { margin: 0; }
 
 /* 破壊的操作の隔離ゾーン（show の最下部） */
 .danger-zone { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--hairline); }
@@ -215,7 +219,7 @@ body { padding-left: var(--sidebar-width); }
 .avatar { border-radius: 50%; object-fit: cover; vertical-align: middle; display: inline-block; }
 .avatar-initial { color: #fff; text-align: center; font-weight: 600; }
 .profile { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
-.contributors { display: flex; gap: 0.25rem; flex-wrap: wrap; margin: 0.5rem 0; }
+.contributors { display: inline-flex; gap: 0.25rem; flex-wrap: wrap; margin: 0; vertical-align: middle; }
 .contributors a { line-height: 0; }
 
 /* Citation picker (editor toolbar popup) */
