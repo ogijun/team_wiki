@@ -16,9 +16,13 @@ class TranscriptionsController < ApplicationController
   end
 
   def update
+    was_new = @transcription.new_record?
     @transcription.assign_attributes(transcription_params)
     @transcription.author = Current.user
     if @transcription.save
+      ActivityRecorder.record(actor: Current.user,
+                              action: was_new ? "transcription.created" : "transcription.edited",
+                              subject: @material)
       redirect_to @material, notice: "文字起こしを保存しました。"
     else
       render :edit, status: :unprocessable_entity

@@ -38,6 +38,24 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /続きを読む/, count: 0
   end
 
+  test "records a transcription.created activity on first save" do
+    assert_difference "Activity.where(action: 'transcription.created').count", 1 do
+      patch material_transcription_url(@media), params: { transcription: { body: "初回", status: "drafting" } }
+    end
+    act = Activity.where(action: "transcription.created").order(:id).last
+    assert_equal @media, act.subject
+    assert_equal @media.title, act.subject_label
+  end
+
+  test "records a transcription.edited activity on subsequent saves" do
+    Transcription.create!(material: @media, author: @user, body: "v1", status: "drafting")
+    assert_difference "Activity.where(action: 'transcription.edited').count", 1 do
+      assert_no_difference "Activity.where(action: 'transcription.created').count" do
+        patch material_transcription_url(@media), params: { transcription: { body: "v2", status: "done" } }
+      end
+    end
+  end
+
   test "creates a transcription on update" do
     patch material_transcription_url(@media), params: { transcription: { body: "起こし本文", status: "drafting" } }
     assert_redirected_to material_url(@media)
