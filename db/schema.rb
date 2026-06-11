@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_11_062524) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_11_222940) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -183,6 +183,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_062524) do
     t.index ["slug"], name: "index_tags_on_slug", unique: true
   end
 
+  create_table "transcription_revisions", force: :cascade do |t|
+    t.integer "author_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.integer "transcription_id", null: false
+    t.index ["author_id"], name: "index_transcription_revisions_on_author_id"
+    t.index ["transcription_id"], name: "index_transcription_revisions_on_transcription_id"
+  end
+
   create_table "transcriptions", force: :cascade do |t|
     t.string "ai_model"
     t.string "ai_service"
@@ -231,6 +240,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_11_062524) do
   add_foreign_key "revisions", "users", column: "author_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "taggings", "tags"
+  add_foreign_key "transcription_revisions", "transcriptions"
+  add_foreign_key "transcription_revisions", "users", column: "author_id"
   add_foreign_key "transcriptions", "materials"
   add_foreign_key "transcriptions", "users", column: "author_id"
   add_foreign_key "uploads", "users"

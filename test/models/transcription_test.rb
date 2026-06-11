@@ -65,6 +65,15 @@ class TranscriptionTest < ActiveSupport::TestCase
     assert_equal "whisper-large-v3", t.ai_model
   end
 
+  test "contributors lists revision authors in first-contribution order" do
+    bob = User.create!(email_address: "b@example.com", name: "B", provider: "discord", uid: "trans-bob")
+    t = Transcription.create!(material: @material, author: @user, body: "v1", status: "drafting")
+    t.revisions.create!(author: @user, body: "v1")
+    t.revisions.create!(author: bob, body: "v2")
+    t.revisions.create!(author: @user, body: "v3")
+    assert_equal [ @user, bob ], t.contributors
+  end
+
   test "preview helpers truncate long bodies and report the overflow" do
     short = Transcription.new(body: "短い本文")
     assert_not short.long?

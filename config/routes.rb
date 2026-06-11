@@ -17,7 +17,9 @@ Rails.application.routes.draw do
   resource :account, only: %i[edit update]
   get "search", to: "search#index"
   resources :materials do
-    resource :transcription, only: %i[show edit update]
+    resource :transcription, only: %i[show edit update] do
+      resources :revisions, only: %i[index show], controller: "transcription_revisions"
+    end
     resources :comments, only: :create
   end
   get "transcriptions", to: "transcriptions#index"

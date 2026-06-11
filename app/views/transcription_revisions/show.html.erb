@@ -1,0 +1,9 @@
+<% content_for :title, "文字起こしリビジョン #{@revision.id} — #{@material.title}" %>
+<%= link_to "← 履歴", material_transcription_revisions_path(@material), class: "back-link" %>
+<h1>リビジョン #<%= @revision.id %></h1>
+<% if @diff %>
+  <h2>差分（#<%= @base.id %> → #<%= @revision.id %>）</h2>
+  <div class="diff"><%= @diff %></div>
+<% else %>
+  <div class="prewrap"><%= @revision.body %></div>
+<% end %>

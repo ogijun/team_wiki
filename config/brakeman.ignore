@@ -5,6 +5,10 @@
       "note": "Diffy::Diff#to_s(:html) HTML-escapes the diffed line content; only the diff markup is html_safe. Reviewed safe."
     },
     {
+      "fingerprint": "2176c2424b61e393f9a3a946efdc7375c3e07fa5c86f44f0fd699b955c6b8504",
+      "note": "Same Diffy :html diff as article revisions (transcription revisions view); content is escaped by Diffy. Reviewed safe."
+    },
+    {
       "fingerprint": "a95af94fd81eb2bc69fdffbf7b1e214af2a05cd6f3647c6cf4b286bc0932a74f",
       "note": "material.url is validated to \\Ahttps?://\\S+\\z (http/https only, no whitespace), so the href can't be a javascript:/data: scheme; rel=noopener is set. Reviewed safe."
     }

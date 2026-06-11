@@ -6,9 +6,14 @@
   <%= render BadgeComponent.new(text: @transcription.status_label, variant: :status) %>
   <% if @transcription.creation_summary %><span>作成: <%= @transcription.creation_summary %></span><% end %>
   <span>by <%= link_to display_name(@transcription.author), @transcription.author %> ・ <%= @transcription.updated_at.to_fs(:jp) %></span>
+  <% contributors = @transcription.contributors %>
+  <% if contributors.any? %>
+    <span class="contributors"><% contributors.each do |u| %><%= avatar_link(u, size: 20) %><% end %></span>
+  <% end %>
 </p>
 <div class="actions">
   <%= link_to "文字起こしを編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %>
+  <%= link_to "履歴", material_transcription_revisions_path(@material), role: "button", class: "btn-sm secondary outline" %>
 </div>
 
 <div class="prewrap"><%= @transcription.body %></div>

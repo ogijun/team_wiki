@@ -38,6 +38,44 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /続きを読む/, count: 0
   end
 
+  test "each body change appends a revision; status-only changes do not" do
+    assert_difference "TranscriptionRevision.count", 1 do
+      patch material_transcription_url(@media), params: { transcription: { body: "v1", status: "drafting" } }
+    end
+    assert_difference "TranscriptionRevision.count", 1 do
+      patch material_transcription_url(@media), params: { transcription: { body: "v2", status: "drafting" } }
+    end
+    assert_no_difference "TranscriptionRevision.count" do
+      patch material_transcription_url(@media), params: { transcription: { body: "v2", status: "done" } }
+    end
+    assert_equal %w[v1 v2], @media.reload.transcription.revisions.order(:created_at).pluck(:body)
+  end
+
+  test "show lists contributor avatars" do
+    bob = User.create!(email_address: "tb@example.com", name: "TB", provider: "discord", uid: "tc-bob")
+    t = Transcription.create!(material: @media, author: @user, body: "v1", status: "drafting")
+    t.revisions.create!(author: @user, body: "v1")
+    t.revisions.create!(author: bob, body: "v2")
+    get material_transcription_url(@media)
+    assert_select ".page-meta .contributors a[href=?]", user_path(@user)
+    assert_select ".page-meta .contributors a[href=?]", user_path(bob)
+    assert_select "a", text: "履歴"
+  end
+
+  test "revision history lists versions and shows a diff" do
+    t = Transcription.create!(material: @media, author: @user, body: "一行目", status: "drafting")
+    r1 = t.revisions.create!(author: @user, body: "一行目")
+    r2 = t.revisions.create!(author: @user, body: "一行目\n二行目")
+
+    get material_transcription_revisions_url(@media)
+    assert_response :success
+    assert_select "a", text: /前の版との差分/
+
+    get material_transcription_revision_url(@media, r2, a: r1.id)
+    assert_response :success
+    assert_select ".diff ins", text: /二行目/
+  end
+
   test "records a transcription.created activity on first save" do
     assert_difference "Activity.where(action: 'transcription.created').count", 1 do
       patch material_transcription_url(@media), params: { transcription: { body: "初回", status: "drafting" } }
