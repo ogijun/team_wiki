@@ -10,5 +10,6 @@ class HomeController < ApplicationController
       # SQLite の LENGTH(text) は文字数（バイト数ではない）を返す
       transcribed_chars: Transcription.sum("LENGTH(body)").to_i
     }
+    @my_stats = Current.user.activity_stats
   end
 end

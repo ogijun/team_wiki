@@ -32,6 +32,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".dashboard-stats", text: /1,234.*文字起こし済/m
   end
 
+  test "shows my personal streak line when I have activity" do
+    ActivityRecorder.record(actor: @user, action: "tag.created", subject_label: "今日の活動")
+    get root_url
+    assert_select ".my-streak", text: /1.*日連続活動中.*最長.*1.*累計.*1/m
+  end
+
   test "renders relative timestamps as auto-updating local-time elements" do
     article = Article.create!(title: "時刻記事", created_by: @user, status: "stub")
     ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
