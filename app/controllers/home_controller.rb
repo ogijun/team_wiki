@@ -6,7 +6,9 @@ class HomeController < ApplicationController
     @stats = {
       articles: Article.count,
       materials: Material.count,
-      unconfirmed_materials: Material.where(confidence: "unconfirmed").count
+      unconfirmed_materials: Material.where(confidence: "unconfirmed").count,
+      # SQLite の LENGTH(text) は文字数（バイト数ではない）を返す
+      transcribed_chars: Transcription.sum("LENGTH(body)").to_i
     }
   end
 end

@@ -23,6 +23,15 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /ダッシュ記事/
   end
 
+  test "stats include the total transcribed characters" do
+    m = Material.new(user: @user, title: "統計音声")
+    m.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
+    m.save!
+    Transcription.create!(material: m, author: @user, body: "あ" * 1234, status: "drafting")
+    get root_url
+    assert_select ".dashboard-stats", text: /1,234.*文字起こし済/m
+  end
+
   test "renders relative timestamps as auto-updating local-time elements" do
     article = Article.create!(title: "時刻記事", created_by: @user, status: "stub")
     ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
