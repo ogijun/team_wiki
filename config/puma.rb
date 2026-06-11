@@ -37,6 +37,15 @@ plugin :tmp_restart
 # Run the Solid Queue supervisor inside of Puma for single-server deployments.
 plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 
+# SQLite を R2 へストリーミングバックアップする litestream を Puma 配下で起動する。
+# このプラグインは config 不在を自己判定せず、起動時に無条件で litestream プロセスを
+# fork/exec する（gem の lib/puma/plugin/litestream.rb 参照）。よって本番かつ複製先バケット
+# の ENV がある時だけ有効化し、dev/test/CI/プリコンパイルには一切影響させない。
+# Rails 未ロードの段階で評価され得るので Rails.env ではなく ENV だけで判定する。
+if ENV.fetch("RAILS_ENV", "development") == "production" && !ENV["LITESTREAM_REPLICA_BUCKET"].to_s.empty?
+  plugin :litestream
+end
+
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
