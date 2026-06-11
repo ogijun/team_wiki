@@ -91,16 +91,47 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".placeholder", count: 0
   end
 
-  test "material detail is organized into body, bibliography, usage and comments zones" do
+  test "material detail is organized into zones; empty zones are absorbed by the progress strip" do
     m = Material.create!(user: @user, url: "https://example.com/zone", title: "ゾーン資料")
     get material_url(m)
-    assert_select "h2", text: "書誌情報"
+    assert_select ".progress-strip"
     assert_select "h2", text: "記事で使う"
-    assert_select "h3", text: "この資料を引用している記事"
-    assert_select ".usage", text: /まだ記事から引用されていません/
     assert_select "h2", text: /コメント/
-    # 書誌が空でも案内つきでゾーンは出る
-    assert_select ".bibliography-section", text: /まだ書誌情報がありません/
+    # 空の書誌ゾーン・空の被引用見出しは出さない（状態はストリップが担う）
+    assert_select ".bibliography-section", count: 0
+    assert_select "h3", text: "この資料を引用している記事", count: 0
+  end
+
+  test "progress strip shows pending steps as action links" do
+    m = Material.create!(user: @user, url: "https://example.com/strip", title: "ストリップ資料")
+    get material_url(m)
+    # 書誌なし→追記リンク / 原本未確認(非admin)はテキスト / 未引用→引用タグへのアンカー
+    assert_select ".progress-strip a[href=?]", edit_material_path(m), text: /書誌を追記/
+    assert_select ".progress-strip", text: /原本未確認/
+    assert_select ".progress-strip a[href=?]", "#usage", text: /引用タグを使う/
+  end
+
+  test "progress strip shows completed steps as checks" do
+    m = Material.create!(user: @user, url: "https://example.com/done", title: "完了資料",
+                         source: "サンプル誌", confidence: "confirmed")
+    article = Article.create!(title: "引用元記事", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "[[ref:#{m.slug}]]", author: @user)
+    get material_url(m)
+    assert_select ".progress-strip .strip-step--done", text: /書誌/
+    assert_select ".progress-strip .strip-step--done", text: /原本確認済/
+    assert_select ".progress-strip .strip-step--done", text: /引用 1件/
+  end
+
+  test "progress strip includes transcription state only for transcribable materials" do
+    media = Material.new(user: @user, title: "音声S")
+    media.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
+    media.save!
+    get material_url(media)
+    assert_select ".progress-strip a[href=?]", edit_material_transcription_path(media), text: /文字起こし/
+
+    link = Material.create!(user: @user, url: "https://example.com/nt", title: "リンクNT")
+    get material_url(link)
+    assert_select ".progress-strip", text: /文字起こし/, count: 0
   end
 
   test "show isolates delete in a danger zone, not the actions row" do

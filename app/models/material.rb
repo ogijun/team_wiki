@@ -79,6 +79,12 @@ class Material < ApplicationRecord
 
   def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)
 
+  # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。
+  def bibliography_present?
+    author.present? || source.present? || published_at.present? ||
+      volume.present? || publisher.present? || pages.present? || isbn.present?
+  end
+
   def confidence_label = CONFIDENCE_LEVELS[confidence]
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
 
