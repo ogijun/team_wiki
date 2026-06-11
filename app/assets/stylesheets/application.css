@@ -344,6 +344,12 @@ form.button_to { display: inline; }
 
 /* 見出し＋付随要素（件数バッジ等） */
 .section-head { display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; margin: 0 0 0.5rem; }
+/* 詳細ページのゾーン見出し: h1(タイトル)と競合しない控えめなサイズに統一。
+   ゾーン内の小見出し(h3)はさらに一段小さく、ラベル寄りの色にする。 */
+.bibliography-section h2, .usage h2, .transcription h2, .citing-articles h2, .comments h2 {
+  font-size: 1.05rem; margin: 0 0 0.6rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline);
+}
+.usage h3, .transcription h3 { font-size: 0.92rem; color: var(--ink-soft); margin: 1.2rem 0 0.4rem; }
 
 /* 「未実装/予定」を示す破線プレースホルダー */
 .placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
