@@ -40,6 +40,13 @@ env:
     # - R2_ENDPOINT
     # - R2_ACCESS_KEY_ID
     # - R2_SECRET_ACCESS_KEY
+    # litestream: SQLite を R2 へ継続バックアップ。BUCKET があるときだけ複製が起動する
+    # （未設定なら no-op）。endpoint は https://<account_id>.r2.cloudflarestorage.com。
+    # - LITESTREAM_REPLICA_BUCKET
+    # - LITESTREAM_REPLICA_ENDPOINT
+    # - LITESTREAM_REPLICA_REGION
+    # - LITESTREAM_ACCESS_KEY_ID
+    # - LITESTREAM_SECRET_ACCESS_KEY
   clear:
     # Pin OmniAuth's redirect_uri host so it matches the Discord OAuth callback URL.
     APP_BASE_URL: https://wiki.example.com
