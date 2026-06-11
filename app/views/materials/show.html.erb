@@ -1,83 +1,95 @@
 <%= link_to "← 資料一覧", materials_path, class: "back-link" %>
 <h1><%= @material.title %></h1>
-<p class="muted" data-controller="clipboard" data-clipboard-text-value="[[ref:<%= @material.slug %>]]">
-  引用ハンドル: <code>[[ref:<%= @material.slug %>]]</code>
-  <%= button_tag "引用タグをコピー", type: "button", class: "secondary outline btn-sm", data: { action: "clipboard#copy" } %>
-</p>
-<small class="muted">この <code>[[ref:…]]</code> を記事本文に貼ると、この資料を出典として脚注に表示できます。</small>
-<p class="muted">by <%= display_name(@material.user) %> / <%= @material.created_at.to_fs(:jp) %></p>
-<p class="badges">
+<p class="page-meta">
   <%= render BadgeComponent.new(text: @material.confidence_label, variant: :status) %>
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
+  <span>by <%= link_to display_name(@material.user), @material.user %> ・ <%= @material.created_at.to_fs(:jp) %></span>
 </p>
 <div class="actions">
-  <%= link_to "編集", edit_material_path(@material), role: "button", class: "btn-sm" %>
+  <%= link_to "資料情報を編集", edit_material_path(@material), role: "button", class: "btn-sm secondary outline" %>
 </div>
 
-<div class="placeholder">ここには資料のサムネイルなどが表示される予定です（開発中）</div>
-
-<% if @material.author.present? || @material.source.present? || @material.published %>
-  <dl class="bibliography">
-    <% if @material.author.present? %><dt>著者・発言者</dt><dd><%= @material.author %></dd><% end %>
-    <% if @material.source.present? %><dt>出典元</dt><dd><%= @material.source %></dd><% end %>
-    <% if @material.published %><dt>発行日</dt><dd><%= @material.published.label %></dd><% end %>
-  </dl>
-<% end %>
-
-<% if @material.description.present? %>
-  <p><%= simple_format @material.description %></p>
-<% end %>
-
-<% if @material.transcribable? %>
-  <% t = @material.transcription %>
-  <section class="transcription">
-    <h2>文字起こし
-      <% if t %><%= render BadgeComponent.new(text: t.status_label, variant: :status) %><% end %>
-    </h2>
-    <% if t %>
-      <% if t.creation_summary %>
-        <p class="meta">作成: <%= t.creation_summary %></p>
-      <% end %>
-      <div class="prewrap"><%= t.body %></div>
-      <p><%= link_to "編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
-    <% else %>
-      <p class="muted">まだ文字起こしがありません。</p>
-      <%= link_to "作成", edit_material_transcription_path(@material), role: "button", class: "btn-sm" %>
+<%# ── ① 資料本体（プレビュー・実体・説明）── %>
+<section class="material-body">
+  <% if @material.link? %>
+    <% if (src = MaterialEmbed.embed_src(@material.url)) %>
+      <div class="embed">
+        <iframe src="<%= src %>" width="640" height="360" frameborder="0" allowfullscreen></iframe>
+      </div>
     <% end %>
-  </section>
-<% end %>
-
-<% if @material.link? %>
-  <% if (src = MaterialEmbed.embed_src(@material.url)) %>
-    <div class="embed">
-      <iframe src="<%= src %>" width="640" height="360" frameborder="0" allowfullscreen></iframe>
-    </div>
+    <p><%= link_to @material.url, @material.url, target: "_blank", rel: "noopener" %></p>
+  <% else %>
+    <% if @material.thumbnailable_file? %>
+      <%= link_to image_tag(@material.thumbnail(640), style: "max-width:100%"), rails_blob_path(@material.file) %>
+    <% else %>
+      <div class="placeholder">プレビューは準備中です（PDF などのプレビュー表示は今後対応）</div>
+    <% end %>
+    <p><%= link_to "⬇ #{@material.file.filename}", rails_blob_path(@material.file) %></p>
   <% end %>
-  <p><%= link_to @material.url, @material.url, target: "_blank", rel: "noopener" %></p>
-<% else %>
-  <p><%= link_to "⬇ #{@material.file.filename}", rails_blob_path(@material.file) %></p>
-  <% if @material.thumbnailable_file? %>
-    <%= link_to image_tag(@material.thumbnail(640), style: "max-width:100%"), rails_blob_path(@material.file) %>
+  <% if @material.description.present? %>
+    <%= simple_format @material.description %>
   <% end %>
-<% end %>
+</section>
 
-<% tags = @material.tags.to_a %>
-<% if tags.any? %>
-  <p>タグ: <% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
-<% end %>
+<%# ── ② 書誌情報 ── %>
+<section class="bibliography-section">
+  <h2>書誌情報</h2>
+  <% tags = @material.tags.to_a %>
+  <% if @material.author.present? || @material.source.present? || @material.published || tags.any? %>
+    <dl class="bibliography">
+      <% if @material.author.present? %><dt>著者・発言者</dt><dd><%= @material.author %></dd><% end %>
+      <% if @material.source.present? %><dt>出典元</dt><dd><%= @material.source %></dd><% end %>
+      <% if @material.published %><dt>発行日</dt><dd><%= @material.published.label %></dd><% end %>
+      <% if tags.any? %>
+        <dt>タグ</dt>
+        <dd><% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></dd>
+      <% end %>
+    </dl>
+  <% else %>
+    <p class="muted">まだ書誌情報がありません。「資料情報を編集」から追記できます。</p>
+  <% end %>
+</section>
 
-<% citing = @material.citing_articles.order(:title).to_a %>
-<% if citing.any? %>
-  <section class="citing-articles">
-    <h2>この資料を引用している記事</h2>
+<%# ── ③ 記事で使う（引用・被引用・文字起こし）── %>
+<section class="usage">
+  <h2>記事で使う</h2>
+  <p class="cite-row" data-controller="clipboard" data-clipboard-text-value="[[ref:<%= @material.slug %>]]">
+    引用タグ <code>[[ref:<%= @material.slug %>]]</code>
+    <%= button_tag "引用タグをコピー", type: "button", class: "btn-sm secondary outline", data: { action: "clipboard#copy" } %>
+  </p>
+  <small class="muted">記事本文に貼ると、この資料が出典として脚注に表示されます。</small>
+
+  <h3>この資料を引用している記事</h3>
+  <% citing = @material.citing_articles.order(:title).to_a %>
+  <% if citing.any? %>
     <ul>
       <% citing.each do |a| %>
         <li><%= link_to a.title, a %></li>
       <% end %>
     </ul>
-  </section>
-<% end %>
+  <% else %>
+    <p class="muted">まだ記事から引用されていません。</p>
+  <% end %>
 
+  <% if @material.transcribable? %>
+    <% t = @material.transcription %>
+    <h3>文字起こし
+      <% if t %><%= render BadgeComponent.new(text: t.status_label, variant: :status) %><% end %>
+    </h3>
+    <% if t %>
+      <% if t.creation_summary %>
+        <p class="meta">作成: <%= t.creation_summary %></p>
+      <% end %>
+      <div class="prewrap"><%= t.body %></div>
+      <p><%= link_to "文字起こしを編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
+    <% else %>
+      <p class="muted">まだ文字起こしがありません。</p>
+      <%= link_to "文字起こしを作成", edit_material_transcription_path(@material), role: "button", class: "btn-sm" %>
+    <% end %>
+  <% end %>
+</section>
+
+<%# ── ④ 議論 ── %>
 <%= render "comments/comments", commentable: @material %>
 
 <div class="danger-zone">

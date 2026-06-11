@@ -79,10 +79,28 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "+09:00", m.created_at.formatted_offset
   end
 
-  test "material detail shows the preview placeholder" do
-    m = Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
-    get material_url(m)
+  test "material detail shows the preview placeholder only for non-previewable files" do
+    pdf = Material.new(user: @user, title: "PDF資料")
+    pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "doc.pdf", content_type: "application/pdf")
+    pdf.save!
+    get material_url(pdf)
     assert_select ".placeholder"
+
+    link = Material.create!(user: @user, url: "https://example.com/a", title: "リンク資料")
+    get material_url(link)
+    assert_select ".placeholder", count: 0
+  end
+
+  test "material detail is organized into body, bibliography, usage and comments zones" do
+    m = Material.create!(user: @user, url: "https://example.com/zone", title: "ゾーン資料")
+    get material_url(m)
+    assert_select "h2", text: "書誌情報"
+    assert_select "h2", text: "記事で使う"
+    assert_select "h3", text: "この資料を引用している記事"
+    assert_select ".usage", text: /まだ記事から引用されていません/
+    assert_select "h2", text: /コメント/
+    # 書誌が空でも案内つきでゾーンは出る
+    assert_select ".bibliography-section", text: /まだ書誌情報がありません/
   end
 
   test "show isolates delete in a danger zone, not the actions row" do
