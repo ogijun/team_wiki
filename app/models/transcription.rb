@@ -11,6 +11,7 @@ class Transcription < ApplicationRecord
 
   belongs_to :material
   belongs_to :author, class_name: "User"
+  has_many :revisions, class_name: "TranscriptionRevision", dependent: :destroy
 
   normalizes :creation_method, :ai_service, :ai_model, with: ->(v) { v.presence }
 
@@ -25,6 +26,13 @@ class Transcription < ApplicationRecord
   def status_label = STATUSES[status]
 
   def ai? = AI_METHODS.include?(creation_method)
+
+  # 版の author を初参加順（最初に貢献した順）で重複除去して返す（Article#contributors と同形）。
+  def contributors
+    ids = revisions.order(:created_at).pluck(:author_id).uniq
+    by_id = User.where(id: ids).with_attached_avatar.index_by(&:id)
+    ids.map { |id| by_id[id] }
+  end
 
   def long? = body.to_s.length > PREVIEW_LIMIT
   def preview_body = body.to_s.first(PREVIEW_LIMIT)

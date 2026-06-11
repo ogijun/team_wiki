@@ -20,6 +20,10 @@ class TranscriptionsController < ApplicationController
     @transcription.assign_attributes(transcription_params)
     @transcription.author = Current.user
     if @transcription.save
+      # 本文が変わった保存だけ版を追記（状態・作成手法のみの変更では版を作らない）。
+      if @transcription.saved_change_to_body?
+        @transcription.revisions.create!(author: Current.user, body: @transcription.body)
+      end
       ActivityRecorder.record(actor: Current.user,
                               action: was_new ? "transcription.created" : "transcription.edited",
                               subject: @material)

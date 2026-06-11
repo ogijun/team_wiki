@@ -1,0 +1,15 @@
+<% content_for :title, "文字起こしの履歴 — #{@material.title}" %>
+<%= link_to "← 文字起こし", material_transcription_path(@material), class: "back-link" %>
+<h1>文字起こしの履歴</h1>
+<p class="page-meta"><span><%= @material.title %></span></p>
+<ul>
+  <% @revisions.each do |rev| %>
+    <li>
+      <%= link_to "##{rev.id} #{rev.created_at.to_fs(:jp)}", material_transcription_revision_path(@material, rev) %>
+      by <%= display_name(rev.author) %>
+      <% if (prev = @previous_of[rev.id]) %>
+        <%= link_to "前の版との差分", material_transcription_revision_path(@material, rev, a: prev.id) %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
