@@ -309,6 +309,21 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_nil plain_entry["thumb_url"]
   end
 
+  test "create persists the bibliographic detail fields and show displays them" do
+    post materials_url, params: { material: {
+      url: "https://x.test/bib2", title: "詳細書誌資料",
+      isbn: "978-4-04-410103-3", pages: "pp.12-15", publisher: "サンプル書店", volume: "Vol.3"
+    } }
+    m = Material.find_by!(title: "詳細書誌資料")
+    assert_equal "978-4-04-410103-3", m.isbn
+
+    get material_url(m)
+    assert_select ".bibliography dt", text: "ISBN"
+    assert_select ".bibliography dd", text: "pp.12-15"
+    assert_select ".bibliography dd", text: "サンプル書店"
+    assert_select ".bibliography dd", text: "Vol.3"
+  end
+
   test "create persists bibliographic fields and year-only published date" do
     post materials_url, params: { material: {
       url: "https://x.test/a", source: "サンプル誌", author: "サンプル著者",
