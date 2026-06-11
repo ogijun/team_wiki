@@ -2,6 +2,11 @@ test:
   service: Disk
   root: <%= Rails.root.join("tmp/storage") %>
 
+# StorageMigrator のテスト用：service 間コピーの移行先（R2 認証情報なしで Disk→Disk を検証）
+test_secondary:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage_secondary") %>
+
 local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
