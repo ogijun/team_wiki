@@ -65,6 +65,19 @@ class TranscriptionTest < ActiveSupport::TestCase
     assert_equal "whisper-large-v3", t.ai_model
   end
 
+  test "preview helpers truncate long bodies and report the overflow" do
+    short = Transcription.new(body: "短い本文")
+    assert_not short.long?
+    assert_equal "短い本文", short.preview_body
+    assert_equal 0, short.overflow_chars
+
+    long_body = "あ" * (Transcription::PREVIEW_LIMIT + 250)
+    long = Transcription.new(body: long_body)
+    assert long.long?
+    assert_equal Transcription::PREVIEW_LIMIT, long.preview_body.length
+    assert_equal 250, long.overflow_chars
+  end
+
   test "creation_summary renders per method" do
     assert_nil Transcription.new.creation_summary
     assert_equal "手書き（聞き取り）", Transcription.new(creation_method: "manual").creation_summary

@@ -1,10 +1,15 @@
 class TranscriptionsController < ApplicationController
-  before_action :set_material, only: %i[edit update]
+  before_action :set_material, only: %i[show edit update]
   before_action :set_transcription, only: %i[edit update]
 
   def index
     materials = Material.includes(file_attachment: :blob, transcription: :author).select(&:transcribable?)
     @groups = materials.group_by { |m| m.transcription&.status || "todo" }
+  end
+
+  def show
+    @transcription = @material.transcription
+    redirect_to @material if @transcription.nil?
   end
 
   def edit

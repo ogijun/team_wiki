@@ -6,6 +6,8 @@ class Transcription < ApplicationRecord
     "ai_assisted" => "AI下書き＋人手修正"
   }.freeze
   AI_METHODS = %w[ai ai_assisted].freeze
+  # 資料詳細ページに出すプレビューの上限文字数。超過分は専用ページ（show）へ誘導する。
+  PREVIEW_LIMIT = 400
 
   belongs_to :material
   belongs_to :author, class_name: "User"
@@ -23,6 +25,10 @@ class Transcription < ApplicationRecord
   def status_label = STATUSES[status]
 
   def ai? = AI_METHODS.include?(creation_method)
+
+  def long? = body.to_s.length > PREVIEW_LIMIT
+  def preview_body = body.to_s.first(PREVIEW_LIMIT)
+  def overflow_chars = [ body.to_s.length - PREVIEW_LIMIT, 0 ].max
 
   # 「AI（OpenAI / whisper-large-v3）」のような表示用文字列。未記録は nil。
   def creation_summary

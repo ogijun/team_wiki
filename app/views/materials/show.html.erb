@@ -80,7 +80,10 @@
       <% if t.creation_summary %>
         <p class="meta">作成: <%= t.creation_summary %></p>
       <% end %>
-      <div class="prewrap"><%= t.body %></div>
+      <div class="prewrap"><%= t.preview_body %></div>
+      <% if t.long? %>
+        <p><%= link_to "続きを読む（あと#{number_with_delimiter(t.overflow_chars)}文字）", material_transcription_path(@material) %></p>
+      <% end %>
       <p><%= link_to "文字起こしを編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
     <% else %>
       <p class="muted">まだ文字起こしがありません。</p>
