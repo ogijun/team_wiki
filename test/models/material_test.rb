@@ -32,6 +32,29 @@ class MaterialTest < ActiveSupport::TestCase
     assert m.valid?, m.errors.full_messages.join(", ")
   end
 
+  test "bibliographic detail fields store values and normalize blanks to nil" do
+    m = Material.create!(user: @user, url: "https://x.test/bib", title: "書誌",
+                         isbn: "4-04-410103-9", pages: "12-15, 52", publisher: "サンプル書店", volume: "1991年4月号")
+    m.reload
+    assert_equal "4-04-410103-9", m.isbn
+    assert_equal "12-15, 52", m.pages
+    assert_equal "サンプル書店", m.publisher
+    assert_equal "1991年4月号", m.volume
+
+    m.update!(isbn: "", pages: "", publisher: "", volume: "")
+    assert_nil m.reload.isbn
+    assert_nil m.pages
+  end
+
+  test "isbn accepts loose ISBN shapes and rejects letters" do
+    base = { user: @user, url: "https://x.test/i", title: "i" }
+    assert Material.new(base.merge(isbn: "978-4-04-410103-3")).valid?
+    assert Material.new(base.merge(isbn: "404410103X")).valid?
+    bad = Material.new(base.merge(isbn: "ABC-DEF"))
+    assert_not bad.valid?
+    assert bad.errors[:isbn].any?
+  end
+
   test "link-type material is valid" do
     m = Material.new(user: @user, url: "https://youtu.be/abc123")
     assert m.valid?, m.errors.full_messages.join(", ")

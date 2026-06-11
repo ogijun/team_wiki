@@ -41,6 +41,11 @@ class Material < ApplicationRecord
   normalizes :rights, with: ->(v) { v.presence }
   validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
 
+  # 書誌の詳細（すべて任意・自由記述）。空文字は nil に揃える。
+  normalizes :isbn, :pages, :publisher, :volume, with: ->(v) { v.presence }
+  # ISBN は新旧・ハイフン有無の表記揺れを許容する緩い検証（数字・ハイフン・空白・チェック桁の X のみ）。
+  validates :isbn, format: { with: /\A[\d\-xX ]+\z/, message: "は数字・ハイフン・X のみで入力してください" }, allow_nil: true
+
   before_validation :assign_slug, on: :create
   before_validation :ensure_title, on: :create
   validates :slug, presence: true, uniqueness: true

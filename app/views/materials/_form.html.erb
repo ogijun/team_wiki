@@ -44,6 +44,8 @@
     <legend>出典情報（書けるところだけでOK）<%= optional_badge %></legend>
     <div class="field"><%= f.label :author, "著者・発言者" %><%= f.text_field :author %></div>
     <div class="field"><%= f.label :source, "出典元（掲載誌・書籍・サイト名）" %><%= f.text_field :source %></div>
+    <div class="field"><%= f.label :volume, "巻号" %><%= f.text_field :volume, placeholder: "例: 1991年4月号 / Vol.12" %></div>
+    <div class="field"><%= f.label :publisher, "出版社・発行元" %><%= f.text_field :publisher %></div>
     <div class="field">
       <%= f.label :published_year, "発行日" %>
       <span class="date-row">
@@ -52,6 +54,8 @@
         <%= f.number_field :published_day, in: 1..31, value: fuzzy_part(material.published, :day), placeholder: "日" %>
       </span>
     </div>
+    <div class="field"><%= f.label :pages, "ページ範囲（出版物の一部のとき）" %><%= f.text_field :pages, placeholder: "例: 12-15 / p.3 / 34-45, 52" %></div>
+    <div class="field"><%= f.label :isbn, "ISBN" %><%= f.text_field :isbn, placeholder: "例: 978-4-04-410103-3" %></div>
     <div class="field">
       <%= f.label :rights, "権利状態" %>
       <%= f.select :rights, Material::RIGHTS_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>

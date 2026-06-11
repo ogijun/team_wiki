@@ -35,11 +35,17 @@
 <section class="bibliography-section">
   <h2>書誌情報</h2>
   <% tags = @material.tags.to_a %>
-  <% if @material.author.present? || @material.source.present? || @material.published || tags.any? %>
+  <% details_present = @material.author.present? || @material.source.present? || @material.published ||
+                       @material.volume || @material.publisher || @material.pages || @material.isbn %>
+  <% if details_present || tags.any? %>
     <dl class="bibliography">
       <% if @material.author.present? %><dt>著者・発言者</dt><dd><%= @material.author %></dd><% end %>
       <% if @material.source.present? %><dt>出典元</dt><dd><%= @material.source %></dd><% end %>
+      <% if @material.volume %><dt>巻号</dt><dd><%= @material.volume %></dd><% end %>
+      <% if @material.publisher %><dt>出版社・発行元</dt><dd><%= @material.publisher %></dd><% end %>
       <% if @material.published %><dt>発行日</dt><dd><%= @material.published.label %></dd><% end %>
+      <% if @material.pages %><dt>ページ</dt><dd><%= @material.pages %></dd><% end %>
+      <% if @material.isbn %><dt>ISBN</dt><dd><%= @material.isbn %></dd><% end %>
       <% if tags.any? %>
         <dt>タグ</dt>
         <dd><% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></dd>
