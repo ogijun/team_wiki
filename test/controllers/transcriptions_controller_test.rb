@@ -10,6 +10,34 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     @link = Material.create!(user: @user, title: "外部記事", url: "https://example.com/x")
   end
 
+  test "show renders the full transcription body" do
+    Transcription.create!(material: @media, author: @user, body: "全" * 500, status: "done")
+    get material_transcription_url(@media)
+    assert_response :success
+    assert_select ".prewrap", text: /全{500}/
+    assert_select "a", text: "文字起こしを編集"
+  end
+
+  test "show redirects to the material when no transcription exists" do
+    get material_transcription_url(@media)
+    assert_redirected_to material_url(@media)
+  end
+
+  test "material page truncates a long transcription with an overflow link" do
+    Transcription.create!(material: @media, author: @user,
+                          body: "き" * (Transcription::PREVIEW_LIMIT + 123), status: "drafting")
+    get material_url(@media)
+    assert_select ".prewrap", text: /\Aき{#{Transcription::PREVIEW_LIMIT}}\z/
+    assert_select "a[href=?]", material_transcription_path(@media), text: /続きを読む（あと123文字）/
+  end
+
+  test "material page shows a short transcription in full without the overflow link" do
+    Transcription.create!(material: @media, author: @user, body: "短い全文", status: "done")
+    get material_url(@media)
+    assert_select ".prewrap", text: "短い全文"
+    assert_select "a", text: /続きを読む/, count: 0
+  end
+
   test "creates a transcription on update" do
     patch material_transcription_url(@media), params: { transcription: { body: "起こし本文", status: "drafting" } }
     assert_redirected_to material_url(@media)
