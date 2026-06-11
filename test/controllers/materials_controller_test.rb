@@ -122,6 +122,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".progress-strip .strip-step--done", text: /引用 1件/
   end
 
+  test "transcribable material without a transcription shows a clear 作成 CTA in the usage zone" do
+    media = Material.new(user: @user, title: "未起こし音声")
+    media.file.attach(io: StringIO.new("x"), filename: "c.mp3", content_type: "audio/mpeg")
+    media.save!
+    get material_url(media)
+    assert_select ".usage a[role=button][href=?]", edit_material_transcription_path(media), text: "文字起こしを作成"
+  end
+
   test "progress strip includes transcription state only for transcribable materials" do
     media = Material.new(user: @user, title: "音声S")
     media.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")

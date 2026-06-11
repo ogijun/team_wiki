@@ -84,7 +84,11 @@
     </ul>
   <% end %>
 
-  <%# 文字起こしは本文がある時だけここに出す（未着手の案内はストリップが担う） %>
+  <% if @material.transcribable? && @material.transcription.nil? %>
+    <h3>文字起こし</h3>
+    <p class="muted">このメディアはまだ文字起こしされていません。聞き取れた／読み取れた範囲でOKです。</p>
+    <%= link_to "文字起こしを作成", edit_material_transcription_path(@material), role: "button", class: "btn-sm" %>
+  <% end %>
   <% if @material.transcribable? && (t = @material.transcription) %>
     <h3>文字起こし
       <%= render BadgeComponent.new(text: t.status_label, variant: :status) %>
