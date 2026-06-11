@@ -350,6 +350,13 @@ form.button_to { display: inline; }
   font-size: 1.05rem; margin: 0 0 0.6rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline);
 }
 .usage h3, .transcription h3 { font-size: 0.92rem; color: var(--ink-soft); margin: 1.2rem 0 0.4rem; }
+/* 進行ストリップ: 資料の状態と次の行動を1行のピル列で示す */
+.progress-strip { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: -0.6rem 0 1.4rem; }
+.strip-step { font-size: 0.8rem; padding: 0.15rem 0.65rem; border-radius: 999px; }
+.strip-step--done { background: var(--accent-weak); color: var(--accent-dark); }
+.strip-step--todo { background: var(--code-bg); color: var(--ink-soft); }
+.strip-step--todo a { color: var(--accent); text-decoration: none; }
+.strip-step--todo a:hover { text-decoration: underline; }
 
 /* 「未実装/予定」を示す破線プレースホルダー */
 .placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
