@@ -7,6 +7,8 @@ module ActivitiesHelper
     "material.added"   => [ "が資料", "を追加しました" ],
     "material.deleted" => [ "が資料", "を削除しました" ],
     "comment.posted"   => [ "が", "にコメントしました" ],
+    "transcription.created" => [ "が", "の文字起こしを作成しました" ],
+    "transcription.edited"  => [ "が", "の文字起こしを編集しました" ],
     "tag.created"      => [ "がタグ", "を作成しました" ],
     "tag.deleted"      => [ "がタグ", "を削除しました" ],
     "user.joined"      => [ "", "が参加しました" ]
