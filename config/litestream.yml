@@ -1,0 +1,20 @@
+# Litestream の設定ファイル（litestream.io/reference/config/）。
+# 値は ENV で注入する。ENV が無ければ litestream プロセス自体を起動しないので
+# （config/puma.rb のガードと bin/kamal の env を参照）、このファイルは安全に no-op になる。
+#
+# 複製対象は primary（本体データ）のみ。cache/queue/cable は Solid Cache/Queue/Cable の
+# 再生成可能な状態なので複製しない（障害時はマイグレーションで作り直せる）。
+#
+# R2 は S3 互換。endpoint は https://<account_id>.r2.cloudflarestorage.com 形式を
+# LITESTREAM_REPLICA_ENDPOINT で渡す。region は R2 では実質無視されるが S3 クライアントが
+# 値を要求するため LITESTREAM_REPLICA_REGION（慣例で auto）を渡す。
+dbs:
+  - path: storage/production.sqlite3
+    replicas:
+      - type: s3
+        bucket: $LITESTREAM_REPLICA_BUCKET
+        path: storage/production.sqlite3
+        endpoint: $LITESTREAM_REPLICA_ENDPOINT
+        region: $LITESTREAM_REPLICA_REGION
+        access-key-id: $LITESTREAM_ACCESS_KEY_ID
+        secret-access-key: $LITESTREAM_SECRET_ACCESS_KEY
