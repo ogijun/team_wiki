@@ -162,6 +162,12 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "未着手動画"
     assert_select "a", text: "完了音声"
     assert_select "a", text: "リンク", count: 0
+
+    # 文字起こしがある行のタイトルは Transcription#show へ、資料へは landmark アイコンの別リンク
+    assert_select "a[href=?]", material_transcription_path(done), text: "完了音声"
+    assert_select "a[href=?] svg use[href*=landmark]", material_path(done)
+    # 未着手はまだ show が無いので従来どおり資料へ
+    assert_select "a[href=?]", material_path(todo), text: "未着手動画"
   end
 
   test "index shows the assignee for in-progress transcripts" do

@@ -214,11 +214,19 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "最初の方針メモ", article.comments.first.body
   end
 
+  test "index uses the rows layout with a newspaper icon per article" do
+    Article.create!(title: "行形式記事", created_by: @user)
+    get articles_url
+    assert_select "ul.rows li.row", minimum: 1
+    assert_select ".row__main svg use[href*=newspaper]"
+    assert_select ".row .meta"
+  end
+
   test "index shows the comment count when present" do
     article = Article.create!(title: "コメント付き記事", created_by: @user)
     article.comments.create!(body: "x", author: @user)
     get articles_url
-    assert_select "li small", text: /・1/
-    assert_select "li small svg use[href*=?]", "message-circle"
+    assert_select "li .meta", text: /・1/
+    assert_select "li .meta svg use[href*=?]", "message-circle"
   end
 end
