@@ -10,11 +10,11 @@
   <% Article::STATUSES.each do |slug, label| %><%= link_to label, articles_path(status: slug, kind: params[:kind]) %> <% end %>
 </p>
 <% if @articles.any? %>
-  <ul>
+  <ul class="rows">
     <% @articles.each do |article| %>
-      <li>
-        <%= link_to article.title, article %>
-        <small><%= article_meta(article) %></small>
+      <li class="row">
+        <span class="row__main"><%= icon("newspaper") %> <%= link_to article.title, article %></span>
+        <span class="meta"><%= article_meta(article) %></span>
       </li>
     <% end %>
   </ul>
