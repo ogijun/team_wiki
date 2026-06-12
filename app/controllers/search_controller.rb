@@ -8,11 +8,11 @@ class SearchController < ApplicationController
     end
 
     like = "%#{ActiveRecord::Base.sanitize_sql_like(@q)}%"
-    @articles = Article.joins(:current_revision)
+    @articles = Article.joins(:current_revision).includes(:current_revision)
                        .where("articles.title LIKE :q OR revisions.body LIKE :q", q: like)
                        .distinct
                        .order(updated_at: :desc)
-    @materials = Material.left_joins(:transcription)
+    @materials = Material.left_joins(:transcription).includes(:transcription)
                          .where("materials.title LIKE :q OR transcriptions.body LIKE :q", q: like)
                          .distinct
                          .order(updated_at: :desc)

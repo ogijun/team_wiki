@@ -8,18 +8,28 @@
 
   <% if @articles.any? %>
     <h2>記事</h2>
-    <ul>
+    <ul class="search-results">
       <% @articles.each do |article| %>
-        <li><%= link_to article.title, article %></li>
+        <li>
+          <%= link_to article.title, article %>
+          <% if (snippet = search_snippet(article.current_revision&.body, @q)) %>
+            <div class="search-snippet muted"><%= snippet %></div>
+          <% end %>
+        </li>
       <% end %>
     </ul>
   <% end %>
 
   <% if @materials.any? %>
     <h2>資料</h2>
-    <ul>
+    <ul class="search-results">
       <% @materials.each do |m| %>
-        <li><%= media_icon(m) %> <%= link_to m.title, m %><% if m.transcription %> <span class="muted">（文字起こしあり）</span><% end %></li>
+        <li>
+          <%= media_icon(m) %> <%= link_to m.title, m %>
+          <% if (snippet = search_snippet(m.transcription&.body, @q)) %>
+            <div class="search-snippet muted">文字起こし: <%= snippet %></div>
+          <% end %>
+        </li>
       <% end %>
     </ul>
   <% end %>
