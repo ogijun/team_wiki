@@ -33,6 +33,20 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "タイトル一致イデオン資料"
   end
 
+  test "results show highlighted snippets around the match" do
+    get search_url, params: { q: "キーワード" }
+    assert_select ".search-snippet mark", text: "キーワード"
+    assert_select ".search-snippet", text: /本文に.*含む/m
+
+    media = Material.new(user: @user, title: "断片音声")
+    media.file.attach(io: StringIO.new("x"), filename: "h.mp3", content_type: "audio/mpeg")
+    media.save!
+    Transcription.create!(material: media, author: @user,
+                          body: "前置き" * 30 + "ハイライト対象" + "後続" * 30, status: "drafting")
+    get search_url, params: { q: "ハイライト対象" }
+    assert_select ".search-snippet mark", text: "ハイライト対象"
+  end
+
   test "empty query returns no results section error" do
     get search_url, params: { q: "" }
     assert_response :success
