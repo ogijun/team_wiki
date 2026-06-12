@@ -6,35 +6,25 @@
 <% if @q.present? %>
   <p class="muted search-note">いまはまだ全文検索が有効になっていないため、検索精度はよくありません。</p>
 
-  <% if @articles.any? %>
-    <h2>記事</h2>
+  <% if @results.any? %>
     <ul class="search-results">
-      <% @articles.each do |article| %>
+      <% @results.each do |r| %>
         <li>
-          <%= link_to article.title, article %>
-          <% if (snippet = search_snippet(article.current_revision&.body, @q)) %>
-            <div class="search-snippet muted"><%= snippet %></div>
+          <% if r.is_a?(Article) %>
+            📝 <%= link_to search_mark(r.title, @q), r %>
+            <% if (snippet = search_snippet(r.current_revision&.body, @q)) %>
+              <div class="search-snippet muted"><%= snippet %></div>
+            <% end %>
+          <% else %>
+            <%= media_icon(r) %> <%= link_to search_mark(r.title, @q), r %>
+            <% if (snippet = search_snippet(r.transcription&.body, @q)) %>
+              <div class="search-snippet muted">文字起こし: <%= snippet %></div>
+            <% end %>
           <% end %>
         </li>
       <% end %>
     </ul>
-  <% end %>
-
-  <% if @materials.any? %>
-    <h2>資料</h2>
-    <ul class="search-results">
-      <% @materials.each do |m| %>
-        <li>
-          <%= media_icon(m) %> <%= link_to m.title, m %>
-          <% if (snippet = search_snippet(m.transcription&.body, @q)) %>
-            <div class="search-snippet muted">文字起こし: <%= snippet %></div>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
-
-  <% if @articles.empty? && @materials.empty? %>
+  <% else %>
     <div class="empty-state">
       「<%= @q %>」に一致する記事・資料は見つかりませんでした。別の言葉や、名前の一部でもお試しください。（全文検索は今後対応予定です）
     </div>

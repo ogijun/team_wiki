@@ -1,4 +1,14 @@
 module SearchHelper
+  # テキスト全体を（切り出しなしで）エスケープし、query のマッチを <mark> にする。
+  # タイトル行のハイライト用。マッチが無くてもエスケープ済みテキストを返す。
+  def search_mark(text, query)
+    return text if text.blank? || query.blank?
+    parts = text.split(/(#{Regexp.escape(query)})/i).map do |part|
+      part.casecmp?(query) ? tag.mark(part) : part
+    end
+    safe_join(parts)
+  end
+
   # 最初のマッチ位置の前後 radius 文字を切り出し、マッチを <mark> でハイライトして返す。
   # 周辺テキストは Rails の highlight がエスケープする。マッチが無ければ nil（呼び出し側で非表示）。
   def search_snippet(text, query, radius: 40)
