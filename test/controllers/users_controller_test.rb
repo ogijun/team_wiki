@@ -20,6 +20,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select "li", text: /テストタグ/
   end
 
+  test "profile timeline omits the actor name and shows the streak line" do
+    ActivityRecorder.record(actor: @user, action: "tag.created", subject_label: "主語なしタグ")
+    get user_url(@user)
+    # 自分のページでは「◯◯が」を繰り返さない
+    assert_select ".timeline strong", count: 0
+    assert_select ".timeline li", text: /\Aタグ「主語なしタグ」を作成しました/
+    assert_select ".my-streak", text: /累計.*1.*日活動/m
+  end
+
   test "members index is admin only" do
     get users_url
     assert_redirected_to root_url
