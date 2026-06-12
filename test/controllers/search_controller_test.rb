@@ -20,6 +20,19 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "Ruby入門"
   end
 
+  test "matches transcription bodies and material titles in a 資料 section" do
+    media = Material.new(user: @user, title: "検索音声")
+    media.file.attach(io: StringIO.new("x"), filename: "q.mp3", content_type: "audio/mpeg")
+    media.save!
+    Transcription.create!(material: media, author: @user, body: "文字起こしに固有語イデオン含む", status: "drafting")
+    Material.create!(user: @user, url: "https://example.com/t", title: "タイトル一致イデオン資料")
+
+    get search_url, params: { q: "イデオン" }
+    assert_select "h2", text: "資料"
+    assert_select "a", text: "検索音声"
+    assert_select "a", text: "タイトル一致イデオン資料"
+  end
+
   test "empty query returns no results section error" do
     get search_url, params: { q: "" }
     assert_response :success

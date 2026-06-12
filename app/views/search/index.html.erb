@@ -5,15 +5,28 @@
 
 <% if @q.present? %>
   <p class="muted search-note">いまはまだ全文検索が有効になっていないため、検索精度はよくありません。</p>
+
   <% if @articles.any? %>
+    <h2>記事</h2>
     <ul>
       <% @articles.each do |article| %>
         <li><%= link_to article.title, article %></li>
       <% end %>
     </ul>
-  <% else %>
+  <% end %>
+
+  <% if @materials.any? %>
+    <h2>資料</h2>
+    <ul>
+      <% @materials.each do |m| %>
+        <li><%= media_icon(m) %> <%= link_to m.title, m %><% if m.transcription %> <span class="muted">（文字起こしあり）</span><% end %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if @articles.empty? && @materials.empty? %>
     <div class="empty-state">
-      「<%= @q %>」に一致する記事は見つかりませんでした。別の言葉や、記事名の一部でもお試しください。（全文検索は今後対応予定です）
+      「<%= @q %>」に一致する記事・資料は見つかりませんでした。別の言葉や、名前の一部でもお試しください。（全文検索は今後対応予定です）
     </div>
   <% end %>
 <% end %>
