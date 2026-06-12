@@ -4,10 +4,10 @@
 </div>
 
 <section class="dashboard-stats">
-  <span><strong><%= @stats[:articles] %></strong> 記事</span>
-  <span><strong><%= @stats[:materials] %></strong> 資料</span>
-  <span><strong><%= @stats[:unconfirmed_materials] %></strong> 未確認資料</span>
-  <span><strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
+  <span>📝 <strong><%= @stats[:articles] %></strong> 記事</span>
+  <span>📚 <strong><%= @stats[:materials] %></strong> 資料</span>
+  <span>🔍 <strong><%= @stats[:unconfirmed_materials] %></strong> 未確認資料</span>
+  <span>✍️ <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
 </section>
 
 <% if @my_stats[:active_days].positive? %>
