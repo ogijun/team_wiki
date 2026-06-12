@@ -11,7 +11,7 @@
       <% @results.each do |r| %>
         <li>
           <% if r.is_a?(Article) %>
-            📝 <%= link_to search_mark(r.title, @q), r %>
+            <%= icon("newspaper") %> <%= link_to search_mark(r.title, @q), r %>
             <% if (snippet = search_snippet(r.current_revision&.body, @q)) %>
               <div class="search-snippet muted"><%= snippet %></div>
             <% end %>

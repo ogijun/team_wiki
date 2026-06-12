@@ -218,6 +218,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     article = Article.create!(title: "コメント付き記事", created_by: @user)
     article.comments.create!(body: "x", author: @user)
     get articles_url
-    assert_select "li", text: /💬1/
+    assert_select "li small", text: /・1/
+    assert_select "li small svg use[href*=?]", "message-circle"
   end
 end

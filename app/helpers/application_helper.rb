@@ -22,15 +22,23 @@ module ApplicationHelper
     ).render(text)
   end
 
+  # ── アイコン（vendored Lucide スプライト app/assets/images/icons.svg の symbol を参照）──
+  def icon(name, css: nil)
+    tag.svg(class: [ "icon", css ].compact.join(" "), "aria-hidden": true) do
+      tag.use(href: "#{asset_path("icons.svg")}##{name}")
+    end
+  end
+
   # ── フォームの必須/任意バッジ（ラベル横に置く）──
   def required_badge = tag.span("必須", class: "field-badge field-badge--req")
   def optional_badge = tag.span("任意", class: "field-badge field-badge--opt")
 
-  # 記事一覧の小さなメタ行（状態・種別 / 更新日 ・💬件数）を組み立てる。
+  # 記事一覧の小さなメタ行（状態・種別 / 更新日 ・コメント件数）を組み立てる。
   def article_meta(article)
     kind = "・#{article.kind_label}" if article.kind
-    comments = " ・💬#{article.comments_count}" if article.comments_count.positive?
-    "#{article.status_label}#{kind} / #{article.updated_at.to_date.to_fs(:jp)}#{comments}"
+    base = "#{article.status_label}#{kind} / #{article.updated_at.to_date.to_fs(:jp)}"
+    return base unless article.comments_count.positive?
+    safe_join([ base, " ・", icon("message-circle"), article.comments_count.to_s ])
   end
 
   # ── ブランド表示 ──

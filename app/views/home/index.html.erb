@@ -4,17 +4,17 @@
 </div>
 
 <section class="dashboard-stats">
-  <span>📝 <strong><%= @stats[:articles_count] %></strong> 記事</span>
-  <span>📚 <strong><%= @stats[:materials_count] %></strong> 資料</span>
-  <span>🔍 <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
-  <span>✍️ <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
-  <span><%= link_to "推移 📈", stats_path %></span>
+  <span><%= icon("pencil-line") %> <strong><%= @stats[:articles_count] %></strong> 記事</span>
+  <span><%= icon("library-big") %> <strong><%= @stats[:materials_count] %></strong> 資料</span>
+  <span><%= icon("search") %> <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
+  <span><%= icon("pen-line") %> <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
+  <span><%= link_to stats_path do %>推移 <%= icon("trending-up") %><% end %></span>
 </section>
 
 <% if @my_stats[:active_days].positive? %>
   <p class="my-streak muted">
     <%= avatar_tag(Current.user, size: 18) %> あなた:
-    <% if @my_stats[:current_streak].positive? %>🔥 <strong><%= @my_stats[:current_streak] %></strong>日連続活動中 ・<% end %>
+    <% if @my_stats[:current_streak].positive? %><%= icon("flame") %> <strong><%= @my_stats[:current_streak] %></strong>日連続活動中 ・<% end %>
     最長 <strong><%= @my_stats[:longest_streak] %></strong>日 ・ 累計 <strong><%= @my_stats[:active_days] %></strong>日活動
   </p>
 <% end %>

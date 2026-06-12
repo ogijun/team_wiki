@@ -28,7 +28,7 @@ class MaterialThumbComponentTest < ViewComponent::TestCase
   test "renders link icon for a non-youtube link" do
     m = Material.create!(user: @user, url: "https://example.com/page")
     html = render_inline(MaterialThumbComponent.new(material: m)).to_html
-    assert_includes html, "🔗"
+    assert_includes html, "#link"
     assert_no_match(/<img /, html)
   end
 
@@ -36,6 +36,6 @@ class MaterialThumbComponentTest < ViewComponent::TestCase
     m = attach(Material.new(user: @user), "d.pdf", "application/pdf", "%PDF-1.4")
     m.save!
     html = render_inline(MaterialThumbComponent.new(material: m)).to_html
-    assert_includes html, "📄"
+    assert_includes html, "#file-text"
   end
 end

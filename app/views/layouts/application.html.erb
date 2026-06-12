@@ -36,7 +36,7 @@
 
   <body data-controller="sidebar">
     <header class="topbar">
-      <button type="button" class="topbar__toggle" data-action="sidebar#toggle" aria-label="メニューを開閉">☰</button>
+      <button type="button" class="topbar__toggle" data-action="sidebar#toggle" aria-label="メニューを開閉"><%= icon("menu") %></button>
       <strong class="brand"><%= link_to brand_display, root_path %></strong>
     </header>
 
@@ -48,20 +48,20 @@
       </form>
 
       <nav class="sidebar__nav" data-action="click->sidebar#close">
-        <%= link_to "ホーム", root_path %>
+        <%= link_to root_path do %><%= icon("house") %> ホーム<% end %>
         <div class="nav-group">
           <span class="nav-group__label">コンテンツ</span>
-          <%= link_to "記事一覧", articles_path %>
-          <%= link_to chronicle_path do %>年表 <small class="wip">(検討中)</small><% end %>
-          <%= link_to "タグ", tags_path %>
-          <%= link_to "資料", materials_path %>
-          <%= link_to "文字起こし", transcriptions_path %>
+          <%= link_to articles_path do %><%= icon("newspaper") %> 記事一覧<% end %>
+          <%= link_to chronicle_path do %><%= icon("calendar-days") %> 年表 <small class="wip">(検討中)</small><% end %>
+          <%= link_to tags_path do %><%= icon("tags") %> タグ<% end %>
+          <%= link_to materials_path do %><%= icon("archive") %> 資料<% end %>
+          <%= link_to transcriptions_path do %><%= icon("audio-lines") %> 文字起こし<% end %>
         </div>
         <% if Current.user&.admin? %>
           <div class="nav-group">
             <span class="nav-group__label">管理</span>
-            <%= link_to "メンバー", users_path %>
-            <%= link_to "設定", edit_settings_path %>
+            <%= link_to users_path do %><%= icon("users") %> メンバー<% end %>
+            <%= link_to edit_settings_path do %><%= icon("settings") %> 設定<% end %>
           </div>
         <% end %>
       </nav>
@@ -74,7 +74,7 @@
             <%= button_to "ログアウト", session_path, method: :delete, class: "secondary outline btn-sm" %>
           </div>
         <% end %>
-        <%= link_to "このサイトについて", about_path, class: "sidebar__about", data: { action: "click->sidebar#close" } %>
+        <%= link_to about_path, class: "sidebar__about", data: { action: "click->sidebar#close" } do %><%= icon("info") %> このサイトについて<% end %>
       </div>
     </aside>
 
