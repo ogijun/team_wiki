@@ -1,14 +1,29 @@
 import { Controller } from "@hotwired/stimulus"
 
-// PDF.js によるページ単位ビューア。本体は importmap 経由で CDN から動的 import するので、
-// PDF の無いページでは一切ダウンロードされない。配信は ActiveStorage のプロキシ URL
-// （同一オリジン・Range 対応）なので、大きな PDF でも必要なチャンクだけ取得して描画できる。
+// PDF.js によるページ単位ビューア。ファイル名クリックで開閉し、初回オープン時にだけ
+// 本体を CDN から動的 import する（開かなければ一切ダウンロードされない）。
+// 配信は ActiveStorage のプロキシ URL（同一オリジン・Range 対応）なので、
+// 大きな PDF でも表示ページに必要なチャンクだけ取得して描画する。
 export default class extends Controller {
-  static targets = ["canvas", "page", "status"]
+  static targets = ["placeholder", "viewer", "canvas", "page", "status"]
   static values = { url: String }
 
-  async connect() {
+  async toggle(event) {
+    event.preventDefault()
+    if (this.viewerTarget.hidden) {
+      this.viewerTarget.hidden = false
+      this.placeholderTarget.hidden = true
+      await this.load()
+    } else {
+      this.viewerTarget.hidden = true
+      this.placeholderTarget.hidden = false
+    }
+  }
+
+  async load() {
+    if (this.doc) return
     this.pageNum = 1
+    this.statusTarget.textContent = "読み込み中…"
     try {
       const pdfjs = await import("pdfjs-dist")
       pdfjs.GlobalWorkerOptions.workerSrc =
@@ -17,6 +32,7 @@ export default class extends Controller {
       this.doc = await pdfjs.getDocument({
         url: this.urlValue, disableAutoFetch: true, disableStream: true
       }).promise
+      this.statusTarget.textContent = ""
       await this.render()
     } catch {
       this.statusTarget.textContent = "プレビューを読み込めませんでした（ダウンロードしてご覧ください）"
@@ -40,10 +56,10 @@ export default class extends Controller {
   }
 
   prev() {
-    if (this.pageNum > 1) { this.pageNum--; this.render() }
+    if (this.doc && this.pageNum > 1) { this.pageNum--; this.render() }
   }
 
   next() {
-    if (this.pageNum < this.doc.numPages) { this.pageNum++; this.render() }
+    if (this.doc && this.pageNum < this.doc.numPages) { this.pageNum++; this.render() }
   }
 }
