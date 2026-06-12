@@ -1,0 +1,13 @@
+<%# 既存タグ辞書とのマッチから出すタグ候補（人がワンクリックで確定） %>
+<% suggestions = TagSuggester.call(taggable) %>
+<% if suggestions.any? %>
+  <%# button_to は <form> を生むので <p> ではなく <div> で包む（p 内の form は HTML 的に弾かれる） %>
+  <div class="tag-suggestions muted">
+    <%= icon("tags") %> タグ候補:
+    <% suggestions.each do |tag| %>
+      <%= button_to "##{tag.name}", polymorphic_path([ taggable, :taggings ], tag_slug: tag.slug),
+                    class: "btn-sm secondary outline", title: "タグを追加" %>
+    <% end %>
+    <span class="tag-suggestions__hint">本文・メタデータに出現している既存タグです（クリックで追加）</span>
+  </div>
+<% end %>
