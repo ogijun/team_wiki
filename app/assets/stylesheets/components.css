@@ -39,9 +39,11 @@
 /* SVG アイコン（Lucide スプライト）: 文字サイズ追従・currentColor で着色 */
 .icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
 
-/* タイムライン: 黒点マーカーの代わりにアクション種別アイコンを行頭に出す */
+/* タイムライン: 黒点マーカーの代わりにアクション種別アイコンを行頭に出す
+   （Pico は li 側にもマーカーを当てるので両方で無効化する） */
 .timeline { list-style: none; padding-left: 0; margin: 0; }
-.timeline li { margin-bottom: 0.45rem; }
+.timeline li { list-style: none; margin-bottom: 0.45rem; }
+.timeline li::marker { content: none; }
 .timeline__icon { color: var(--muted); margin-right: 0.35rem; }
 
 /* 改行を保持して表示（文字起こし本文など） */

@@ -19,7 +19,7 @@ module ActivitiesHelper
     "article.created"  => "newspaper",
     "article.edited"   => "pencil-line",
     "article.deleted"  => "trash-2",
-    "material.added"   => "archive",
+    "material.added"   => "landmark",
     "material.deleted" => "trash-2",
     "comment.posted"   => "message-circle",
     "transcription.created" => "audio-lines",
