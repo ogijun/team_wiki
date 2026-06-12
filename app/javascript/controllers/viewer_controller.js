@@ -1,12 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 
-// 汎用の開閉ビューア（画像の原寸表示など）。viewer ターゲットの hidden をトグルするだけ。
-// 中の <img loading="lazy"> は hidden の間は取得されないので、開くまで原寸は読まれない。
+// 汎用のオーバーレイビューア（画像の原寸表示など）。<dialog> を showModal で開く。
+// 閉じるのは ESC（dialog 標準）か背景クリック。閉じている間は display:none なので
+// 中の <img loading="lazy"> は開くまで取得されない。
 export default class extends Controller {
-  static targets = ["viewer"]
+  static targets = ["dialog"]
 
-  toggle(event) {
+  open(event) {
     event.preventDefault()
-    this.viewerTarget.hidden = !this.viewerTarget.hidden
+    this.dialogTarget.showModal()
+  }
+
+  // dialog 自身（=背景余白）がクリックされたときだけ閉じる
+  backdropClose(event) {
+    if (event.target === this.dialogTarget) this.dialogTarget.close()
   }
 }

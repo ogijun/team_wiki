@@ -1,23 +1,26 @@
 import { Controller } from "@hotwired/stimulus"
 
-// PDF.js によるページ単位ビューア。ファイル名クリックで開閉し、初回オープン時にだけ
+// PDF.js によるページ単位ビューア。ファイル名クリックで <dialog> オーバーレイとして開き、初回オープン時にだけ
 // 本体を CDN から動的 import する（開かなければ一切ダウンロードされない）。
 // 配信は ActiveStorage のプロキシ URL（同一オリジン・Range 対応）なので、
 // 大きな PDF でも表示ページに必要なチャンクだけ取得して描画する。
 export default class extends Controller {
-  static targets = ["placeholder", "viewer", "canvas", "page", "status"]
+  static targets = ["dialog", "canvas", "page", "status"]
   static values = { url: String }
 
-  async toggle(event) {
+  async open(event) {
     event.preventDefault()
-    if (this.viewerTarget.hidden) {
-      this.viewerTarget.hidden = false
-      this.placeholderTarget.hidden = true
-      await this.load()
-    } else {
-      this.viewerTarget.hidden = true
-      this.placeholderTarget.hidden = false
-    }
+    this.dialogTarget.showModal()
+    await this.load()
+  }
+
+  close() {
+    this.dialogTarget.close()
+  }
+
+  // dialog 自身（=背景余白）がクリックされたときだけ閉じる
+  backdropClose(event) {
+    if (event.target === this.dialogTarget) this.dialogTarget.close()
   }
 
   async load() {
