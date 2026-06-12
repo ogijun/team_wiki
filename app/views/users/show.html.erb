@@ -5,7 +5,7 @@
   <% stats = @user.activity_stats %>
   <% if stats[:active_days].positive? %>
     <p class="my-streak muted">
-      <% if stats[:current_streak].positive? %>🔥 <strong><%= stats[:current_streak] %></strong>日連続活動中 ・<% end %>
+      <% if stats[:current_streak].positive? %><%= icon("flame") %> <strong><%= stats[:current_streak] %></strong>日連続活動中 ・<% end %>
       最長 <strong><%= stats[:longest_streak] %></strong>日 ・ 累計 <strong><%= stats[:active_days] %></strong>日活動
     </p>
   <% end %>

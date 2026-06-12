@@ -10,14 +10,14 @@
   <p class="muted"><%= @snapshots.first.date.to_fs(:jp) %> 〜 <%= @snapshots.last.date.to_fs(:jp) %>（<%= @snapshots.size %>日分）</p>
   <div class="stat-charts">
     <% {
-      "📝 記事" => :articles_count,
-      "📚 資料" => :materials_count,
-      "🔍 未確認資料" => :unconfirmed_materials_count,
-      "✍️ 文字起こし済（文字）" => :transcribed_chars
-    }.each do |label, column| %>
+      "記事" => [ :articles_count, "pencil-line" ],
+      "資料" => [ :materials_count, "library-big" ],
+      "未確認資料" => [ :unconfirmed_materials_count, "search" ],
+      "文字起こし済（文字）" => [ :transcribed_chars, "pen-line" ]
+    }.each do |label, (column, icon_name)| %>
       <% values = @snapshots.map { |s| s.public_send(column) } %>
       <div class="stat-chart">
-        <div class="stat-chart__head"><%= label %> <strong><%= number_with_delimiter(values.last) %></strong></div>
+        <div class="stat-chart__head"><%= icon(icon_name) %> <%= label %> <strong><%= number_with_delimiter(values.last) %></strong></div>
         <%= sparkline_svg(values) %>
       </div>
     <% end %>

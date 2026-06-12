@@ -18,7 +18,7 @@ class FuzzyDateComponentTest < ViewComponent::TestCase
   test "icon: true prefixes a calendar" do
     fd = FuzzyDate.wrap(Time.zone.local(1979), "year")
     html = render_inline(FuzzyDateComponent.new(starts: fd, icon: true)).to_html
-    assert_includes html, "🗓"
+    assert_includes html, "#calendar"
   end
 
   test "renders nothing when starts is nil" do

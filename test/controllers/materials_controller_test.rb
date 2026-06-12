@@ -183,7 +183,8 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     m = Material.create!(user: @user, url: "https://example.com/cc", title: "コメント資料CC")
     m.comments.create!(body: "x", author: @user)
     get materials_url
-    assert_select "td", text: /💬1/
+    assert_select "td .muted svg use[href*=?]", "message-circle"
+    assert_select "td .muted", text: /1/
   end
 
   test "create stores the extracted file date and posts a candidates comment" do

@@ -1,1 +1,1 @@
-<span class="when"><% if @icon %>🗓 <% end %><%= @starts.label %><% if @ends %> 〜 <%= @ends.label %><% end %></span>
+<span class="when"><% if @icon %><%= helpers.icon("calendar") %> <% end %><%= @starts.label %><% if @ends %> 〜 <%= @ends.label %><% end %></span>

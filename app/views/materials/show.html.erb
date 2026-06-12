@@ -9,11 +9,13 @@
   <%= link_to "資料情報を編集", edit_material_path(@material), role: "button", class: "btn-sm secondary outline" %>
 </div>
 
-<%# 進行ストリップ: 状態の全体像と次の行動を1行で。済み=✓ / 未完=リンク %>
+<%# 進行ストリップ: 状態の全体像と次の行動を1行で。済み=チェック / 未完=リンク %>
 <ul class="progress-strip">
   <% material_progress_steps(@material).each do |step| %>
     <li class="strip-step <%= step[:done] ? "strip-step--done" : "strip-step--todo" %>">
-      <% if step[:done] || step[:path].nil? %>
+      <% if step[:done] %>
+        <%= icon("check") %> <%= step[:text] %>
+      <% elsif step[:path].nil? %>
         <%= step[:text] %>
       <% else %>
         <%= link_to step[:text], step[:path] %>
@@ -37,7 +39,7 @@
     <% else %>
       <div class="placeholder">プレビューは準備中です（PDF などのプレビュー表示は今後対応）</div>
     <% end %>
-    <p><%= link_to "⬇ #{@material.file.filename}", rails_blob_path(@material.file) %></p>
+    <p><%= link_to rails_blob_path(@material.file) do %><%= icon("download") %> <%= @material.file.filename %><% end %></p>
   <% end %>
   <% if @material.description.present? %>
     <%= simple_format @material.description %>

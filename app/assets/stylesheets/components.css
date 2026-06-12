@@ -36,6 +36,9 @@
 /* Muted text utility (Pico classless has no .muted class of its own) */
 .muted { color: var(--muted); }
 
+/* SVG アイコン（Lucide スプライト）: 文字サイズ追従・currentColor で着色 */
+.icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+
 /* 改行を保持して表示（文字起こし本文など） */
 .prewrap { white-space: pre-wrap; }
 
