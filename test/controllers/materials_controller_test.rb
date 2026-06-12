@@ -79,11 +79,23 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "+09:00", m.created_at.formatted_offset
   end
 
-  test "material detail shows the preview placeholder only for non-previewable files" do
+  test "pdf material gets the PDF.js viewer wired to the proxy url" do
     pdf = Material.new(user: @user, title: "PDF資料")
     pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "doc.pdf", content_type: "application/pdf")
     pdf.save!
     get material_url(pdf)
+    assert_select ".pdf-viewer[data-controller=pdf]" do
+      assert_select "[data-pdf-url-value=?]", rails_storage_proxy_path(pdf.file)
+    end
+    assert_select ".placeholder", count: 0
+  end
+
+  test "material detail shows the preview placeholder only for non-previewable files" do
+    doc = Material.new(user: @user, title: "DOCX資料")
+    doc.file.attach(io: StringIO.new("x"), filename: "d.docx",
+                    content_type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    doc.save!
+    get material_url(doc)
     assert_select ".placeholder"
 
     link = Material.create!(user: @user, url: "https://example.com/a", title: "リンク資料")
