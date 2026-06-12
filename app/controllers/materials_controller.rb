@@ -73,11 +73,27 @@ class MaterialsController < ApplicationController
     Material.transaction do
       material.save!
       add_first_comment(material, params[:first_comment])
+      record_extracted_metadata(material)
       StubArticleForMaterial.call(material: material, author: Current.user) if params[:create_stub_article] == "1"
     end
     true
   rescue ActiveRecord::RecordInvalid
     false
+  end
+
+  # EXIF/PDF メタデータの抽出結果を記録する。日時はファイル作成日カラムへ
+  # （発行日とは別物：スキャン/撮影日であることが多いため年表には使わない）、
+  # その他はコメントに候補として列挙し、人が書誌へ転記する。
+  def record_extracted_metadata(material)
+    result = MaterialMetadataExtractor.call(material)
+    material.update_column(:file_created_at, result[:file_created_at]) if result[:file_created_at]
+    return if result[:details].empty?
+
+    lines = result[:details].map { |label, value| "・#{label}: #{value}" }
+    material.comments.create!(
+      author: Current.user,
+      body: "📄 ファイルのメタデータから自動抽出した候補です（要確認）:\n#{lines.join("\n")}\n書誌情報の参考にどうぞ。"
+    )
   end
 
   def set_material

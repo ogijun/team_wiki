@@ -186,6 +186,33 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /💬1/
   end
 
+  test "create stores the extracted file date and posts a candidates comment" do
+    extracted = { file_created_at: Time.zone.local(2020, 3, 16, 10, 0),
+                  details: { "タイトル (PDF)" => "Sample Doc", "撮影日時 (EXIF)" => "2020年3月16日 10:00" } }
+    file = fixture_file_upload("example-photo.png", "image/png")
+    stub_singleton(MaterialMetadataExtractor, :call, extracted) do
+      post materials_url, params: { material: { file: file, title: "抽出資料" } }
+    end
+    m = Material.find_by!(title: "抽出資料")
+    assert_equal Time.zone.local(2020, 3, 16, 10, 0), m.file_created_at
+    comment = m.comments.first
+    assert_includes comment.body, "自動抽出"
+    assert_includes comment.body, "タイトル (PDF): Sample Doc"
+
+    get material_url(m)
+    assert_select ".bibliography dt", text: "ファイル作成日"
+    assert_select ".bibliography dd", text: /2020年3月16日/
+  end
+
+  test "create without extractable metadata adds neither date nor comment" do
+    stub_singleton(MaterialMetadataExtractor, :call, { file_created_at: nil, details: {} }) do
+      post materials_url, params: link_params(title: "抽出なし")
+    end
+    m = Material.find_by!(title: "抽出なし")
+    assert_nil m.file_created_at
+    assert_equal 0, m.comments.count
+  end
+
   test "creating a material with the checkbox creates a stub article that cites it" do
     assert_difference("Article.count", 1) do
       post materials_url, params: link_params(title: "新資料Z").merge(create_stub_article: "1")

@@ -46,7 +46,7 @@
 
 <%# ── ② 書誌情報（空ならゾーンごと出さない。状態はストリップが担う）── %>
 <% tags = @material.tags.to_a %>
-<% if @material.bibliography_present? || tags.any? %>
+<% if @material.bibliography_present? || @material.file_created_at || tags.any? %>
 <section class="bibliography-section">
   <h2>書誌情報</h2>
     <dl class="bibliography">
@@ -57,6 +57,7 @@
       <% if @material.published %><dt>発行日</dt><dd><%= @material.published.label %></dd><% end %>
       <% if @material.pages %><dt>ページ</dt><dd><%= @material.pages %></dd><% end %>
       <% if @material.isbn %><dt>ISBN</dt><dd><%= @material.isbn %></dd><% end %>
+      <% if @material.file_created_at %><dt>ファイル作成日</dt><dd><%= @material.file_created_at.to_fs(:jp) %> <small class="muted">（EXIF/PDF から自動抽出。発行日とは別）</small></dd><% end %>
       <% if tags.any? %>
         <dt>タグ</dt>
         <dd><% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></dd>
