@@ -357,6 +357,13 @@ form.button_to { display: inline; }
 .strip-step--todo { background: var(--code-bg); color: var(--ink-soft); }
 .strip-step--todo a { color: var(--accent); text-decoration: none; }
 .strip-step--todo a:hover { text-decoration: underline; }
+/* 統計の推移（スパークライン） */
+.stat-charts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
+.stat-chart { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 0.8rem 1rem; }
+.stat-chart__head { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.4rem; }
+.sparkline { width: 100%; height: 56px; }
+.sparkline polyline { stroke: var(--accent); stroke-width: 2; }
+.sparkline circle { fill: var(--accent); }
 
 /* 「未実装/予定」を示す破線プレースホルダー */
 .placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
