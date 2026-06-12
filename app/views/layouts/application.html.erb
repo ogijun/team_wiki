@@ -68,9 +68,13 @@
       <div class="sidebar__bottom">
         <% if Current.user %>
           <div class="sidebar__user">
-            <%= link_to edit_account_path, class: "user-link" do %>
-              <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
-            <% end %>
+            <span>
+              <%# 名前は公開プロフィールへ。アカウント設定は隣の歯車から %>
+              <%= link_to Current.user, class: "user-link" do %>
+                <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
+              <% end %>
+              <%= link_to edit_account_path, class: "user-link", title: "アカウント設定" do %><%= icon("settings") %><% end %>
+            </span>
             <%= button_to "ログアウト", session_path, method: :delete, class: "secondary outline btn-sm" %>
           </div>
         <% end %>

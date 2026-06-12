@@ -36,6 +36,34 @@ class UserStreakTest < ActiveSupport::TestCase
   end
 end
 
+class UserContributionTest < ActiveSupport::TestCase
+  setup { @user = create(:user) }
+
+  test "contribution_stats counts created articles, authored revisions, and distinct transcriptions" do
+    other = create(:user)
+    a1 = create(:article, created_by: @user)
+    create(:article, created_by: other)
+    ArticleRevisionCreator.call(article: a1, body: "v1", author: @user)
+    ArticleRevisionCreator.call(article: a1, body: "v2", author: @user)
+
+    t = create(:transcription, author: @user)
+    t.revisions.create!(author: @user, body: "v1")
+    t.revisions.create!(author: @user, body: "v2") # 同じ文字起こし→1件と数える
+    t2 = create(:transcription, author: other)
+    t2.revisions.create!(author: @user, body: "手伝い")
+
+    stats = @user.contribution_stats
+    assert_equal 1, stats[:articles_created]
+    assert_equal 2, stats[:revisions_authored]
+    assert_equal 2, stats[:transcriptions_contributed]
+  end
+
+  test "contribution_stats is all zeros for a new user" do
+    assert_equal({ articles_created: 0, revisions_authored: 0, transcriptions_contributed: 0 },
+                 create(:user).contribution_stats)
+  end
+end
+
 class UserTest < ActiveSupport::TestCase
   def build_user(**attrs)
     User.new({ email_address: "u#{rand(100000)}@example.com", password: "password123" }.merge(attrs))
