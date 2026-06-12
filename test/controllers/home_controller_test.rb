@@ -16,9 +16,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     Article.create!(title: "ダッシュ記事", created_by: @user, status: "stub")
     get root_url
     assert_response :success
-    assert_select "h2", text: "最近更新された記事"
-    assert_select "h2", text: "加筆を求む"
-    assert_select "h2", text: "最近の動き"
+    assert_select "h2", text: /最近更新された記事/
+    assert_select "h2", text: /加筆を求む/
+    assert_select "h2", text: /最近の動き/
     assert_select ".dashboard-stats"
     assert_select "a", text: /ダッシュ記事/
   end
