@@ -18,6 +18,7 @@
     <%= link_to "本文を編集", edit_article_path(@article), role: "button", class: "btn-sm secondary outline" %>
     <%= link_to "履歴", article_revisions_path(@article), role: "button", class: "btn-sm secondary outline" %>
   </div>
+  <%= render "shared/tag_suggestions", taggable: @article %>
   <div class="page-body">
     <%= @rendered.html %>
   </div>

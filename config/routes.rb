@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       post :restore, on: :member
     end
     resources :comments, only: :create
+    resources :taggings, only: :create
   end
   resources :comments, only: :destroy
   resources :tags, only: %i[index show create destroy]
@@ -22,6 +23,7 @@ Rails.application.routes.draw do
       resources :revisions, only: %i[index show], controller: "transcription_revisions"
     end
     resources :comments, only: :create
+    resources :taggings, only: :create
   end
   get "transcriptions", to: "transcriptions#index"
   resources :uploads, only: :create
