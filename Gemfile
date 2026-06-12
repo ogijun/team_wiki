@@ -90,3 +90,5 @@ group :test do
 end
 
 gem "litestream", "~> 0.14.0"
+
+gem "pdf-reader", "~> 2.15"
