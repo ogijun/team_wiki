@@ -92,3 +92,7 @@ end
 gem "litestream", "~> 0.14.0"
 
 gem "pdf-reader", "~> 2.15"
+
+gem "factory_bot_rails", "~> 6.5", groups: [ :development, :test ]
+
+gem "rubocop-migration", "~> 0.7.1", group: :development, require: false
