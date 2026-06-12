@@ -1,6 +1,7 @@
 require "test_helper"
 
 class ActivitiesHelperTest < ActionView::TestCase
+  include ApplicationHelper # activity_icon が icon() に依存（実ビューでは全ヘルパーが mix される）
   setup do
     @user = User.create!(email_address: "h@example.com", password: "password123", name: "Hana")
   end
@@ -51,5 +52,15 @@ class ActivitiesHelperTest < ActionView::TestCase
   # action の追加時に表示文言の追加を忘れると沈黙の汎用フォールバックに落ちるのを防ぐ。
   test "every Activity action has a display phrase" do
     assert_equal Activity::ACTIONS.sort, ActivitiesHelper::PHRASES.keys.sort
+  end
+
+  test "every Activity action has a timeline icon" do
+    assert_equal Activity::ACTIONS.sort, ActivitiesHelper::ICONS.keys.sort
+  end
+
+  test "activity_icon renders the mapped sprite symbol" do
+    a = Activity.new(user: @user, action: "comment.posted", subject_label: "x")
+    assert_includes activity_icon(a), "#message-circle"
+    assert_includes activity_icon(a), "timeline__icon"
   end
 end

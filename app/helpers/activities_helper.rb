@@ -14,6 +14,25 @@ module ActivitiesHelper
     "user.joined"      => [ "", "が参加しました" ]
   }.freeze
 
+  # action -> タイムラインの行頭アイコン（スプライトの symbol 名）。
+  ICONS = {
+    "article.created"  => "newspaper",
+    "article.edited"   => "pencil-line",
+    "article.deleted"  => "trash-2",
+    "material.added"   => "archive",
+    "material.deleted" => "trash-2",
+    "comment.posted"   => "message-circle",
+    "transcription.created" => "audio-lines",
+    "transcription.edited"  => "pen-line",
+    "tag.created"      => "tags",
+    "tag.deleted"      => "trash-2",
+    "user.joined"      => "users"
+  }.freeze
+
+  def activity_icon(activity)
+    icon(ICONS.fetch(activity.action, "info"), css: "timeline__icon")
+  end
+
   # actor: false で主語（先頭の「が」）を落とす。ユーザページなど actor が自明な文脈用。
   def activity_phrase(activity, actor: true)
     prefix, suffix = PHRASES.fetch(activity.action, [ "", "が操作しました" ])
