@@ -64,6 +64,15 @@
 /* タグ候補（既存タグ辞書とのマッチ。クリックで付与） */
 .tag-suggestions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.85rem; margin: 0.8rem 0; }
 .tag-suggestions__hint { font-size: 0.75rem; }
+/* 候補チップ: 確定ボタンと区別する「未確定」の点線ピル。hover で採用イメージの塗りに */
+button.tag-chip {
+  font-size: 0.78rem; line-height: 1.5; padding: 0.05rem 0.6rem; margin: 0;
+  border: 1px dashed var(--accent); border-radius: 999px;
+  background: transparent; color: var(--accent); width: auto;
+}
+button.tag-chip:hover, button.tag-chip:focus {
+  background: var(--accent-weak); border-style: solid; color: var(--accent-dark);
+}
 
 /* 件数・ラベルの小チップ */
 .pill { font-size: 0.75rem; color: var(--ink-soft); background: var(--accent-weak); border-radius: 999px; padding: 0.05rem 0.55rem; }

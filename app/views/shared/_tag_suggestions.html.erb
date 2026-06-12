@@ -6,7 +6,7 @@
     <%= icon("tags") %> タグ候補:
     <% suggestions.each do |tag| %>
       <%= button_to "##{tag.name}", polymorphic_path([ taggable, :taggings ], tag_slug: tag.slug),
-                    class: "btn-sm secondary outline", title: "タグを追加" %>
+                    class: "tag-chip", title: "タグを追加" %>
     <% end %>
     <span class="tag-suggestions__hint">本文・メタデータに出現している既存タグです（クリックで追加）</span>
   </div>
