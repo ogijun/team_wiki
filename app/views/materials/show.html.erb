@@ -49,7 +49,7 @@
     <% elsif @material.file.content_type == "application/pdf" %>
       <%# ファイル名クリックでオーバーレイのページビューア（PDF.js は初回オープン時に遅延ロード）。DLは隣のアイコンから %>
       <div data-controller="pdf" data-pdf-url-value="<%= rails_storage_proxy_path(@material.file) %>">
-        <div class="placeholder">プレビューは準備中です（ファイル名をクリックするとページビューアで読めます）</div>
+        <div class="placeholder">ファイル名をクリックするとページビューアで読めます（ページ単位で部分読み込み）</div>
         <dialog class="lightbox" data-pdf-target="dialog" data-action="click->pdf#backdropClose">
           <div class="pdf-viewer">
             <div class="pdf-viewer__bar">

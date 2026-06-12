@@ -58,6 +58,9 @@
 .meta { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
 .meta img { border-radius: 50%; vertical-align: middle; }
 
+/* あいまい日付の表示（FuzzyDateComponent。page-meta 内では margin を打ち消す＝上の .page-meta .when） */
+.when { color: var(--muted); font-size: 0.9rem; margin: 0.25rem 0 1rem; }
+
 /* 件数・ラベルの小チップ */
 .pill { font-size: 0.75rem; color: var(--ink-soft); background: var(--accent-weak); border-radius: 999px; padding: 0.05rem 0.55rem; }
 
@@ -172,7 +175,6 @@
 }
 .badge-status { background: var(--accent); color: #fff; border-color: var(--accent); }
 .badge-kind { border-color: var(--accent); color: var(--accent); background: var(--accent-weak); }
-.when { color: var(--muted); font-size: 0.9rem; margin: 0.25rem 0 1rem; }
 
 /* ── 資料まわり ────────────────────────────── */
 
