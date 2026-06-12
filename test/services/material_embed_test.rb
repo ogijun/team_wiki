@@ -16,7 +16,21 @@ class MaterialEmbedTest < ActiveSupport::TestCase
                  MaterialEmbed.embed_src("https://www.youtube.com/embed/dQw4w9WgXcQ")
   end
 
-  test "non-youtube url returns nil" do
+  test "dailymotion urls return dailymotion embed src" do
+    assert_equal "https://www.dailymotion.com/embed/video/xualzi",
+                 MaterialEmbed.embed_src("https://www.dailymotion.com/video/xualzi")
+    assert_equal "https://www.dailymotion.com/embed/video/xualzi",
+                 MaterialEmbed.embed_src("https://dai.ly/xualzi")
+  end
+
+  test "vimeo urls return vimeo player src" do
+    assert_equal "https://player.vimeo.com/video/838983799",
+                 MaterialEmbed.embed_src("https://vimeo.com/838983799")
+    assert_equal "https://player.vimeo.com/video/838983799",
+                 MaterialEmbed.embed_src("https://player.vimeo.com/video/838983799")
+  end
+
+  test "unsupported video host returns nil" do
     assert_nil MaterialEmbed.embed_src("https://example.com/page")
   end
 
@@ -32,7 +46,16 @@ class MaterialEmbedTest < ActiveSupport::TestCase
                  MaterialEmbed.thumbnail_src("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
   end
 
-  test "thumbnail_src returns nil for non-youtube or blank" do
+  test "thumbnail_src returns the dailymotion thumbnail redirect url" do
+    assert_equal "https://www.dailymotion.com/thumbnail/video/xualzi",
+                 MaterialEmbed.thumbnail_src("https://www.dailymotion.com/video/xualzi")
+  end
+
+  test "thumbnail_src is nil for vimeo (no static url; icon fallback)" do
+    assert_nil MaterialEmbed.thumbnail_src("https://vimeo.com/838983799")
+  end
+
+  test "thumbnail_src returns nil for unsupported hosts or blank" do
     assert_nil MaterialEmbed.thumbnail_src("https://example.com/page")
     assert_nil MaterialEmbed.thumbnail_src(nil)
   end
