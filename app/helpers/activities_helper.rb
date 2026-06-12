@@ -14,8 +14,13 @@ module ActivitiesHelper
     "user.joined"      => [ "", "が参加しました" ]
   }.freeze
 
-  def activity_phrase(activity)
+  # actor: false で主語（先頭の「が」）を落とす。ユーザページなど actor が自明な文脈用。
+  def activity_phrase(activity, actor: true)
     prefix, suffix = PHRASES.fetch(activity.action, [ "", "が操作しました" ])
+    unless actor
+      prefix = prefix.delete_prefix("が")
+      suffix = suffix.delete_prefix("が") if prefix.empty?
+    end
     label = activity.subject_label
     return safe_join([ prefix, suffix ]) if label.blank?
 

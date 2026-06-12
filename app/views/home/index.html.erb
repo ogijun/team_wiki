@@ -12,6 +12,7 @@
 
 <% if @my_stats[:active_days].positive? %>
   <p class="my-streak muted">
+    <%= avatar_tag(Current.user, size: 18) %> あなた:
     <% if @my_stats[:current_streak].positive? %>🔥 <strong><%= @my_stats[:current_streak] %></strong>日連続活動中 ・<% end %>
     最長 <strong><%= @my_stats[:longest_streak] %></strong>日 ・ 累計 <strong><%= @my_stats[:active_days] %></strong>日活動
   </p>

@@ -15,6 +15,13 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_equal "が参加しました", activity_phrase(a)
   end
 
+  test "actor: false drops the leading が (subject implied by context)" do
+    a = Activity.new(user: @user, action: "article.edited", subject_label: "対象")
+    assert_equal "記事「対象」を編集しました", activity_phrase(a, actor: false)
+    joined = Activity.new(user: @user, action: "user.joined")
+    assert_equal "参加しました", activity_phrase(joined, actor: false)
+  end
+
   test "phrase for comment.posted references the subject label" do
     a = Activity.new(user: @user, action: "comment.posted", subject_label: "対象")
     assert_equal "が「対象」にコメントしました", activity_phrase(a)
