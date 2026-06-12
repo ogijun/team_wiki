@@ -13,3 +13,7 @@ production:
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
+  daily_stat_snapshot:
+    class: StatSnapshotJob
+    # 1日の締めの値を JST で記録する（cron 形式 + タイムゾーン指定）
+    schedule: "55 23 * * * Asia/Tokyo"

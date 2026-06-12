@@ -1,0 +1,25 @@
+<% content_for :title, "統計の推移" %>
+<%= link_to "← ホーム", root_path, class: "back-link" %>
+<div class="page-header"><h1>統計の推移</h1></div>
+
+<% if @snapshots.empty? %>
+  <div class="empty-state">
+    まだスナップショットがありません。毎日 23:55（JST）にその日の統計が自動記録され、ここに推移グラフが育っていきます。
+  </div>
+<% else %>
+  <p class="muted"><%= @snapshots.first.date.to_fs(:jp) %> 〜 <%= @snapshots.last.date.to_fs(:jp) %>（<%= @snapshots.size %>日分）</p>
+  <div class="stat-charts">
+    <% {
+      "📝 記事" => :articles_count,
+      "📚 資料" => :materials_count,
+      "🔍 未確認資料" => :unconfirmed_materials_count,
+      "✍️ 文字起こし済（文字）" => :transcribed_chars
+    }.each do |label, column| %>
+      <% values = @snapshots.map { |s| s.public_send(column) } %>
+      <div class="stat-chart">
+        <div class="stat-chart__head"><%= label %> <strong><%= number_with_delimiter(values.last) %></strong></div>
+        <%= sparkline_svg(values) %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
