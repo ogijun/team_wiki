@@ -38,7 +38,7 @@ class MaterialsController < ApplicationController
 
   def create
     @material = Material.new(material_params.merge(user: Current.user))
-    autofill_title(@material)
+    autofill_from_url(@material)
     if save_material_with_stub(@material)
       ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
       redirect_to @material
@@ -116,11 +116,20 @@ class MaterialsController < ApplicationController
     params.require(:material).permit(*permitted)
   end
 
-  # title 未記入の URL 資料に、より良い title を入れる（YouTube は oEmbed、その他は og:title）。
-  # 取得できなければ何もしない＝モデルの ensure_title が url/ファイル名で必ず埋める。ファイルも同様。
-  def autofill_title(material)
-    return if material.title.present? || material.file.attached? || material.url.blank?
+  # URL 資料の空欄をサイト側メタデータで補完する。
+  # title: 動画サイト(YouTube/Dailymotion/Vimeo)の API → だめなら og:title。
+  #        取得できなければ何もしない＝モデルの ensure_title が url で必ず埋める。
+  # 発行日: 動画の公開日が取れて未記入なら day 精度で設定（動画はサイト公開日≒発行日とみなす）。
+  def autofill_from_url(material)
+    return if material.file.attached? || material.url.blank?
 
-    material.title = YoutubeOembed.title(material.url) || OgTitleFetcher.call(material.url)
+    video = VideoMetadata.call(material.url)
+    if material.title.blank?
+      material.title = video&.dig(:title) || OgTitleFetcher.call(material.url)
+    end
+    if material.published_at.nil? && (date = video&.dig(:published_on))
+      material.published_at = date.in_time_zone
+      material.published_precision = "day"
+    end
   end
 end

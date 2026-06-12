@@ -11,7 +11,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   end
 
   def link_params(extra = {})
-    { material: { url: "https://youtu.be/dQw4w9WgXcQ", title: "動画", tag_names: "ruby, rails" }.merge(extra) }
+    { material: { url: "https://example.com/v1", title: "動画", tag_names: "ruby, rails" }.merge(extra) }
   end
 
   # minitest 6 に Object#stub が無いので、モジュールメソッドを一時的に差し替える。
@@ -163,7 +163,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
       post materials_url, params: link_params
     end
     m = Material.order(:id).last
-    assert_equal "https://youtu.be/dQw4w9WgXcQ", m.url
+    assert_equal "https://example.com/v1", m.url
     assert_equal %w[rails ruby], m.tags.pluck(:name).sort
     assert_redirected_to material_url(m)
   end
@@ -265,15 +265,36 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "取得したページ題名", Material.order(:id).last.title
   end
 
-  test "create autofills title from YouTube oEmbed for a youtube url when blank" do
-    stub_singleton(YoutubeOembed, :title, "動画タイトル") do
+  test "create autofills title from the video site api when blank" do
+    stub_singleton(VideoMetadata, :call, { title: "動画タイトル", published_on: nil }) do
       post materials_url, params: { material: { url: "https://www.youtube.com/watch?v=oxCt6HYg4bo" } }
     end
     assert_equal "動画タイトル", Material.order(:id).last.title
   end
 
+  test "create fills the blank published date from the video site api (day precision)" do
+    stub_singleton(VideoMetadata, :call, { title: "DM動画", published_on: Date.new(2012, 10, 13) }) do
+      post materials_url, params: { material: { url: "https://www.dailymotion.com/video/xualzi" } }
+    end
+    m = Material.order(:id).last
+    assert_equal "DM動画", m.title
+    assert_equal Time.zone.local(2012, 10, 13), m.published_at
+    assert_equal "day", m.published_precision
+  end
+
+  test "user-entered published date wins over the video site date" do
+    stub_singleton(VideoMetadata, :call, { title: "上書きしない", published_on: Date.new(2012, 10, 13) }) do
+      post materials_url, params: { material: {
+        url: "https://vimeo.com/838983799", title: "手動日付", published_year: "1991", published_month: "", published_day: ""
+      } }
+    end
+    m = Material.find_by!(title: "手動日付")
+    assert_equal 1991, m.published_at.year
+    assert_equal "year", m.published_precision
+  end
+
   test "create falls back to the url as title when no title can be fetched" do
-    stub_singleton(YoutubeOembed, :title, nil) do
+    stub_singleton(VideoMetadata, :call, nil) do
       stub_singleton(OgTitleFetcher, :call, nil) do
         post materials_url, params: { material: { url: "https://example.com/no-title" } }
       end
@@ -281,8 +302,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "https://example.com/no-title", Material.order(:id).last.title
   end
 
-  test "create keeps a given title (autofill does not run, no fetch)" do
-    # title があれば autofill は早期 return＝OgTitleFetcher は呼ばれない（外部取得なし）。
+  test "create keeps a given title without fetching og title" do
     post materials_url, params: { material: { url: "https://example.com/page", title: "手入力" } }
     assert_equal "手入力", Material.order(:id).last.title
   end
