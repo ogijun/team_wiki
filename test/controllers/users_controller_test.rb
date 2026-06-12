@@ -26,7 +26,27 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     # 自分のページでは「◯◯が」を繰り返さない
     assert_select ".timeline strong", count: 0
     assert_select ".timeline li", text: /\Aタグ「主語なしタグ」を作成しました/
-    assert_select ".my-streak", text: /累計.*1.*日活動/m
+    assert_select ".page-meta", text: /累計.*1.*日活動/m
+  end
+
+  test "profile shows contribution counts" do
+    article = Article.create!(title: "貢献記事", created_by: @user)
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    get user_url(@user)
+    assert_select ".page-meta", text: /記事.*1.*本作成/m
+    assert_select ".page-meta", text: /編集.*1.*回/m
+    assert_select ".page-meta", text: /文字起こし.*0.*件/m
+  end
+
+  test "own profile links to account settings; sidebar name links to the public profile" do
+    get user_url(@user)
+    assert_select ".actions a[href=?]", edit_account_path
+    assert_select ".sidebar__user a[href=?]", user_path(@user)
+    assert_select ".sidebar__user a[href=?] svg use[href*=settings]", edit_account_path
+
+    other = User.create!(email_address: "oth@example.com", name: "他人", provider: "discord", uid: "oth-u")
+    get user_url(other)
+    assert_select ".actions a[href=?]", edit_account_path, count: 0
   end
 
   test "members index is admin only" do

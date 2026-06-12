@@ -1,17 +1,35 @@
+<% content_for :title, display_name(@user) %>
+
 <header class="profile">
   <%= avatar_tag(@user, size: 64) %>
-  <h1><%= display_name(@user) %><% if @user.admin? %> <%= render BadgeComponent.new(text: "管理者", variant: :status) %><% end %></h1>
-  <p class="muted">参加日: <%= @user.created_at.to_date.to_fs(:jp) %></p>
-  <% stats = @user.activity_stats %>
-  <% if stats[:active_days].positive? %>
-    <p class="my-streak muted">
-      <% if stats[:current_streak].positive? %><%= icon("flame") %> <strong><%= stats[:current_streak] %></strong>日連続活動中 ・<% end %>
-      最長 <strong><%= stats[:longest_streak] %></strong>日 ・ 累計 <strong><%= stats[:active_days] %></strong>日活動
+  <div>
+    <h1><%= display_name(@user) %><% if @user.admin? %> <%= render BadgeComponent.new(text: "管理者", variant: :status) %><% end %></h1>
+    <p class="page-meta">
+      <span><%= icon("calendar") %> 参加: <%= @user.created_at.to_date.to_fs(:jp) %></span>
+      <% stats = @user.activity_stats %>
+      <% if stats[:active_days].positive? %>
+        <span>
+          <% if stats[:current_streak].positive? %><%= icon("flame") %> <strong><%= stats[:current_streak] %></strong>日連続 ・<% end %>
+          最長 <strong><%= stats[:longest_streak] %></strong>日 ・ 累計 <strong><%= stats[:active_days] %></strong>日活動
+        </span>
+      <% end %>
     </p>
-  <% end %>
+    <% c = @user.contribution_stats %>
+    <p class="page-meta">
+      <span><%= icon("newspaper") %> 記事 <strong><%= c[:articles_created] %></strong>本作成</span>
+      <span><%= icon("pencil-line") %> 編集 <strong><%= c[:revisions_authored] %></strong>回</span>
+      <span><%= icon("audio-lines") %> 文字起こし <strong><%= c[:transcriptions_contributed] %></strong>件</span>
+    </p>
+  </div>
 </header>
 
+<% if @user == Current.user %>
+  <div class="actions">
+    <%= link_to edit_account_path, role: "button", class: "btn-sm secondary outline" do %><%= icon("settings") %> アカウント設定<% end %>
+  </div>
+<% end %>
+
 <section class="recent-activity">
-  <h2>最近の動き</h2>
+  <h2><%= icon("activity") %> 最近の動き</h2>
   <%= render "activities/timeline", activities: @activities, show_actor: false %>
 </section>

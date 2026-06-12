@@ -16,6 +16,15 @@ class User < ApplicationRecord
 
   def admin? = role == "admin"
 
+  # プロフィールに出す貢献カウント（作成した記事・書いた版・関わった文字起こし）。
+  def contribution_stats
+    {
+      articles_created: Article.where(created_by: self).count,
+      revisions_authored: Revision.where(author: self).count,
+      transcriptions_contributed: TranscriptionRevision.where(author: self).distinct.count(:transcription_id)
+    }
+  end
+
   # 活動日（JST）から { current_streak:, longest_streak:, active_days: } を算出する。
   # current_streak は「今日 or 昨日まで連続」している日数（今日まだ活動が無くても昨日までの連続は生存）。
   def activity_stats(today: Date.current)
