@@ -219,6 +219,12 @@
 
 .media-preview { margin: 0.1rem 0 0.6rem; }
 
+/* PDF ビューア（PDF.js・ページ単位の部分読み込み） */
+.pdf-viewer { margin: 0 0 1rem; }
+.pdf-viewer__bar { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.5rem; }
+.pdf-viewer__page { font-size: 0.85rem; color: var(--ink-soft); min-width: 4.5rem; text-align: center; }
+.pdf-viewer canvas { max-width: 100%; border: 1px solid var(--hairline); border-radius: 4px; background: #fff; }
+
 /* ── ホーム・統計・検索・年表 ──────────────── */
 
 /* Home dashboard */
