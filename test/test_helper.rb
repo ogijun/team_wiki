@@ -12,6 +12,9 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
+    # factory_bot: create(:user) 等を直接呼べるように（定義は test/factories.rb）
+    include FactoryBot::Syntax::Methods
+
     # Add more helper methods to be used by all tests here...
   end
 end

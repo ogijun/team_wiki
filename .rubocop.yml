@@ -1,6 +1,17 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
+# マイグレーション安全 lint (r7kamura/rubocop-migration)
+plugins:
+  - rubocop-migration
+
+# 本番 DB は SQLite のため、PostgreSQL/MySQL 専用の cop は対象外にする。
+Migration/AddIndexConcurrently: { Enabled: false } # PG の algorithm: :concurrently
+Migration/Jsonb:                { Enabled: false } # PG の jsonb 型
+Migration/ReservedWordMysql:    { Enabled: false } # MySQL 予約語
+Migration/AddCheckConstraint:   { Enabled: false } # PG の NOT VALID 前提
+Migration/ChangeColumnNull:     { Enabled: false } # PG の制約検証前提
+
 # Overwrite or add rules to create your own house style
 #
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
