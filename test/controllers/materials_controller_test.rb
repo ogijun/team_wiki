@@ -79,15 +79,29 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "+09:00", m.created_at.formatted_offset
   end
 
-  test "pdf material gets the PDF.js viewer wired to the proxy url" do
+  test "pdf material: filename toggles the hidden viewer; download is a separate icon link" do
     pdf = Material.new(user: @user, title: "PDF資料")
     pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "doc.pdf", content_type: "application/pdf")
     pdf.save!
     get material_url(pdf)
-    assert_select ".pdf-viewer[data-controller=pdf]" do
-      assert_select "[data-pdf-url-value=?]", rails_storage_proxy_path(pdf.file)
+    assert_select "[data-controller=pdf][data-pdf-url-value=?]", rails_storage_proxy_path(pdf.file) do
+      assert_select ".placeholder"                       # 既定はプレースホルダ表示
+      assert_select ".pdf-viewer[hidden]"                # ビューアは閉じた状態
+      assert_select "a[data-action='pdf#toggle']", text: /doc\.pdf/
+      assert_select "a[href=?] svg use[href*=download]", rails_blob_path(pdf.file)
     end
-    assert_select ".placeholder", count: 0
+  end
+
+  test "image material mirrors the viewer + download-icon composition" do
+    img = Material.new(user: @user, title: "画像資料V")
+    img.file.attach(io: File.open(file_fixture("example-photo.png")), filename: "p.png", content_type: "image/png")
+    img.save!
+    get material_url(img)
+    assert_select "[data-controller=viewer]" do
+      assert_select "[data-viewer-target=viewer][hidden]"
+      assert_select "a[data-action='viewer#toggle']", text: /p\.png/
+      assert_select "a[href=?] svg use[href*=download]", rails_blob_path(img.file)
+    end
   end
 
   test "material detail shows the preview placeholder only for non-previewable files" do

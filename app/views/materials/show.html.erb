@@ -35,23 +35,39 @@
     <p><%= link_to @material.url, @material.url, target: "_blank", rel: "noopener" %></p>
   <% else %>
     <% if @material.thumbnailable_file? %>
-      <%= link_to image_tag(@material.thumbnail(640), style: "max-width:100%"), rails_blob_path(@material.file) %>
-    <% elsif @material.file.content_type == "application/pdf" %>
-      <%# PDF.js ビューア: プロキシ配信(同一オリジン・Range対応)で必要ページのみ取得 %>
-      <div class="pdf-viewer" data-controller="pdf"
-           data-pdf-url-value="<%= rails_storage_proxy_path(@material.file) %>">
-        <div class="pdf-viewer__bar">
-          <button type="button" class="btn-sm secondary outline" data-action="pdf#prev">前のページ</button>
-          <span class="pdf-viewer__page" data-pdf-target="page">…</span>
-          <button type="button" class="btn-sm secondary outline" data-action="pdf#next">次のページ</button>
+      <%# サムネ/ファイル名クリックで原寸ビューアを開閉。DLは隣のアイコンから（PDF と同じ構成） %>
+      <div data-controller="viewer">
+        <a href="#" data-action="viewer#toggle"><%= image_tag @material.thumbnail(640), style: "max-width:100%" %></a>
+        <div data-viewer-target="viewer" hidden>
+          <%= image_tag rails_blob_path(@material.file), style: "max-width:100%", loading: "lazy" %>
         </div>
-        <canvas data-pdf-target="canvas"></canvas>
-        <p class="muted" data-pdf-target="status"></p>
+        <p>
+          <a href="#" data-action="viewer#toggle"><%= icon("image") %> <%= @material.file.filename %></a>
+          <%= link_to rails_blob_path(@material.file), title: "ダウンロード", class: "muted" do %><%= icon("download") %><% end %>
+        </p>
+      </div>
+    <% elsif @material.file.content_type == "application/pdf" %>
+      <%# ファイル名クリックでビューアを開閉（PDF.js は初回オープン時に遅延ロード）。DLは隣のアイコンから %>
+      <div data-controller="pdf" data-pdf-url-value="<%= rails_storage_proxy_path(@material.file) %>">
+        <div class="placeholder" data-pdf-target="placeholder">プレビューは準備中です（ファイル名をクリックするとページビューアで読めます）</div>
+        <div class="pdf-viewer" data-pdf-target="viewer" hidden>
+          <div class="pdf-viewer__bar">
+            <button type="button" class="btn-sm secondary outline" data-action="pdf#prev">前のページ</button>
+            <span class="pdf-viewer__page" data-pdf-target="page">…</span>
+            <button type="button" class="btn-sm secondary outline" data-action="pdf#next">次のページ</button>
+          </div>
+          <canvas data-pdf-target="canvas"></canvas>
+          <p class="muted" data-pdf-target="status"></p>
+        </div>
+        <p>
+          <a href="#" data-action="pdf#toggle"><%= icon("file-text") %> <%= @material.file.filename %></a>
+          <%= link_to rails_blob_path(@material.file), title: "ダウンロード", class: "muted" do %><%= icon("download") %><% end %>
+        </p>
       </div>
     <% else %>
       <div class="placeholder">プレビューは準備中です（この形式のプレビュー表示は今後対応）</div>
+      <p><%= link_to rails_blob_path(@material.file) do %><%= icon("download") %> <%= @material.file.filename %><% end %></p>
     <% end %>
-    <p><%= link_to rails_blob_path(@material.file) do %><%= icon("download") %> <%= @material.file.filename %><% end %></p>
   <% end %>
   <% if @material.description.present? %>
     <%= simple_format @material.description %>
