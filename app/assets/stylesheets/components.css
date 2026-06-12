@@ -1,0 +1,239 @@
+/*
+ * components.css — アプリ固有のコンポーネント語彙。
+ * 画面ごとに専用クラスを足さず、各画面はこの汎用クラスを組み合わせて使う。
+ * 新しい見た目が要るときは、画面固有名ではなく「再利用できる一般ルール」としてここに足す。
+ */
+
+/* ── ページ操作の文法 ──────────────────────────
+   back-link (上の戻り) / page-header (index: 見出し+主ボタン=既定サイズ) /
+   page-meta (h1直下のメタ1行) / actions (show: 建設的操作のみ、btn-sm 統一) /
+   delete は actions に置かず最下部の danger-zone(赤・隔離)へ. */
+.back-link { display: inline-block; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 0.5rem; }
+.back-link:hover { color: var(--accent); }
+.page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.actions { display: flex; align-items: center; gap: 0.9rem; margin: 0.6rem 0 1.4rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--hairline); }
+/* h1 直下のメタ1行：バッジ・作成者・日付・タグ・貢献者をここに集約する（詳細ページ共通の文法） */
+.page-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.6rem; margin: 0.25rem 0 0.4rem; font-size: 0.9rem; color: var(--ink-soft); }
+.page-meta .avatar { vertical-align: middle; }
+.page-meta .when { margin: 0; }
+
+/* 破壊的操作の隔離ゾーン（show の最下部） */
+.danger-zone { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--hairline); }
+.danger-zone__label { display: block; font-size: 0.78rem; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 0.45rem; }
+.btn-danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+.btn-danger:hover, .btn-danger:focus { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+/* Compact inline action button (delete / logout) — sits beside text links. */
+.btn-sm { padding: 0.18rem 0.6rem; font-size: 0.8rem; line-height: 1.4; }
+
+/* 管理者専用操作を上部で強調するブロック */
+.admin-box { border: 1px solid var(--accent); border-left-width: 3px; background: var(--accent-weak); border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0 0 1.3rem; }
+.admin-box__label { display: inline-block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.35rem; }
+.admin-box p { margin: 0; }
+
+/* ── 汎用レイアウト語彙 ─────────────────────── */
+
+/* Muted text utility (Pico classless has no .muted class of its own) */
+.muted { color: var(--muted); }
+
+/* 改行を保持して表示（文字起こし本文など） */
+.prewrap { white-space: pre-wrap; }
+
+/* 行リスト: メイン(.row__main)を左に伸ばし、末尾に meta・アクションを並べる。ヘアライン区切り。 */
+.rows { list-style: none; padding: 0; margin: 0; }
+.row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.2rem; border-bottom: 1px solid var(--hairline); }
+.row__main { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 補足メタ（アバター＋名前＋日時など）: ミュート小・横並び */
+.meta { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.meta img { border-radius: 50%; vertical-align: middle; }
+
+/* 件数・ラベルの小チップ */
+.pill { font-size: 0.75rem; color: var(--ink-soft); background: var(--accent-weak); border-radius: 999px; padding: 0.05rem 0.55rem; }
+
+/* 見出し＋付随要素（件数バッジ等） */
+.section-head { display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; margin: 0 0 0.5rem; }
+/* 詳細ページのゾーン見出し: h1(タイトル)と競合しない控えめなサイズに統一。
+   ゾーン内の小見出し(h3)はさらに一段小さく、ラベル寄りの色にする。 */
+.bibliography-section h2, .usage h2, .comments h2 {
+  font-size: 1.05rem; margin: 0 0 0.6rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline);
+}
+.usage h3 { font-size: 0.92rem; color: var(--ink-soft); margin: 1.2rem 0 0.4rem; }
+
+/* 「未実装/予定」を示す破線プレースホルダー */
+.placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
+
+/* 空状態: 一覧が0件のときのやさしい案内（コンテンツが増えれば消える）。.placeholder とは別物。 */
+.empty-state { padding: 1.5rem 0.2rem; color: var(--muted); line-height: 1.9; }
+.empty-state__cta { margin-top: 0.6rem; }
+
+/* WIP marker (e.g. 年表 (検討中)) */
+.wip { color: var(--muted); font-size: 0.7rem; font-weight: normal; }
+
+/* ── フォーム ──────────────────────────────── */
+
+/* Stacked form: each field group owns its spacing; label sits tight to its control. */
+.stacked-form .field { margin-bottom: 1.6rem; }
+.stacked-form .field:last-child { margin-bottom: 0; }
+.stacked-form .field > label { margin-bottom: 0.4rem; }
+/* ラベル直後の必須/任意バッジを改行させず同じ行に出す（label は Pico だと block） */
+.stacked-form .field > label:has(+ .field-badge) { display: inline-block; margin-right: 0.15rem; }
+.stacked-form .field > :where(input, textarea, select) { margin-bottom: 0; }
+.field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
+.field__hint code { font-size: 0.85em; }
+.field__check { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0; font-weight: 400; }
+
+/* Required / optional markers on form labels and fieldset legends */
+.field-badge { display: inline-block; margin-left: 0.4rem; padding: 0.05rem 0.4rem; border-radius: 999px; font-size: 0.68rem; font-weight: 600; line-height: 1.5; vertical-align: middle; letter-spacing: 0.02em; }
+.field-badge--req { color: var(--danger); background: var(--danger-weak); }
+.field-badge--opt { color: var(--muted); background: var(--code-bg); }
+
+/* Flash messages (rendered once in the layout) */
+.flash { margin: 0 0 1.1rem; padding: 0.55rem 0.9rem; border-radius: 6px; font-size: 0.9rem; }
+.flash--notice { background: var(--accent-weak); color: var(--accent-dark); }
+.flash--alert { background: var(--danger-weak); color: var(--danger); }
+
+/* Chronicle date inputs */
+.date-clear {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+}
+.date-clear:hover { color: #c00; }
+.date-row { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.date-row input { font: inherit; width: auto; display: inline-block; margin-bottom: 0; }
+.date-row input[name$="_year]"] { width: 6em; }
+.date-row input[name$="_month]"],
+.date-row input[name$="_day]"],
+.date-row input[name$="_hour]"],
+.date-row input[name$="_minute]"] { width: 4.5em; }
+
+/* Compact, inline per-page selector */
+.per-form { margin: 0 0 1rem; }
+.per-select { display: inline-block; margin: 0 0 0 0.4rem; }
+
+/* ── 記事・本文まわり ──────────────────────── */
+
+/* Revision diff */
+.diff ins { background: #d4f8d4; text-decoration: none; }
+.diff del { background: #f8d4d4; text-decoration: none; }
+
+/* Wiki links */
+.wikilink-new { color: #c00; }
+
+/* Inline citations */
+.ref { font-size: 0.75em; vertical-align: super; }
+.ref a { text-decoration: none; }
+.ref-broken { color: #c00; }
+
+/* 出典 card */
+.citations {
+  margin: 2.5rem 0 0; padding: 1.3rem 1.5rem;
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px;
+}
+.citations h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
+.citations ol { padding-left: 1.4rem; margin: 0; }
+.citations li { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.5rem; line-height: 1.7; }
+
+/* Citation picker (editor toolbar popup) */
+.citation-btn { margin: 0 6px; background: transparent; border: 0; color: var(--ink); }
+.citation-picker { padding: 8px; }
+.citation-picker__search { width: 100%; margin-bottom: 6px; }
+.citation-list { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow-y: auto; }
+.citation-list__empty { color: var(--muted); padding: 4px; }
+/* Picker options are plain text rows, not Pico's blue primary buttons. */
+.citation-list button {
+  display: block; width: 100%; text-align: left;
+  background: transparent; border: 0; color: var(--ink);
+  padding: 0.35rem 0.5rem; border-radius: 6px; font-size: 0.9rem; line-height: 1.4;
+}
+.citation-list button:hover { background: var(--accent-weak); color: var(--accent); }
+.citation-thumb { width: 28px; height: 28px; object-fit: cover; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+
+/* バッジ（記事の状態/種別、資料の信頼度/権利など） */
+.badge {
+  display: inline-block; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em;
+  padding: 0.18rem 0.7rem; border-radius: 999px;
+  border: 1px solid var(--hairline); color: var(--ink-soft); background: var(--surface);
+}
+.badge-status { background: var(--accent); color: #fff; border-color: var(--accent); }
+.badge-kind { border-color: var(--accent); color: var(--accent); background: var(--accent-weak); }
+.when { color: var(--muted); font-size: 0.9rem; margin: 0.25rem 0 1rem; }
+
+/* ── 資料まわり ────────────────────────────── */
+
+.bibliography { margin: 0.5rem 0; }
+.bibliography dt { font-size: 0.8rem; color: var(--muted); }
+.bibliography dd { margin: 0 0 0.4rem; }
+
+/* Material thumbnails */
+.material-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; vertical-align: middle; }
+.material-thumb--icon { display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; background: var(--code-bg); }
+
+/* Materials table */
+.materials-table th a.sort-link { color: inherit; text-decoration: none; }
+.materials-table th a.sort-link:hover { color: var(--accent); }
+.pagy { display: flex; gap: 0.4rem; flex-wrap: wrap; padding: 0.75rem 0; list-style: none; }
+.pagy a, .pagy span { padding: 0.1rem 0.5rem; }
+
+/* 進行ストリップ: 資料の状態と次の行動を1行のピル列で示す */
+.progress-strip { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: -0.6rem 0 1.4rem; }
+.strip-step { font-size: 0.8rem; padding: 0.15rem 0.65rem; border-radius: 999px; }
+.strip-step--done { background: var(--accent-weak); color: var(--accent-dark); }
+.strip-step--todo { background: var(--code-bg); color: var(--ink-soft); }
+.strip-step--todo a { color: var(--accent); text-decoration: none; }
+.strip-step--todo a:hover { text-decoration: underline; }
+
+/* ── 人・コメント ──────────────────────────── */
+
+/* Avatars & profile */
+.avatar { border-radius: 50%; object-fit: cover; vertical-align: middle; display: inline-block; }
+.avatar-initial { color: #fff; text-align: center; font-weight: 600; }
+.profile { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.contributors { display: inline-flex; gap: 0.25rem; flex-wrap: wrap; margin: 0; vertical-align: middle; }
+.contributors a { line-height: 0; }
+
+/* Comments (articles / materials) */
+.comments { margin-top: 2rem; }
+.comment-list { list-style: none; padding: 0; margin: 0 0 1.2rem; }
+.comment { padding: 0.6rem 0; border-top: 1px solid var(--hairline); }
+.comment__head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.comment__author { font-weight: 600; }
+.comment__body { margin-top: 0.3rem; }
+.comment__delete-form { margin: 0 0 0 auto; }
+.comment-form textarea { width: 100%; }
+
+.media-preview { margin: 0.1rem 0 0.6rem; }
+
+/* ── ホーム・統計・検索・年表 ──────────────── */
+
+/* Home dashboard */
+.dashboard-stats { display: flex; gap: 1.4rem; flex-wrap: wrap; margin: 0.5rem 0 1.4rem; color: var(--ink-soft); font-size: 0.9rem; }
+.dashboard-stats strong { font-size: 1.15rem; color: var(--ink); }
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.2rem; }
+.dashboard-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+.dashboard-card h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
+.dashboard-card ul { margin: 0; padding-left: 1.1rem; }
+.dashboard-card li { margin-bottom: 0.35rem; }
+
+/* 統計の推移（スパークライン） */
+.stat-charts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
+.stat-chart { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 0.8rem 1rem; }
+.stat-chart__head { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.4rem; }
+.sparkline { width: 100%; height: 56px; }
+.sparkline polyline { stroke: var(--accent); stroke-width: 2; }
+.sparkline circle { fill: var(--accent); }
+
+/* 検索結果のスニペット（マッチ前後の引用とハイライト） */
+.search-results li { margin-bottom: 0.7rem; }
+.search-snippet { font-size: 0.85rem; line-height: 1.6; margin-top: 0.15rem; }
+.search-snippet mark { background: #f5e1a4; color: var(--ink); padding: 0 0.15em; border-radius: 3px; }
+
+/* Chronicle (interim flat view) */
+.chronicle-note { margin: 0 0 1.4rem; }
+.chronicle-list { margin: 0; padding-left: 1.1rem; }
+.chronicle-list li { margin-bottom: 0.35rem; }

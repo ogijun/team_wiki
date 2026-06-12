@@ -1,0 +1,119 @@
+/*
+ * base.css — ページの骨格と Pico classless の上書き。
+ * 方眼背景・中央パネル・サイドバー/トップバー（ドロワー）・フッタ・フォーム既定の補正。
+ * アプリ固有の部品クラスは components.css へ。
+ */
+
+/* Headings share the body sans font (per design). */
+body { font-family: var(--pico-font-family-sans-serif); color: var(--ink); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--pico-font-family-sans-serif); letter-spacing: 0.01em; }
+
+/* Gridded background on the outer ground. */
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 2.5rem 2.5rem;
+  background-position: -1px -1px;
+}
+
+/* Content panel: a solid surface centered over the grid.
+   `body > main` outranks Pico's container so --page actually applies. */
+body > main {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 2.6rem 2.2rem 5rem;
+  background: var(--panel);
+  border-left: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
+  box-shadow: 0 18px 50px -34px rgba(43, 43, 43, 0.3);
+  min-height: 70vh;
+}
+@media (max-width: 640px) { body > main { padding: 1.6rem 1.1rem 3rem; border: none; box-shadow: none; } }
+
+main a { color: var(--accent); }
+
+/* `main` itself is the page panel, so a semantic <article> inside it must not
+   render as a second Pico card. Strip Pico's card visuals — keep it a plain block
+   so `main > article` pages and `main`-only pages share the same layout. */
+main > article {
+  margin: 0; padding: 0;
+  background: none; border: 0; border-radius: 0; box-shadow: none;
+}
+
+/* ── Side navigation ──────────────────────────
+   Wide: fixed left sidebar, content shifted right via body padding.
+   Narrow (<= 880px): off-canvas drawer toggled by the topbar hamburger (overlay). */
+body { padding-left: var(--sidebar-width); }
+
+.topbar { display: none; }
+
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-width); z-index: 30;
+  display: flex; flex-direction: column; gap: 0.15rem;
+  padding: 1rem 0.9rem 1.3rem; overflow-y: auto;
+  background: var(--panel); border-right: 1px solid var(--hairline);
+}
+.sidebar__brand { font-size: 1.1rem; padding: 0.2rem 0.4rem 0.6rem; }
+.sidebar__search { margin: 0 0 0.6rem; }
+.sidebar__search input { width: 100%; font-size: 0.85rem; padding: 0.35rem 0.6rem; margin: 0; }
+.sidebar__nav { display: flex; flex-direction: column; gap: 0.1rem; }
+.sidebar__nav a {
+  color: var(--ink-soft); text-decoration: none; font-size: 0.92rem; font-weight: 500;
+  padding: 0.4rem 0.55rem; border-radius: 7px;
+}
+.sidebar__nav a:hover { background: var(--accent-weak); color: var(--accent); }
+.nav-group { display: flex; flex-direction: column; gap: 0.1rem; margin-top: 0.9rem; }
+.nav-group__label {
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; color: var(--muted);
+  padding: 0 0.55rem 0.2rem;
+}
+.sidebar__bottom { margin-top: auto; }
+.sidebar__user {
+  padding-top: 0.9rem; border-top: 1px solid var(--hairline);
+  display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start;
+}
+.sidebar__about { display: block; margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); }
+.sidebar .user-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--ink-soft); text-decoration: none; }
+.sidebar .user-link:hover { color: var(--accent); }
+
+.site-footer {
+  margin-top: 3rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline);
+  font-size: 0.82rem; color: var(--muted);
+}
+.site-footer p { margin: 0.2rem 0; }
+
+.backdrop { display: none; }
+
+@media (max-width: 880px) {
+  body { padding-left: 0; }
+  .topbar {
+    display: flex; align-items: center; gap: 0.6rem; position: sticky; top: 0; z-index: 10;
+    padding: 0.45rem 0.9rem; border-bottom: 1px solid var(--hairline);
+    background: rgba(253, 253, 251, 0.92); backdrop-filter: saturate(1.2) blur(8px);
+  }
+  .topbar__toggle { background: none; border: 0; font-size: 1.4rem; line-height: 1; padding: 0.1rem 0.4rem; cursor: pointer; color: var(--ink); }
+  .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: 0 0 40px rgba(43, 43, 43, 0.18); }
+  .sidebar__brand { display: none; }
+  body.sidebar-open .sidebar { transform: translateX(0); }
+  body.sidebar-open .backdrop { display: block; position: fixed; inset: 0; z-index: 20; background: rgba(20, 17, 15, 0.35); }
+}
+
+.brand { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; }
+.brand-logo { max-height: 28px; width: auto; vertical-align: middle; }
+.brand a { color: var(--ink); }
+.brand::before {
+  content: ""; display: inline-block; width: 0.5rem; height: 0.5rem;
+  background: var(--accent); border-radius: 2px; margin-right: 0.5rem;
+  transform: translateY(-1px) rotate(45deg);
+}
+
+/* Pico full-widths only submit controls (button[type=submit], input[type=submit], select)
+   with NO !important. Match that selector — later in the cascade wins — to keep them
+   content-width. Other buttons / [role=button] are already auto-width by default. */
+button[type="submit"], input[type="submit"], select { width: auto; }
+
+/* button_to renders a <form>; keep it inline so action buttons sit beside links/text.
+   Button styling now uses Pico variants (.secondary / .outline). */
+form.button_to { display: inline; }
