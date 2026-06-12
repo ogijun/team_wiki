@@ -247,6 +247,8 @@ body { padding-left: var(--sidebar-width); }
 .stacked-form .field { margin-bottom: 1.6rem; }
 .stacked-form .field:last-child { margin-bottom: 0; }
 .stacked-form .field > label { margin-bottom: 0.4rem; }
+/* ラベル直後の必須/任意バッジを改行させず同じ行に出す（label は Pico だと block） */
+.stacked-form .field > label:has(+ .field-badge) { display: inline-block; margin-right: 0.15rem; }
 .stacked-form .field > :where(input, textarea, select) { margin-bottom: 0; }
 .field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
 .field__hint code { font-size: 0.85em; }
