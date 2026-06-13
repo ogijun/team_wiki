@@ -219,6 +219,30 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal "未設定", Material.new(user: @user, url: "https://x.test/a", rights: nil).rights_label
   end
 
+  test "linearize_file! replaces the blob with a linearized PDF and is idempotent" do
+    m = Material.new(user: @user, title: "PDF")
+    m.file.attach(io: one_page_pdf, filename: "doc.pdf", content_type: "application/pdf")
+    m.save!
+    before = m.file.blob.id
+
+    m.linearize_file!
+    after = m.reload.file.blob.id
+    assert_not_equal before, after, "blob が差し替わる"
+    m.file.open { |f| assert PdfLinearizer.linearized?(f.path), "linearized になる" }
+
+    stable = m.file.blob.id
+    m.linearize_file!                       # 2回目は既にlinearizedなので no-op
+    assert_equal stable, m.reload.file.blob.id, "冪等（再linearizeしない）"
+  end
+
+  test "linearize_file! is a no-op for non-pdf files" do
+    m = attach_png(Material.new(user: @user))
+    m.save!
+    before = m.file.blob.id
+    m.linearize_file!
+    assert_equal before, m.reload.file.blob.id
+  end
+
   test "transcribable? is true for media kinds, false for plain links" do
     audio = Material.new(user: @user)
     audio.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")

@@ -122,6 +122,23 @@ class Material < ApplicationRecord
     updated
   end
 
+  # PDF を linearize（Web表示用に最適化・可逆）して blob を最適化版へ差し替える。冪等。
+  # has_one_attached の再 attach は旧 blob を purge_later で削除する（オーファンは出ない）。
+  # 失敗（暗号化・破損・qpdf不在）は原本据え置き＋ログ。アップロードは既に成功しているので raise しない。
+  def linearize_file!
+    return unless file.attached? && file.content_type == "application/pdf"
+
+    out = nil
+    file.open { |tmp| out = PdfLinearizer.linearize(tmp.path) unless PdfLinearizer.linearized?(tmp.path) }
+    return unless out
+
+    File.open(out) { |f| file.attach(io: f, filename: file.filename.to_s, content_type: "application/pdf") }
+  rescue StandardError => e
+    Rails.logger.warn("linearize_file! failed for Material##{id}: #{e.class}: #{e.message}")
+  ensure
+    File.unlink(out) if out && File.exist?(out)
+  end
+
   def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)
 
   # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。
