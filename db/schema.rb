@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_13_083355) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_13_084507) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -170,6 +170,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_13_083355) do
     t.datetime "created_at", null: false
     t.date "date", null: false
     t.integer "materials_count", default: 0, null: false
+    t.integer "total_file_bytes"
+    t.integer "total_pages"
     t.integer "transcribed_chars", default: 0, null: false
     t.integer "unconfirmed_materials_count", default: 0, null: false
     t.datetime "updated_at", null: false
