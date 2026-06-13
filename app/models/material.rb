@@ -21,7 +21,9 @@ class Material < ApplicationRecord
     text/csv text/plain
     application/zip
   ].freeze
-  MAX_BYTES = 100.megabytes
+  # 1ファイルの上限。本番は R2（容量無制限）＋ kamal-proxy の既定 max_request_body=1GB に合わせる。
+  # これを 1GB 超にするなら deploy.yml の proxy.buffering.max_request_body も上げること。
+  MAX_BYTES = 1.gigabyte
   THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
   CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "unconfirmed" => "未確認" }.freeze
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze

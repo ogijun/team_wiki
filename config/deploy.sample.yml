@@ -57,6 +57,11 @@ env:
     # ACTIVE_STORAGE_SERVICE: r2
     # R2_BUCKET: team-wiki
 
+    # 大きいファイルのアップロードが Thruster の読み取りタイムアウト（既定30秒）で切れないよう延長。
+    # アプリ側の上限は Material::MAX_BYTES（1GB）、上流の天井は kamal-proxy の max_request_body 既定1GB。
+    # 1GB 超を許可するなら下の proxy.buffering.max_request_body も設定する。
+    HTTP_READ_TIMEOUT: 600
+
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     SOLID_QUEUE_IN_PUMA: true
 

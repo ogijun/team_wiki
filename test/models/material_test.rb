@@ -55,6 +55,24 @@ class MaterialTest < ActiveSupport::TestCase
     assert bad.errors[:isbn].any?
   end
 
+  test "per-file upload limit is 1 gigabyte" do
+    assert_equal 1.gigabyte, Material::MAX_BYTES
+  end
+
+  test "rejects a file larger than MAX_BYTES" do
+    m = attach_png(Material.new(user: @user))
+    # 実 1GB は載せられないので byte_size をスタブして境界だけ検証する
+    m.file.blob.define_singleton_method(:byte_size) { Material::MAX_BYTES + 1 }
+    assert_not m.valid?
+    assert m.errors[:file].any? { |msg| msg.include?("大きすぎ") }
+  end
+
+  test "accepts a file at exactly MAX_BYTES" do
+    m = attach_png(Material.new(user: @user))
+    m.file.blob.define_singleton_method(:byte_size) { Material::MAX_BYTES }
+    assert m.valid?, m.errors.full_messages.join(", ")
+  end
+
   test "link-type material is valid" do
     m = Material.new(user: @user, url: "https://youtu.be/abc123")
     assert m.valid?, m.errors.full_messages.join(", ")
