@@ -40,8 +40,8 @@ class MaterialsController < ApplicationController
     @material = Material.new(material_params.merge(user: Current.user))
     autofill_from_url(@material)
     if save_material_with_stub(@material)
-      # 抽出はファイル I/O を伴うのでトランザクションの外で（SQLite の書き込みロックを長く握らない）。
-      record_extracted_metadata(@material)
+      # 重い後処理（メタ抽出・PDF linearize）はリクエストから外して非同期で行う。
+      MaterialPostProcessJob.perform_later(@material)
       ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
       redirect_to @material
     else
@@ -80,24 +80,6 @@ class MaterialsController < ApplicationController
     true
   rescue ActiveRecord::RecordInvalid
     false
-  end
-
-  # EXIF/PDF メタデータの抽出結果を記録する。日時はファイル作成日カラムへ
-  # （発行日とは別物：スキャン/撮影日であることが多いため年表には使わない）、
-  # その他はコメントに候補として列挙し、人が書誌へ転記する。
-  def record_extracted_metadata(material)
-    return unless material.file.attached?
-
-    result = MaterialMetadataExtractor.call(material)
-    material.update_column(:file_created_at, result[:file_created_at]) if result[:file_created_at]
-    material.update_column(:page_count, result[:page_count]) if result[:page_count]
-    return if result[:details].empty?
-
-    lines = result[:details].map { |label, value| "・#{label}: #{value}" }
-    material.comments.create!(
-      author: Current.user,
-      body: "📄 ファイルのメタデータから自動抽出した候補です（要確認）:\n#{lines.join("\n")}\n書誌情報の参考にどうぞ。"
-    )
   end
 
   def set_material
