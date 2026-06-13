@@ -10,6 +10,22 @@ class MaterialTest < ActiveSupport::TestCase
     material
   end
 
+  # PDF::Reader が page_count=1 と読める最小の有効 PDF を組み立てる
+  def one_page_pdf
+    objects = [
+      "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+      "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+      "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 10 10] >>\nendobj\n"
+    ]
+    head = "%PDF-1.4\n"
+    offsets = []
+    pos = head.bytesize
+    objects.each { |o| offsets << pos; pos += o.bytesize }
+    xref = "xref\n0 4\n0000000000 65535 f \n" + offsets.map { |o| format("%010d 00000 n \n", o) }.join
+    trailer = "trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n#{pos}\n%%EOF"
+    StringIO.new(head + objects.join + xref + trailer)
+  end
+
   test "blank rights is normalized to nil (フォームの未設定=空文字を許容)" do
     m = Material.new(user: @user, url: "https://example.com/x", title: "t", rights: "")
     assert m.valid?, m.errors.full_messages.join(", ")
@@ -240,5 +256,16 @@ class MaterialTest < ActiveSupport::TestCase
     u.avatar.attach(io: StringIO.new("avatardata"), filename: "a.png", content_type: "image/png")
     create(:material, :with_pdf)            # 唯一の資料ファイル（"%PDF-1.4"）
     assert_equal "%PDF-1.4".bytesize, Material.library_summary[:total_bytes]
+  end
+
+  test "backfill_page_counts! fills page_count for PDFs missing it and is idempotent" do
+    m = Material.new(user: @user, title: "PDF")
+    m.file.attach(io: one_page_pdf, filename: "doc.pdf", content_type: "application/pdf")
+    m.save!
+    assert_nil m.page_count
+
+    assert_equal 1, Material.backfill_page_counts!   # 1件埋まる
+    assert_equal 1, m.reload.page_count
+    assert_equal 0, Material.backfill_page_counts!   # 2回目は対象なし（冪等）
   end
 end

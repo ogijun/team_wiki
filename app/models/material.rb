@@ -109,6 +109,19 @@ class Material < ApplicationRecord
     }
   end
 
+  # 移行後の一括補完用。page_count 未設定の PDF を抽出して埋める（冪等）。
+  def self.backfill_page_counts!
+    updated = 0
+    with_attached_file.where(page_count: nil).find_each do |m|
+      next unless m.file.attached? && m.file.content_type == "application/pdf"
+      result = MaterialMetadataExtractor.call(m)
+      next unless result[:page_count]
+      m.update_column(:page_count, result[:page_count])
+      updated += 1
+    end
+    updated
+  end
+
   def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)
 
   # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。
