@@ -17,6 +17,7 @@
 <% end %>
 
 <% if @materials.any? %>
+<% if params[:tag].blank? %><%= render "library_summary" %><% end %>
 <table class="materials-table">
   <thead>
     <tr>

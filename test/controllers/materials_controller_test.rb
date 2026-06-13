@@ -54,6 +54,19 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "資料A"
   end
 
+  test "index shows the library summary band" do
+    create(:material, :with_pdf)
+    get materials_url
+    assert_select ".library-summary"
+  end
+
+  test "index hides the library summary band when filtering by tag" do
+    m = create(:material, :with_pdf)
+    m.update!(tag_names: "ruby")
+    get materials_url(tag: m.tags.first.slug)
+    assert_select ".library-summary", false
+  end
+
   test "index shows a friendly empty state when there are no materials" do
     Material.destroy_all
     get materials_url
