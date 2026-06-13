@@ -11,6 +11,10 @@
     {
       "fingerprint": "a95af94fd81eb2bc69fdffbf7b1e214af2a05cd6f3647c6cf4b286bc0932a74f",
       "note": "material.url is validated to \\Ahttps?://\\S+\\z (http/https only, no whitespace), so the href can't be a javascript:/data: scheme; rel=noopener is set. Reviewed safe."
+    },
+    {
+      "fingerprint": "e449fbe1952bc6d1905180ec5c44f4578a6b61b8546c36eb11d40a1e5e44b3aa",
+      "note": "Open3.capture3 is called with the array/multi-arg form (no shell), so in_path is passed to execve as a literal argument and cannot be interpreted as a command even with shell metacharacters. in_path is a server-side temp path of an uploaded blob. Reviewed safe."
     }
   ],
   "brakeman_version": "8.0.4"
