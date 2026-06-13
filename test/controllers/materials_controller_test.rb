@@ -1,6 +1,8 @@
 require "test_helper"
 
 class MaterialsControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   setup do
     @user = User.create!(email_address: "mc@example.com", name: "MC", provider: "discord", uid: "mat-user")
     login
@@ -36,15 +38,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".field-badge--opt", minimum: 1
   end
 
-  test "create persists the extracted page_count" do
+  test "create enqueues the post-process job" do
     file = Rack::Test::UploadedFile.new(
       Rails.root.join("test/fixtures/files/example-photo.png"), "image/png"
     )
-    stub_singleton(MaterialMetadataExtractor, :call,
-                   { file_created_at: nil, details: {}, page_count: 5 }) do
-      post materials_url, params: { material: { title: "PDF資料", file: file } }
+    assert_enqueued_with(job: MaterialPostProcessJob) do
+      post materials_url, params: { material: { title: "画像資料", file: file } }
     end
-    assert_equal 5, Material.order(:created_at).last.page_count
   end
 
   test "index renders when logged in with a material" do
@@ -241,8 +241,11 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     extracted = { file_created_at: Time.zone.local(2020, 3, 16, 10, 0),
                   details: { "タイトル (PDF)" => "Sample Doc", "撮影日時 (EXIF)" => "2020年3月16日 10:00" } }
     file = fixture_file_upload("example-photo.png", "image/png")
+    # 抽出は非同期化されたので、enqueue されたジョブをその場で実行して結果を検証する。
     stub_singleton(MaterialMetadataExtractor, :call, extracted) do
-      post materials_url, params: { material: { file: file, title: "抽出資料" } }
+      perform_enqueued_jobs do
+        post materials_url, params: { material: { file: file, title: "抽出資料" } }
+      end
     end
     m = Material.find_by!(title: "抽出資料")
     assert_equal Time.zone.local(2020, 3, 16, 10, 0), m.file_created_at
@@ -257,7 +260,9 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
 
   test "create without extractable metadata adds neither date nor comment" do
     stub_singleton(MaterialMetadataExtractor, :call, { file_created_at: nil, details: {} }) do
-      post materials_url, params: link_params(title: "抽出なし")
+      perform_enqueued_jobs do
+        post materials_url, params: link_params(title: "抽出なし")
+      end
     end
     m = Material.find_by!(title: "抽出なし")
     assert_nil m.file_created_at
