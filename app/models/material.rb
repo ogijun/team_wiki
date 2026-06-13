@@ -84,6 +84,31 @@ class Material < ApplicationRecord
     self.class.kind_for(file.content_type)
   end
 
+  # 種別ごとの件数（画像/動画/音声/文書/リンク）。リンクは url 有無、ファイルは blob の content_type で判定。
+  # 27件規模では grouped count で十分。500件超で media_kind をカラム化する（WHEN-IT-HURTS 閾値）。
+  def self.kind_counts
+    counts = Hash.new(0)
+    counts[:link] = where.not(url: [ nil, "" ]).count
+    ActiveStorage::Attachment.where(record_type: "Material", name: "file")
+                             .joins(:blob)
+                             .group("active_storage_blobs.content_type").count
+                             .each { |content_type, n| counts[kind_for(content_type)] += n }
+    counts
+  end
+
+  # 資料コレクションの現在値の単一窓口。一覧ヘッダ帯と StatSnapshot.current_values が共用する。
+  # total_pages = PDF のページ数合計（SUM page_count）＋ 画像件数（画像1枚=1ページ）。
+  def self.library_summary
+    kinds = kind_counts
+    files = ActiveStorage::Attachment.where(record_type: "Material", name: "file")
+    {
+      file_count: files.count,
+      total_bytes: files.joins(:blob).sum("active_storage_blobs.byte_size"),
+      total_pages: sum(:page_count).to_i + kinds[:image],
+      kind_counts: kinds
+    }
+  end
+
   def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)
 
   # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。

@@ -220,4 +220,25 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal :document, Material.kind_for("application/pdf")
     assert_equal :document, Material.kind_for("text/csv")
   end
+
+  test "library_summary aggregates size, kind counts, and total pages" do
+    create(:material)                       # リンク（既定）
+    create(:material, :with_image)          # 画像
+    pdf = create(:material, :with_pdf)      # 文書(PDF)
+    pdf.update_column(:page_count, 12)
+    create(:material, :with_audio)          # 音声
+
+    s = Material.library_summary
+    assert_equal 3, s[:file_count]          # 画像+PDF+音声（リンクはファイル無し）
+    assert_equal({ link: 1, image: 1, document: 1, audio: 1 }, s[:kind_counts])
+    assert_equal 13, s[:total_pages]        # PDF 12 + 画像 1
+    assert s[:total_bytes].positive?
+  end
+
+  test "library_summary total_bytes counts only material files, not avatars" do
+    u = create(:user)
+    u.avatar.attach(io: StringIO.new("avatardata"), filename: "a.png", content_type: "image/png")
+    create(:material, :with_pdf)            # 唯一の資料ファイル（"%PDF-1.4"）
+    assert_equal "%PDF-1.4".bytesize, Material.library_summary[:total_bytes]
+  end
 end
