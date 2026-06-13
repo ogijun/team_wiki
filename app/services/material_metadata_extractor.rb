@@ -6,7 +6,7 @@ require "pdf-reader"
 module MaterialMetadataExtractor
   module_function
 
-  EMPTY = { file_created_at: nil, details: {} }.freeze
+  EMPTY = { file_created_at: nil, details: {}, page_count: nil }.freeze
 
   def call(material)
     return EMPTY unless material.file.attached?
@@ -29,7 +29,8 @@ module MaterialMetadataExtractor
       # マルチページ画像（TIFF/アニメGIF等）のページ数。単頁(1)は出さない
       pages = safe_get(image, "n-pages").to_i
       details["ページ数"] = pages.to_s if pages > 1
-      { file_created_at: time, details: details }
+      # 画像は集計側で1ページと数えるため page_count カラムには入れない（PDF専用）
+      { file_created_at: time, details: details, page_count: nil }
     end
   end
 
@@ -44,12 +45,13 @@ module MaterialMetadataExtractor
       reader = PDF::Reader.new(file.path)
       info = reader.info || {}
       time = parse_pdf_time(info[:CreationDate].to_s)
+      page_count = reader.page_count.to_i
       details = {}
       details["タイトル (PDF)"] = info[:Title].to_s if info[:Title].present?
       details["作成者 (PDF)"] = info[:Author].to_s if info[:Author].present?
       details["作成日 (PDF)"] = format_time(time) if time
-      details["ページ数 (PDF)"] = reader.page_count.to_s if reader.page_count.to_i.positive?
-      { file_created_at: time, details: details }
+      details["ページ数 (PDF)"] = page_count.to_s if page_count.positive?
+      { file_created_at: time, details: details, page_count: page_count.positive? ? page_count : nil }
     end
   end
 

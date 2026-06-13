@@ -34,13 +34,14 @@ class MaterialMetadataExtractorTest < ActiveSupport::TestCase
     StringIO.new(head + objects.join + xref + trailer)
   end
 
-  EMPTY = { file_created_at: nil, details: {} }.freeze
+  EMPTY = { file_created_at: nil, details: {}, page_count: nil }.freeze
 
   test "extracts the EXIF capture time from an image" do
     m = attach_material(jpeg_with_exif("2020:03:16 10:00:00"), "photo.jpg", "image/jpeg")
     result = MaterialMetadataExtractor.call(m)
     assert_equal Time.zone.local(2020, 3, 16, 10, 0), result[:file_created_at]
     assert_equal "2020年3月16日 10:00", result[:details]["撮影日時 (EXIF)"]
+    assert_nil result[:page_count]
   end
 
   test "extracts title, author, creation date and page count from a PDF" do
@@ -51,6 +52,7 @@ class MaterialMetadataExtractorTest < ActiveSupport::TestCase
     assert_equal "Sample Writer", result[:details]["作成者 (PDF)"]
     assert_equal "2020年3月16日 10:00", result[:details]["作成日 (PDF)"]
     assert_equal "1", result[:details]["ページ数 (PDF)"]
+    assert_equal 1, result[:page_count]
   end
 
   test "returns empty for links, exif-less images, and broken files" do
