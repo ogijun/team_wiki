@@ -68,15 +68,20 @@ class Material < ApplicationRecord
     MaterialEmbed.thumbnail_src(url) if link?
   end
 
-  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。
-  def media_kind
-    return :link if link?
-    case file.content_type.to_s.split("/").first
+  # content_type → メディア種別 symbol の対応（表示・集計が共有する単一の出どころ）。
+  def self.kind_for(content_type)
+    case content_type.to_s.split("/").first
     when "image" then :image
     when "video" then :video
     when "audio" then :audio
     else :document
     end
+  end
+
+  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。
+  def media_kind
+    return :link if link?
+    self.class.kind_for(file.content_type)
   end
 
   def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)

@@ -212,4 +212,12 @@ class MaterialTest < ActiveSupport::TestCase
     link = Material.create!(user: @user, title: "外部記事", url: "https://example.com/article")
     assert_not link.transcribable?
   end
+
+  test "kind_for maps content types to media kinds" do
+    assert_equal :image, Material.kind_for("image/png")
+    assert_equal :video, Material.kind_for("video/mp4")
+    assert_equal :audio, Material.kind_for("audio/mpeg")
+    assert_equal :document, Material.kind_for("application/pdf")
+    assert_equal :document, Material.kind_for("text/csv")
+  end
 end
