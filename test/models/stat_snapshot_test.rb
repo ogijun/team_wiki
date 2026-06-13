@@ -15,6 +15,17 @@ class StatSnapshotTest < ActiveSupport::TestCase
     assert_equal 0, snap.transcribed_chars
   end
 
+  test "capture! records total file bytes and total pages" do
+    m = Material.new(user: @user, title: "PDF")
+    m.file.attach(io: StringIO.new("%PDF-1.4"), filename: "doc.pdf", content_type: "application/pdf")
+    m.save!
+    m.update_column(:page_count, 3)
+
+    snap = StatSnapshot.capture!
+    assert_equal "%PDF-1.4".bytesize, snap.total_file_bytes
+    assert_equal 3, snap.total_pages   # PDF 3ページ + 画像0
+  end
+
   test "capture! is idempotent per date (re-run updates the same row)" do
     StatSnapshot.capture!
     Article.create!(title: "後から", created_by: @user)
