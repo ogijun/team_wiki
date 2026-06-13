@@ -18,6 +18,14 @@ servers:
 proxy:
   ssl: true
   host: wiki.example.com   # your domain (A record -> the server IP)
+  # Stream large responses instead of buffering them. The proxy's default
+  # response buffering reads the whole body before sending headers, which
+  # delays the PDF.js range-probe on big PDFs (TTFB ~= full download time).
+  # Thruster already streams in front of Puma, so proxy response buffering is
+  # redundant. Keep request buffering on (protects large uploads).
+  buffering:
+    requests: true
+    responses: false
 
 # Where you keep your container images.
 registry:
