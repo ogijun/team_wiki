@@ -36,11 +36,35 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".field-badge--opt", minimum: 1
   end
 
+  test "create persists the extracted page_count" do
+    file = Rack::Test::UploadedFile.new(
+      Rails.root.join("test/fixtures/files/example-photo.png"), "image/png"
+    )
+    stub_singleton(MaterialMetadataExtractor, :call,
+                   { file_created_at: nil, details: {}, page_count: 5 }) do
+      post materials_url, params: { material: { title: "PDF資料", file: file } }
+    end
+    assert_equal 5, Material.order(:created_at).last.page_count
+  end
+
   test "index renders when logged in with a material" do
     Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
     get materials_url
     assert_response :success
     assert_select "a", text: "資料A"
+  end
+
+  test "index shows the library summary band" do
+    create(:material, :with_pdf)
+    get materials_url
+    assert_select ".library-summary"
+  end
+
+  test "index hides the library summary band when filtering by tag" do
+    m = create(:material, :with_pdf)
+    m.update!(tag_names: "ruby")
+    get materials_url(tag: m.tags.first.slug)
+    assert_select ".library-summary", false
   end
 
   test "index shows a friendly empty state when there are no materials" do

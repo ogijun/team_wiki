@@ -274,3 +274,23 @@ button.tag-chip:hover, button.tag-chip:focus {
 .chronicle-note { margin: 0 0 1.4rem; }
 .chronicle-list { margin: 0; padding-left: 1.1rem; }
 .chronicle-list li { margin-bottom: 0.35rem; }
+
+/* 資料一覧の概況帯 */
+.library-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.library-summary__kinds {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+}

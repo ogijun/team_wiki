@@ -1,0 +1,11 @@
+<% summary = Material.library_summary %>
+<div class="library-summary">
+  <span><%= icon("library-big") %> <%= number_with_delimiter(summary[:kind_counts].values.sum) %>件</span>
+  <span><%= icon("archive") %> <%= number_to_human_size(summary[:total_bytes]) %><span class="muted">（<%= summary[:file_count] %>ファイル）</span></span>
+  <span><%= icon("file-text") %> 総ページ <%= number_with_delimiter(summary[:total_pages]) %></span>
+  <span class="library-summary__kinds">
+    <% { image: "画像", video: "動画", audio: "音声", document: "文書", link: "リンク" }.each do |kind, label| %>
+      <span><%= icon(MaterialsHelper::MEDIA_ICONS.fetch(kind)) %> <%= label %> <%= summary[:kind_counts][kind] %></span>
+    <% end %>
+  </span>
+</div>

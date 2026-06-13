@@ -68,15 +68,58 @@ class Material < ApplicationRecord
     MaterialEmbed.thumbnail_src(url) if link?
   end
 
-  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。
-  def media_kind
-    return :link if link?
-    case file.content_type.to_s.split("/").first
+  # content_type → メディア種別 symbol の対応（表示・集計が共有する単一の出どころ）。
+  def self.kind_for(content_type)
+    case content_type.to_s.split("/").first
     when "image" then :image
     when "video" then :video
     when "audio" then :audio
     else :document
     end
+  end
+
+  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。
+  def media_kind
+    return :link if link?
+    self.class.kind_for(file.content_type)
+  end
+
+  # 種別ごとの件数（画像/動画/音声/文書/リンク）。リンクは url 有無、ファイルは blob の content_type で判定。
+  # 27件規模では grouped count で十分。500件超で media_kind をカラム化する（WHEN-IT-HURTS 閾値）。
+  def self.kind_counts
+    counts = Hash.new(0)
+    counts[:link] = where.not(url: [ nil, "" ]).count
+    ActiveStorage::Attachment.where(record_type: "Material", name: "file")
+                             .joins(:blob)
+                             .group("active_storage_blobs.content_type").count
+                             .each { |content_type, n| counts[kind_for(content_type)] += n }
+    counts
+  end
+
+  # 資料コレクションの現在値の単一窓口。一覧ヘッダ帯と StatSnapshot.current_values が共用する。
+  # total_pages = PDF のページ数合計（SUM page_count）＋ 画像件数（画像1枚=1ページ）。
+  def self.library_summary
+    kinds = kind_counts
+    files = ActiveStorage::Attachment.where(record_type: "Material", name: "file")
+    {
+      file_count: files.count,
+      total_bytes: files.joins(:blob).sum("active_storage_blobs.byte_size"),
+      total_pages: sum(:page_count).to_i + kinds[:image],
+      kind_counts: kinds
+    }
+  end
+
+  # 移行後の一括補完用。page_count 未設定の PDF を抽出して埋める（冪等）。
+  def self.backfill_page_counts!
+    updated = 0
+    with_attached_file.where(page_count: nil).find_each do |m|
+      next unless m.file.attached? && m.file.content_type == "application/pdf"
+      result = MaterialMetadataExtractor.call(m)
+      next unless result[:page_count]
+      m.update_column(:page_count, result[:page_count])
+      updated += 1
+    end
+    updated
   end
 
   def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)

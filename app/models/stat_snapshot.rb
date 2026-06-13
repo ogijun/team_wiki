@@ -5,12 +5,15 @@ class StatSnapshot < ApplicationRecord
 
   # 現在値の単一の算出窓口（ホームの統計表示とスナップショットで共用）。
   def self.current_values
+    library = Material.library_summary
     {
       articles_count: Article.count,
       materials_count: Material.count,
       unconfirmed_materials_count: Material.where(confidence: "unconfirmed").count,
       # SQLite の LENGTH(text) は文字数（バイト数ではない）を返す
-      transcribed_chars: Transcription.sum("LENGTH(body)").to_i
+      transcribed_chars: Transcription.sum("LENGTH(body)").to_i,
+      total_file_bytes: library[:total_bytes],
+      total_pages: library[:total_pages]
     }
   end
 

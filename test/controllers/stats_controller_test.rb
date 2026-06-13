@@ -27,4 +27,13 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     get stats_url
     assert_select ".empty-state"
   end
+
+  test "renders all stat charts including storage and pages" do
+    StatSnapshot.capture!
+    get stats_url
+    assert_response :success
+    assert_select ".stat-chart", count: 6
+    assert_select ".stat-chart__head", text: /保存容量/
+    assert_select ".stat-chart__head", text: /総ページ数/
+  end
 end

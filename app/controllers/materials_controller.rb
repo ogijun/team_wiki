@@ -90,6 +90,7 @@ class MaterialsController < ApplicationController
 
     result = MaterialMetadataExtractor.call(material)
     material.update_column(:file_created_at, result[:file_created_at]) if result[:file_created_at]
+    material.update_column(:page_count, result[:page_count]) if result[:page_count]
     return if result[:details].empty?
 
     lines = result[:details].map { |label, value| "・#{label}: #{value}" }

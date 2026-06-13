@@ -10,6 +10,22 @@ class MaterialTest < ActiveSupport::TestCase
     material
   end
 
+  # PDF::Reader が page_count=1 と読める最小の有効 PDF を組み立てる
+  def one_page_pdf
+    objects = [
+      "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+      "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+      "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 10 10] >>\nendobj\n"
+    ]
+    head = "%PDF-1.4\n"
+    offsets = []
+    pos = head.bytesize
+    objects.each { |o| offsets << pos; pos += o.bytesize }
+    xref = "xref\n0 4\n0000000000 65535 f \n" + offsets.map { |o| format("%010d 00000 n \n", o) }.join
+    trailer = "trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n#{pos}\n%%EOF"
+    StringIO.new(head + objects.join + xref + trailer)
+  end
+
   test "blank rights is normalized to nil (フォームの未設定=空文字を許容)" do
     m = Material.new(user: @user, url: "https://example.com/x", title: "t", rights: "")
     assert m.valid?, m.errors.full_messages.join(", ")
@@ -211,5 +227,45 @@ class MaterialTest < ActiveSupport::TestCase
 
     link = Material.create!(user: @user, title: "外部記事", url: "https://example.com/article")
     assert_not link.transcribable?
+  end
+
+  test "kind_for maps content types to media kinds" do
+    assert_equal :image, Material.kind_for("image/png")
+    assert_equal :video, Material.kind_for("video/mp4")
+    assert_equal :audio, Material.kind_for("audio/mpeg")
+    assert_equal :document, Material.kind_for("application/pdf")
+    assert_equal :document, Material.kind_for("text/csv")
+  end
+
+  test "library_summary aggregates size, kind counts, and total pages" do
+    create(:material)                       # リンク（既定）
+    create(:material, :with_image)          # 画像
+    pdf = create(:material, :with_pdf)      # 文書(PDF)
+    pdf.update_column(:page_count, 12)
+    create(:material, :with_audio)          # 音声
+
+    s = Material.library_summary
+    assert_equal 3, s[:file_count]          # 画像+PDF+音声（リンクはファイル無し）
+    assert_equal({ link: 1, image: 1, document: 1, audio: 1 }, s[:kind_counts])
+    assert_equal 13, s[:total_pages]        # PDF 12 + 画像 1
+    assert s[:total_bytes].positive?
+  end
+
+  test "library_summary total_bytes counts only material files, not avatars" do
+    u = create(:user)
+    u.avatar.attach(io: StringIO.new("avatardata"), filename: "a.png", content_type: "image/png")
+    create(:material, :with_pdf)            # 唯一の資料ファイル（"%PDF-1.4"）
+    assert_equal "%PDF-1.4".bytesize, Material.library_summary[:total_bytes]
+  end
+
+  test "backfill_page_counts! fills page_count for PDFs missing it and is idempotent" do
+    m = Material.new(user: @user, title: "PDF")
+    m.file.attach(io: one_page_pdf, filename: "doc.pdf", content_type: "application/pdf")
+    m.save!
+    assert_nil m.page_count
+
+    assert_equal 1, Material.backfill_page_counts!   # 1件埋まる
+    assert_equal 1, m.reload.page_count
+    assert_equal 0, Material.backfill_page_counts!   # 2回目は対象なし（冪等）
   end
 end

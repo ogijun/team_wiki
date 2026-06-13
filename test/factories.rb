@@ -35,6 +35,13 @@ FactoryBot.define do
         material.file.attach(io: StringIO.new("%PDF-1.4"), filename: "doc.pdf", content_type: "application/pdf")
       end
     end
+
+    trait :with_image do
+      url { nil }
+      after(:build) do |material|
+        material.file.attach(io: StringIO.new("x"), filename: "img.png", content_type: "image/png")
+      end
+    end
   end
 
   factory :transcription do
