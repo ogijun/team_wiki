@@ -12,6 +12,11 @@ class Materials::PdfController < ApplicationController
     blob = @material.file.blob
     return head(:not_found) unless blob&.content_type == "application/pdf"
 
+    # gzip 圧縮を抑止する。Thruster 等の gzip は Content-Length と Accept-Ranges を落とし、
+    # Content-Encoding を identity 以外にするため、PDF.js が Range 取得を無効化して全体DLしてしまう。
+    # PDF は元々圧縮済みで gzip の利点も無い。identity 明示で圧縮層をスキップさせる。
+    response.headers["Content-Encoding"] = "identity"
+
     if request.headers["Range"].present?
       send_blob_byte_range_data(blob, request.headers["Range"])
     else

@@ -30,6 +30,8 @@ class Materials::PdfControllerTest < ActionDispatch::IntegrationTest
     assert_equal @material.file.blob.byte_size.to_s, response.headers["Content-Length"]
     assert_equal "bytes", response.headers["Accept-Ranges"]
     assert_equal "application/pdf", response.media_type
+    # gzip 抑止（圧縮層が Content-Length/Accept-Ranges を落とし PDF.js の Range を壊すため）
+    assert_equal "identity", response.headers["Content-Encoding"]
   end
 
   test "range request returns 206 with Content-Range and a sized partial" do
