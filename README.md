@@ -102,7 +102,11 @@ Kamal の永続ボリューム（`/rails/storage`）に保存されるためデ�
    1件失敗しても全体は止めず、最後に失敗一覧を出して非ゼロ終了する。再実行すれば既存キーは skip される。
 3. `config/deploy.yml`（インスタンス側）の env に `ACTIVE_STORAGE_SERVICE=r2` と `R2_*` シークレットを設定し、`bin/kamal deploy` する。
 4. 添付・サムネイル（variant）が表示されることを確認する。variant も blob 行として一緒に移行・再生成されるため個別対応は不要。
-5. 元の `local`（Disk）の実体はそのまま残るので、問題があれば `ACTIVE_STORAGE_SERVICE` を `local` に戻すだけで切り戻せる。安定後に手動で削除する。
+5. 元の `local`（Disk）の実体はそのまま残るので、問題があれば `ACTIVE_STORAGE_SERVICE` を `local` に戻すだけで切り戻せる。
+6. 移行先が安定したら、旧 `local` の実体を `StoragePurger` で掃除する（手作業の `rm` は同じ `storage/` 直下の DB ファイルを巻き込む事故があるので使わない）。現役の既定 service と、まだその service で配信中の blob は保護される。
+   ```sh
+   bin/kamal app exec --reuse 'bin/rails storage:purge_source FROM=local'
+   ```
 
 ### バックアップ
 
