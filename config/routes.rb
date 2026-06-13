@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "search", to: "search#index"
   get "stats", to: "stats#index"
   resources :materials do
+    get "pdf", on: :member, to: "materials/pdf#show"
     resource :transcription, only: %i[show edit update] do
       resources :revisions, only: %i[index show], controller: "transcription_revisions"
     end
