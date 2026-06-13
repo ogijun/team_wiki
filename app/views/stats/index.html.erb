@@ -10,14 +10,17 @@
   <p class="muted"><%= @snapshots.first.date.to_fs(:jp) %> 〜 <%= @snapshots.last.date.to_fs(:jp) %>（<%= @snapshots.size %>日分）</p>
   <div class="stat-charts">
     <% {
-      "記事" => [ :articles_count, "pencil-line" ],
-      "資料" => [ :materials_count, "library-big" ],
-      "未確認資料" => [ :unconfirmed_materials_count, "search" ],
-      "文字起こし済（文字）" => [ :transcribed_chars, "pen-line" ]
-    }.each do |label, (column, icon_name)| %>
-      <% values = @snapshots.map { |s| s.public_send(column) } %>
+      "記事" => [ :articles_count, "pencil-line", :number ],
+      "資料" => [ :materials_count, "library-big", :number ],
+      "未確認資料" => [ :unconfirmed_materials_count, "search", :number ],
+      "文字起こし済（文字）" => [ :transcribed_chars, "pen-line", :number ],
+      "保存容量" => [ :total_file_bytes, "archive", :bytes ],
+      "総ページ数" => [ :total_pages, "file-text", :number ]
+    }.each do |label, (column, icon_name, fmt)| %>
+      <% values = @snapshots.map { |s| s.public_send(column).to_i } %>
+      <% last = fmt == :bytes ? number_to_human_size(values.last) : number_with_delimiter(values.last) %>
       <div class="stat-chart">
-        <div class="stat-chart__head"><%= icon(icon_name) %> <%= label %> <strong><%= number_with_delimiter(values.last) %></strong></div>
+        <div class="stat-chart__head"><%= icon(icon_name) %> <%= label %> <strong><%= last %></strong></div>
         <%= sparkline_svg(values) %>
       </div>
     <% end %>
