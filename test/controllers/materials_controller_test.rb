@@ -108,7 +108,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "doc.pdf", content_type: "application/pdf")
     pdf.save!
     get material_url(pdf)
-    assert_select "[data-controller=pdf][data-pdf-url-value=?]", rails_storage_proxy_path(pdf.file) do
+    assert_select "[data-controller=pdf][data-pdf-url-value=?]", pdf_material_path(pdf) do
       assert_select ".placeholder"                            # 既定はプレースホルダ表示
       assert_select "dialog.lightbox:not([open]) .pdf-viewer" # オーバーレイは閉じた状態
       assert_select "a[data-action='pdf#open']", text: /doc\.pdf/
