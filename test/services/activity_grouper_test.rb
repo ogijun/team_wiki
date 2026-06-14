@@ -97,4 +97,35 @@ class ActivityGrouperTest < ActiveSupport::TestCase
   test "returns empty for empty input" do
     assert_equal [], ActivityGrouper.call([])
   end
+
+  test "extends a :subject group across three create/edit events on one subject" do
+    article = create(:article, title: "三版")
+    a1 = act("article.created", subject: article, at: 15.minutes.ago)
+    a2 = act("article.edited",  subject: article, at: 10.minutes.ago)
+    a3 = act("article.edited",  subject: article, at: 5.minutes.ago)
+    groups = ActivityGrouper.call(desc(a1, a2, a3))
+    assert_equal 1, groups.size
+    assert_equal :subject, groups.first.kind
+    assert_equal 3, groups.first.activities.size
+  end
+
+  test "a :subject run breaks when the next item is a different subject" do
+    a = create(:article, title: "甲")
+    b = create(:article, title: "乙")
+    e1 = act("article.created", subject: a, at: 15.minutes.ago)
+    e2 = act("article.edited",  subject: a, at: 10.minutes.ago)
+    e3 = act("article.created", subject: b, at: 5.minutes.ago)
+    groups = ActivityGrouper.call(desc(e1, e2, e3))
+    assert_equal 2, groups.size
+    assert_equal :single, groups.first.kind    # 降順先頭グループ = 乙の作成（1件）
+    assert_equal :subject, groups.last.kind    # 甲の作成・編集（2件）
+    assert_equal 2, groups.last.activities.size
+  end
+
+  test "a single activity yields one :single group" do
+    a = act("comment.posted", label: "対象", at: 1.minute.ago)
+    groups = ActivityGrouper.call([ a ])
+    assert_equal 1, groups.size
+    assert_equal :single, groups.first.kind
+  end
 end

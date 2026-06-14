@@ -44,7 +44,7 @@ module ActivityGrouper
             break # 連結不可 → head は単独
           end
         when :subject
-          break unless same_subject?(head, cur) && mergeable?(cur.action)
+          break unless same_subject?(head, cur) && same_merge_set?(head.action, cur.action)
         when :action
           break unless head.action == cur.action
         end
@@ -59,10 +59,6 @@ module ActivityGrouper
 
   def same_subject?(a, b)
     !a.subject_id.nil? && a.subject_type == b.subject_type && a.subject_id == b.subject_id
-  end
-
-  def mergeable?(action)
-    MERGEABLE_SETS.any? { |set| set.include?(action) }
   end
 
   def same_merge_set?(a, b)
