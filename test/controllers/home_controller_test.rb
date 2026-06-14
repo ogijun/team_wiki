@@ -23,6 +23,13 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /ダッシュ記事/
   end
 
+  test "stats trends link is an accessible icon-only link" do
+    get root_url
+    # アイコンのみ＝可視テキストは無いが、リンク名は aria-label で読み上げ可能
+    assert_select ".dashboard-stats a[href=?][aria-label=?]", stats_path, "統計の推移"
+    assert_select ".dashboard-stats a[href=?] svg", stats_path
+  end
+
   test "stats include the total transcribed characters" do
     m = Material.new(user: @user, title: "統計音声")
     m.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")

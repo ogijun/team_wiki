@@ -29,6 +29,15 @@ module ApplicationHelper
     end
   end
 
+  # アイコンのみのリンク。label は必須＝アクセシブル名(aria-label)とツールチップ(title)を必ず付ける
+  # （icon() の svg は aria-hidden なので、ラベルが無いとリンク名が無音になるのを構造的に防ぐ）。
+  def icon_link(name, url, label:, css: nil, **opts)
+    link_to url, title: label, "aria-label": label,
+                 class: [ "icon-link", css ].compact.join(" "), **opts do
+      icon(name)
+    end
+  end
+
   # ── フォームの必須/任意バッジ（ラベル横に置く）──
   def required_badge = tag.span("必須", class: "field-badge field-badge--req")
   def optional_badge = tag.span("任意", class: "field-badge field-badge--opt")

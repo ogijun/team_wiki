@@ -8,7 +8,7 @@
   <span><%= icon("library-big") %> <strong><%= @stats[:materials_count] %></strong> 資料</span>
   <span><%= icon("search") %> <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
   <span><%= icon("pen-line") %> <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
-  <span><%= link_to stats_path do %>推移 <%= icon("trending-up") %><% end %></span>
+  <span><%= icon_link "trending-up", stats_path, label: "統計の推移" %></span>
 </section>
 
 <% if @my_stats[:active_days].positive? %>
