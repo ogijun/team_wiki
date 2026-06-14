@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // 大きな PDF でも表示ページに必要なチャンクだけ Range 取得して描画する。
 // 表示はページ本来のアスペクト比を厳密に維持し、既定はビューポートにフィット。拡大/縮小/等倍/フィット操作つき。
 export default class extends Controller {
-  static targets = ["dialog", "canvas", "page", "status", "pct"]
+  static targets = ["dialog", "canvas", "page", "status", "pct", "stage"]
   static values = { url: String }
 
   MIN_SCALE = 0.15
@@ -61,6 +61,14 @@ export default class extends Controller {
     return Math.min(maxW / viewport1.width, maxH / viewport1.height)
   }
 
+  // ステージ枠を「フィット時のページ表示寸法」に固定する。以後ズームしても枠＝ツールバーは動かず、
+  // canvas だけが枠内で拡大縮小・スクロールする。+2px は canvas の枠線分。
+  sizeStage() {
+    const fs = this.fitScaleFor(this.baseViewport)
+    this.stageTarget.style.width = `${this.baseViewport.width * fs + 2}px`
+    this.stageTarget.style.height = `${this.baseViewport.height * fs + 2}px`
+  }
+
   async render() {
     if (!this.doc) return
     const token = (this.token = (this.token || 0) + 1)
@@ -70,8 +78,10 @@ export default class extends Controller {
     if (token !== this.token) return // 後続の操作に追い越されたら破棄
 
     this.baseViewport = page.getViewport({ scale: 1 })
-    if (this.scale == null) this.scale = this.fitScaleFor(this.baseViewport)
+    const firstFit = this.scale == null
+    if (firstFit) this.scale = this.fitScaleFor(this.baseViewport)
     this.scale = Math.min(Math.max(this.scale, this.MIN_SCALE), this.MAX_SCALE)
+    if (firstFit) this.sizeStage() // 初回にステージ枠（=フィット時のページ寸法）を確定して固定する
 
     // 表示サイズは this.scale 基準でアスペクト比を厳密に維持（画面の縦横比に依存しない）。
     const display = page.getViewport({ scale: this.scale })
@@ -111,5 +121,10 @@ export default class extends Controller {
   zoomIn() { this.scale = (this.scale ?? 1) * 1.25; this.render() }
   zoomOut() { this.scale = (this.scale ?? 1) / 1.25; this.render() }
   actualSize() { this.scale = 1; this.render() }            // 等倍 (1pt = 1px)
-  fit() { if (this.baseViewport) { this.scale = this.fitScaleFor(this.baseViewport); this.render() } }
+  fit() {
+    if (!this.baseViewport) return
+    this.scale = this.fitScaleFor(this.baseViewport)
+    this.sizeStage()
+    this.render()
+  }
 }

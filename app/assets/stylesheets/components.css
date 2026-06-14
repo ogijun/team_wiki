@@ -249,9 +249,12 @@ button.tag-chip:hover, button.tag-chip:focus {
 .pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.6rem; }
 .pdf-viewer__pct { font-size: 0.8rem; color: var(--ink-soft); min-width: 3.4rem; text-align: center; }
 .pdf-viewer__close { margin-left: auto; }
-/* ステージ: フィット時は中身に縮み、拡大時はビューポート上限でスクロールする。 */
-.pdf-viewer__stage { overflow: auto; max-width: 92vw; max-height: 82vh; display: flex; align-items: flex-start; justify-content: center; background: var(--surface); border-radius: 4px; }
-.pdf-viewer__stage canvas { display: block; border: 1px solid var(--hairline); background: #fff; }
+/* ステージ: JS が「フィット時のページ寸法」に固定する枠。ツールバーはこの枠の外＝固定。
+   ズーム時は枠内で canvas だけが拡大縮小し、はみ出たらこの枠の中だけスクロールする。
+   inline-block + text-align:center にして、拡大時も左端までスクロール可能にする（flex の中央寄せ
+   だとはみ出した先頭がスクロールできない問題を回避）。 */
+.pdf-viewer__stage { overflow: auto; max-width: 92vw; max-height: 82vh; margin: 0 auto; text-align: center; background: var(--surface); border-radius: 4px; }
+.pdf-viewer__stage canvas { display: inline-block; vertical-align: top; border: 1px solid var(--hairline); background: #fff; }
 
 /* ── ホーム・統計・検索・年表 ──────────────── */
 
