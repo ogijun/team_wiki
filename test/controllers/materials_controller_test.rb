@@ -75,6 +75,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".table-scroll table.materials-table"
   end
 
+  test "index date and status cells use nowrap classes to keep rows short" do
+    Material.create!(user: @user, url: "https://x.test/short", title: "短行資料", published_year: 2020)
+    get materials_url
+    assert_select "td.col-when"   # 投稿日時/発行日（折返し制御）
+    assert_select "td.col-status" # 文字起こし
+    assert_select "td .cell-tags" # タグはチップを詰めて並べる
+  end
+
   test "index shows the library summary band" do
     create(:material, :with_pdf)
     get materials_url
