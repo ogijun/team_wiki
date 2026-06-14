@@ -2,11 +2,16 @@ import { Controller } from "@hotwired/stimulus"
 
 // PDF.js によるページ単位ビューア。ファイル名クリックで <dialog> オーバーレイとして開き、初回オープン時にだけ
 // 本体を CDN から動的 import する（開かなければ一切ダウンロードされない）。
-// 配信は ActiveStorage のプロキシ URL（同一オリジン・Range 対応）なので、
-// 大きな PDF でも表示ページに必要なチャンクだけ取得して描画する。
+// 配信は同一オリジンの Materials::PdfController（Content-Length + Accept-Ranges + identity）なので、
+// 大きな PDF でも表示ページに必要なチャンクだけ Range 取得して描画する。
+// 表示はページ本来のアスペクト比を厳密に維持し、既定はビューポートにフィット。拡大/縮小/等倍/フィット操作つき。
 export default class extends Controller {
-  static targets = ["dialog", "canvas", "page", "status"]
+  static targets = ["dialog", "canvas", "page", "status", "pct"]
   static values = { url: String }
+
+  MIN_SCALE = 0.15
+  MAX_SCALE = 4
+  MAX_BITMAP = 4096 // 拡大時のメモリ暴走を防ぐビットマップ最大辺(px)
 
   async open(event) {
     event.preventDefault()
@@ -26,6 +31,7 @@ export default class extends Controller {
   async load() {
     if (this.doc) return
     this.pageNum = 1
+    this.scale = null // null = 初回描画でフィット倍率を算出
     this.statusTarget.textContent = "読み込み中…"
     try {
       const pdfjs = await import("pdfjs-dist")
@@ -43,19 +49,55 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.renderTask?.cancel()
     this.doc?.destroy()
     this.doc = null
   }
 
+  // ページ全体がビューポート（おおよそ 90vw × 78vh）に収まる倍率。
+  fitScaleFor(viewport1) {
+    const maxW = window.innerWidth * 0.90
+    const maxH = window.innerHeight * 0.78
+    return Math.min(maxW / viewport1.width, maxH / viewport1.height)
+  }
+
   async render() {
+    if (!this.doc) return
+    const token = (this.token = (this.token || 0) + 1)
+    this.renderTask?.cancel()
+
     const page = await this.doc.getPage(this.pageNum)
-    const scale = this.canvasTarget.parentElement.clientWidth / page.getViewport({ scale: 1 }).width
-    const viewport = page.getViewport({ scale: scale * window.devicePixelRatio })
-    this.canvasTarget.width = viewport.width
-    this.canvasTarget.height = viewport.height
-    this.canvasTarget.style.width = `${viewport.width / window.devicePixelRatio}px`
-    await page.render({ canvasContext: this.canvasTarget.getContext("2d"), viewport }).promise
+    if (token !== this.token) return // 後続の操作に追い越されたら破棄
+
+    this.baseViewport = page.getViewport({ scale: 1 })
+    if (this.scale == null) this.scale = this.fitScaleFor(this.baseViewport)
+    this.scale = Math.min(Math.max(this.scale, this.MIN_SCALE), this.MAX_SCALE)
+
+    // 表示サイズは this.scale 基準でアスペクト比を厳密に維持（画面の縦横比に依存しない）。
+    const display = page.getViewport({ scale: this.scale })
+    // 描画ビットマップは devicePixelRatio で鮮明にしつつ、最大辺を MAX_BITMAP に制限する。
+    const dpr = window.devicePixelRatio || 1
+    let renderScale = this.scale * dpr
+    const maxDim = Math.max(display.width, display.height) * dpr
+    if (maxDim > this.MAX_BITMAP) renderScale *= this.MAX_BITMAP / maxDim
+    const bitmap = page.getViewport({ scale: renderScale })
+
+    const c = this.canvasTarget
+    c.width = bitmap.width
+    c.height = bitmap.height
+    c.style.width = `${display.width}px`
+    c.style.height = `${display.height}px`
+
+    this.renderTask = page.render({ canvasContext: c.getContext("2d"), viewport: bitmap })
+    try {
+      await this.renderTask.promise
+    } catch (e) {
+      if (e?.name === "RenderingCancelledException") return
+      throw e
+    }
+    if (token !== this.token) return
     this.pageTarget.textContent = `${this.pageNum} / ${this.doc.numPages}`
+    this.pctTarget.textContent = `${Math.round(this.scale * 100)}%`
   }
 
   prev() {
@@ -65,4 +107,9 @@ export default class extends Controller {
   next() {
     if (this.doc && this.pageNum < this.doc.numPages) { this.pageNum++; this.render() }
   }
+
+  zoomIn() { this.scale = (this.scale ?? 1) * 1.25; this.render() }
+  zoomOut() { this.scale = (this.scale ?? 1) / 1.25; this.render() }
+  actualSize() { this.scale = 1; this.render() }            // 等倍 (1pt = 1px)
+  fit() { if (this.baseViewport) { this.scale = this.fitScaleFor(this.baseViewport); this.render() } }
 }
