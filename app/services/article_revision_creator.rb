@@ -3,12 +3,16 @@ module ArticleRevisionCreator
 
   def call(article:, body:, author:, edit_summary: nil)
     ApplicationRecord.transaction do
-      revision = article.revisions.create!(body: body, author: author, edit_summary: edit_summary)
-      article.update!(current_revision: revision)
+      # 本文が前版と同一なら版行を作らない（タイトル/タグ等だけの保存で同一本文が積み上がるのを防ぐ。
+      # 文字起こし側と同じ方針）。リンク/引用/逆リンクの再同期はタイトル変更等に効くので常に通す。
+      if article.current_revision&.body != body
+        revision = article.revisions.create!(body: body, author: author, edit_summary: edit_summary)
+        article.update!(current_revision: revision)
+      end
       sync_links(article, body)
       sync_citations(article, body)
       backfill_inbound_links(article)
-      revision
+      article.current_revision
     end
   end
 

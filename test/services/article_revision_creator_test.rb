@@ -39,8 +39,19 @@ class ArticleRevisionCreatorTest < ActiveSupport::TestCase
     article.tag_names = "a, b"
     ArticleRevisionCreator.call(article: article, body: "x", author: @user)
     article.tag_names = "a"
-    ArticleRevisionCreator.call(article: article, body: "x", author: @user)
+    ArticleRevisionCreator.call(article: article, body: "x2", author: @user)
     assert_equal [ "a" ], article.reload.tags.pluck(:name)
+  end
+
+  test "does not create a new revision when the body is unchanged" do
+    article = create_article("NoOp")
+    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    assert_no_difference "Revision.count" do
+      ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    end
+    assert_difference "Revision.count", 1 do
+      ArticleRevisionCreator.call(article: article, body: "本文2", author: @user)
+    end
   end
 
   test "rebuilds citations resolving material handles" do
