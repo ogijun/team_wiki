@@ -128,6 +128,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
       assert_select "dialog.lightbox:not([open]) .pdf-viewer" # オーバーレイは閉じた状態
       assert_select "a[data-action='pdf#open']", text: /doc\.pdf/
       assert_select "a[href=?] svg use[href*=download]", rails_blob_path(pdf.file)
+      assert_select "a[href=?][aria-label=?]", rails_blob_path(pdf.file), "ダウンロード" # アイコンのみDLリンクのアクセシブル名
     end
   end
 

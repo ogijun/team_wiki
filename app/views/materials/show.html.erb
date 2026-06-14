@@ -43,7 +43,7 @@
         </dialog>
         <p>
           <a href="#" data-action="viewer#open"><%= icon("image") %> <%= @material.file.filename %></a>
-          <%= link_to rails_blob_path(@material.file), title: "ダウンロード", class: "muted" do %><%= icon("download") %><% end %>
+          <%= icon_link "download", rails_blob_path(@material.file), label: "ダウンロード", css: "muted" %>
         </p>
       </div>
     <% elsif @material.pdf? %>
@@ -76,7 +76,7 @@
         </dialog>
         <p>
           <a href="#" data-action="pdf#open"><%= icon("file-text") %> <%= @material.file.filename %></a>
-          <%= link_to rails_blob_path(@material.file), title: "ダウンロード", class: "muted" do %><%= icon("download") %><% end %>
+          <%= icon_link "download", rails_blob_path(@material.file), label: "ダウンロード", css: "muted" %>
         </p>
       </div>
     <% else %>

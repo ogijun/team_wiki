@@ -89,6 +89,12 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* 「未実装/予定」を示す破線プレースホルダー */
 .placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }
 
+/* アイコンのみリンク（icon_link ヘルパ）。十分なヒット領域・ホバー・キーボードフォーカスを確保する。
+   色は付随クラス(.muted/.meta/.user-link)が指定すればそちらを優先（color は据えない）。 */
+.icon-link { display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem; border-radius: 6px; line-height: 0; }
+.icon-link:hover { background: var(--surface); }
+.icon-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
 /* 空状態: 一覧が0件のときのやさしい案内（コンテンツが増えれば消える）。.placeholder とは別物。 */
 .empty-state { padding: 1.5rem 0.2rem; color: var(--muted); line-height: 1.9; }
 .empty-state__cta { margin-top: 0.6rem; }
