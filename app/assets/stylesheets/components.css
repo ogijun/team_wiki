@@ -326,3 +326,24 @@ button.tag-chip:hover, button.tag-chip:focus {
   flex-wrap: wrap;
   gap: 0.25rem 0.9rem;
 }
+
+/* アクティビティ草マップ（列=週・行=曜日）。横はみ出しはラッパで横スクロール。 */
+.heatmap-wrap { overflow-x: auto; }
+.heatmap { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 2px; width: max-content; }
+.heat { width: 11px; height: 11px; border-radius: 2px; background: var(--hairline); }
+.heat-1 { background: #dfe6f0; }
+.heat-2 { background: #aab9d6; }
+.heat-3 { background: #6b82b0; }
+.heat-4 { background: var(--accent); }
+.heatmap--sm .heat { width: 8px; height: 8px; }
+
+/* 時間帯グラフ（24本の縦棒）。 */
+.hourly { display: flex; align-items: flex-end; gap: 1px; height: 48px; }
+.hourly__bar { flex: 1; min-height: 1px; background: var(--accent-weak); border-radius: 1px 1px 0 0; }
+.hourly--sm { height: 30px; }
+
+/* 種類別 small multiples。 */
+.stat-multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.stat-panel__head { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.35rem; }
+.activity-block { margin-bottom: 1.4rem; }
+.activity-block h2 { font-size: 1.05rem; margin: 0 0 0.6rem; }
