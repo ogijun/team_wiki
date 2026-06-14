@@ -51,4 +51,14 @@ class FuzzyDate
     when "time"  then format("%d年%d月%d日 %02d:%02d", at.year, at.month, at.day, at.hour, at.min)
     end
   end
+
+  # 数字＋区切りのコンパクト表記（時刻と同じ字面。一覧など省スペース向け）。精度で粒度が変わる。
+  def slashes
+    case precision
+    when "year"  then at.year.to_s
+    when "month" then format("%d/%02d", at.year, at.month)
+    when "day"   then format("%d/%02d/%02d", at.year, at.month, at.day)
+    when "time"  then format("%d/%02d/%02d %02d:%02d", at.year, at.month, at.day, at.hour, at.min)
+    end
+  end
 end

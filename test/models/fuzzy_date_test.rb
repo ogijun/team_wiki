@@ -48,4 +48,11 @@ class FuzzyDateTest < ActiveSupport::TestCase
     fd = FuzzyDate.wrap(Time.zone.local(1979, 5, 1, 0, 0), "month")
     assert_equal "1979年5月", fd.label
   end
+
+  test "slashes formats by precision with digits and separators (no kanji)" do
+    assert_equal "1979", FuzzyDate.wrap(Time.zone.local(1979), "year").slashes
+    assert_equal "1979/05", FuzzyDate.wrap(Time.zone.local(1979, 5), "month").slashes
+    assert_equal "1979/05/12", FuzzyDate.wrap(Time.zone.local(1979, 5, 12), "day").slashes
+    assert_equal "1979/05/12 14:30", FuzzyDate.wrap(Time.zone.local(1979, 5, 12, 14, 30), "time").slashes
+  end
 end

@@ -123,8 +123,8 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     # アップローダー欄は名前テキストではなくアイコン＋title 属性（tooltip）
     assert_select "table tbody a[title=?]", @user.name
     assert_select "table tbody a", text: @user.name, count: 0
-    # 発行日が一覧に出る（FuzzyDate label）
-    assert_select "td", text: /2020年3月/
+    # 発行日が一覧に出る（スラッシュ表記）
+    assert_select "td", text: %r{2020/03}
   end
 
   test "timestamps display in JST" do
