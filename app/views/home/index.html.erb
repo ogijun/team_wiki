@@ -61,9 +61,8 @@
 </section>
 
 <section class="activity-block">
-  <h2><%= icon("activity") %> サイトの動き（直近26週）</h2>
-  <div class="heatmap-wrap"><%= activity_heatmap(@daily[:total]) %></div>
-  <%= hourly_bars(@hourly[:total]) %>
+  <h2><%= icon("activity") %> サイトの動き</h2>
+  <%= render "shared/activity_overview", daily: @daily[:total], hourly: @hourly[:total] %>
   <p><%= link_to "統計をくわしく見る", stats_path %></p>
 </section>
 

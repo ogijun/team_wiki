@@ -7,22 +7,34 @@ module StatsHelper
   end
 
   # GitHub風の日別アクティビティマップ。列=週・行=曜日（日曜始まり7行）。依存ゼロ。
-  def activity_heatmap(counts_by_date, weeks: 26, css: nil)
-    cells = (ActivityStats.range_start(weeks)..Date.current).map do |d|
+  # 範囲は ActivityStats.range_start（最初のデータの週）〜今日。データ前の空マスは出さない。
+  def activity_heatmap(counts_by_date, css: nil)
+    cells = (ActivityStats.range_start..Date.current).map do |d|
       n = counts_by_date[d] || 0
       tag.span("", class: "heat heat-#{heat_level(n)}", title: "#{d.strftime('%Y/%m/%d')} · #{n}件")
     end
     tag.div(safe_join(cells), class: [ "heatmap", css ].compact.join(" "))
   end
 
-  # 0..23時の件数を24本の縦棒に。高さは最大比。
-  def hourly_bars(counts)
-    max = [ counts.max, 1 ].max
+  # 草マップの色の凡例（少→多）。
+  def heat_legend
+    swatches = (0..4).map { |lvl| tag.span("", class: "heat heat-#{lvl}") }
+    tag.span(safe_join([ tag.span("少", class: "muted"), *swatches, tag.span("多", class: "muted") ]),
+             class: "heat-legend")
+  end
+
+  # 0..23時の件数を24本の縦棒に。高さは最大比。x軸（0/6/12/18/23時）とピーク件数を添える。
+  def hourly_bars(counts, css: nil)
+    peak = counts.max
+    scale = [ peak, 1 ].max
     bars = counts.each_index.map do |h|
-      tag.span("", class: "hourly__bar", style: "height: #{(counts[h].to_f / max * 100).round}%",
+      tag.span("", class: "hourly__bar", style: "height: #{(counts[h].to_f / scale * 100).round}%",
                    title: "#{h}時 · #{counts[h]}件")
     end
-    tag.div(safe_join(bars), class: "hourly")
+    axis = tag.div(safe_join([ 0, 6, 12, 18, 23 ].map { |l| tag.span(l) }), class: "hourly__axis")
+    caption = tag.div("最多 #{peak}件/時", class: "hourly__peak muted")
+    tag.div(safe_join([ tag.div(safe_join(bars), class: "hourly__bars"), axis, caption ]),
+            class: [ "hourly", css ].compact.join(" "))
   end
 
   # 値の配列をスパークライン SVG にする（依存なし・サーバーサイド描画）。

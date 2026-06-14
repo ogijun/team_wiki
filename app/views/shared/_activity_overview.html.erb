@@ -1,0 +1,11 @@
+<%# 全体アクティビティの概観（草マップ＋凡例＋時間帯）。home と /stats が共用。locals: daily, hourly %>
+<% first = ActivityStats.first_date %>
+<% if first %>
+  <p class="muted"><%= first.strftime("%Y/%m/%d") %> 〜</p>
+  <div class="heatmap-wrap"><%= activity_heatmap(daily) %></div>
+  <%= heat_legend %>
+  <p class="stat-panel__head">時間帯（JST）</p>
+  <%= hourly_bars(hourly) %>
+<% else %>
+  <p class="muted">まだアクティビティがありません。最初の活動からここに草が生えていきます。</p>
+<% end %>
