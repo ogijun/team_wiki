@@ -56,7 +56,7 @@
 
 <section class="dashboard-card recent-activity">
   <h2><%= icon("activity") %> 最近の動き</h2>
-  <%= render "activities/timeline", activities: @recent_activities %>
+  <%= render "activities/timeline", groups: @recent_activity_groups %>
   <p><%= link_to "すべて見る", activities_path %></p>
 </section>
 

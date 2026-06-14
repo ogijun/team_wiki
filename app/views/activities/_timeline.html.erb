@@ -1,10 +1,11 @@
 <ul class="timeline">
-  <% activities.each do |a| %>
+  <% groups.each do |group| %>
+    <% rep = group.activities.first %>
     <li>
-      <%= activity_icon(a) %>
+      <%= activity_group_icon(group) %>
       <% show_actor = local_assigns.fetch(:show_actor, true) %>
-      <% if show_actor %><strong><%= link_to display_name(a.user), a.user %></strong><% end %><%= activity_phrase(a, actor: show_actor) %>
-      <span class="muted"><%= local_time_ago(a.created_at) %></span>
+      <% if show_actor %><strong><%= link_to display_name(rep.user), rep.user %></strong><% end %><%= activity_group_phrase(group, actor: show_actor) %>
+      <span class="muted"><%= local_time_ago(rep.created_at) %></span>
     </li>
   <% end %>
 </ul>

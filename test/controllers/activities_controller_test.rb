@@ -30,4 +30,25 @@ class ActivitiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "li", text: /最近タグ/
   end
+
+  test "index renders the timeline" do
+    Activity.create!(user: @user, action: "article.created", subject_label: "X")
+    get activities_url
+    assert_response :success
+    assert_select "ul.timeline li"
+  end
+
+  test "a burst of same-action uploads collapses into one expandable line" do
+    base = Time.current
+    5.times do |k|
+      m = Material.create!(user: @user, url: "https://e.test/b#{k}", title: "一括#{k}")
+      Activity.create!(user: @user, action: "material.added", subject: m,
+                       subject_label: m.title, created_at: base - k.minutes)
+    end
+    get activities_url
+    assert_response :success
+    assert_select "ul.timeline > li", count: 1            # 5件が1行に圧縮
+    assert_select "li .timeline-more", text: /ほか3件/     # 先頭ACTION_LIST_HEAD(=2)件＋残り3件
+    assert_select "li [data-controller=disclosure]"
+  end
 end

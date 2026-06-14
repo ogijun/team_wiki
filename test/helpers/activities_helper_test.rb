@@ -63,4 +63,65 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_includes activity_icon(a), "#message-circle"
     assert_includes activity_icon(a), "timeline__icon"
   end
+
+  test "subject group merges verbs into 作成・編集 with a single linked title" do
+    article = Article.create!(title: "まとめ記事", created_by: @user)
+    a1 = Activity.new(user: @user, action: "article.created", subject: article, subject_label: article.title)
+    a2 = Activity.new(user: @user, action: "article.edited",  subject: article, subject_label: article.title)
+    group = ActivityGrouper::Group.new(kind: :subject, activities: [ a2, a1 ]) # 降順
+    html = activity_group_phrase(group)
+    assert_includes html, "記事"
+    assert_includes html, "を作成・編集しました"
+    assert_match %r{<a [^>]*>まとめ記事</a>}, html
+    assert_equal 1, html.scan("まとめ記事").size
+  end
+
+  test "action group shows first 2 names plus an expandable ほかN件" do
+    mats = Array.new(5) { |k| Material.create!(user: @user, url: "https://e.test/#{k}", title: "資料#{k}") }
+    acts = mats.map { |m| Activity.new(user: @user, action: "material.added", subject: m, subject_label: m.title) }
+    group = ActivityGrouper::Group.new(kind: :action, activities: acts.reverse) # 降順
+    html = activity_group_phrase(group)
+    assert_includes html, "を追加しました"
+    assert_includes html, "ほか3件"
+    assert_includes html, 'data-controller="disclosure"'
+    assert_includes html, 'data-disclosure-target="rest"'
+    assert_includes html, "hidden"
+    assert_includes html, "資料0"   # 先頭は常時表示
+    assert_includes html, "資料4"   # 残りも DOM 内には存在（隠れているだけ）
+    # 資料0 は隠しスパンの外（常時表示）にある＝先頭2件と残りの分割が正しい
+    assert_no_match %r{<span[^>]*hidden[^>]*>.*資料0}m, html
+  end
+
+  test "single group falls back to the existing per-activity phrase" do
+    a = Activity.new(user: @user, action: "comment.posted", subject_label: "対象")
+    group = ActivityGrouper::Group.new(kind: :single, activities: [ a ])
+    assert_equal activity_phrase(a), activity_group_phrase(group)
+  end
+
+  # 不変条件: ActivityGrouper が :subject グループに通す noun（MERGEABLE_SETS 由来）は、
+  # 必ず MERGE_NOUNS に描画エントリを持つ。これが破れると subject_group_phrase の
+  # MERGE_NOUNS.fetch が実行時に KeyError になるため、テストで先に検出する。
+  test "every mergeable-set noun has a MERGE_NOUNS rendering entry" do
+    nouns = ActivityGrouper::MERGEABLE_SETS.flatten.map { |a| a.split(".").first }.uniq
+    missing = nouns - ActivitiesHelper::MERGE_NOUNS.keys
+    assert_empty missing, "MERGE_NOUNS rendering entry missing for: #{missing.inspect}"
+  end
+
+  # noun と同様に動詞側も machine-check する（MERGEABLE_SETS に published 等を足して
+  # VERBS への追加を忘れると subject_group_phrase の VERBS.fetch が KeyError になるため）。
+  test "every mergeable-set verb has a VERBS rendering entry" do
+    verbs = ActivityGrouper::MERGEABLE_SETS.flatten.map { |a| a.split(".").last }.uniq
+    missing = verbs - ActivitiesHelper::VERBS.keys
+    assert_empty missing, "VERBS rendering entry missing for: #{missing.inspect}"
+  end
+
+  test "subject group with actor: false drops the leading が" do
+    article = Article.create!(title: "無主語記事", created_by: @user)
+    a1 = Activity.new(user: @user, action: "article.created", subject: article, subject_label: article.title)
+    a2 = Activity.new(user: @user, action: "article.edited",  subject: article, subject_label: article.title)
+    group = ActivityGrouper::Group.new(kind: :subject, activities: [ a2, a1 ])
+    html = activity_group_phrase(group, actor: false)
+    assert html.start_with?("記事"), "actor:false は先頭の「が」を落とす（記事…で始まる）"
+    refute_includes html, "が記事"
+  end
 end

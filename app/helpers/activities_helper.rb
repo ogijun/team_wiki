@@ -48,4 +48,76 @@ module ActivitiesHelper
     shown = activity.subject ? link_to(label, activity.subject) : label
     safe_join([ prefix, "「", shown, "」", suffix ])
   end
+
+  # ── ActivityGrouper::Group の描画 ──
+
+  # noun ごとの「作成/編集」まとめ表示の部品（prefix + 「label」 + before + 動詞 + after）。
+  MERGE_NOUNS = {
+    "article"       => { prefix: "が記事", before: "を",            after: "しました" },
+    "transcription" => { prefix: "が",     before: "の文字起こしを", after: "しました" }
+  }.freeze
+  VERBS = { "created" => "作成", "edited" => "編集" }.freeze
+  ACTION_LIST_HEAD = 2 # 同一操作まとめで常時表示する先頭件数
+
+  def activity_group_icon(group)
+    activity_icon(group.activities.first)
+  end
+
+  # actor: false で主語（先頭の「が」）を落とす（ユーザページ用）。
+  def activity_group_phrase(group, actor: true)
+    case group.kind
+    when :subject then subject_group_phrase(group, actor: actor)
+    when :action  then action_group_phrase(group, actor: actor)
+    else activity_phrase(group.activities.first, actor: actor)
+    end
+  end
+
+  private
+
+  # 同一対象の作成/編集をまとめる: 「(が)記事「A」を作成・編集しました」。
+  # 動詞は時系列（古い→新しい）順に重複除去して「・」連結。
+  def subject_group_phrase(group, actor:)
+    rep  = group.activities.first
+    noun = rep.action.split(".").first
+    spec = MERGE_NOUNS.fetch(noun)
+    verbs = group.activities.reverse.map { |a| VERBS.fetch(a.action.split(".").last) }.uniq
+    prefix = actor ? spec[:prefix] : spec[:prefix].delete_prefix("が")
+    suffix = "#{spec[:before]}#{verbs.join('・')}#{spec[:after]}"
+    safe_join([ prefix, "「", subject_link(rep), "」", suffix ])
+  end
+
+  # 同一操作で複数対象をまとめる: 「(が)資料「A」「B」ほか3件を追加しました」。
+  # 対象は時系列（古い→新しい）順。先頭2件は常時表示、残りは隠して「ほかN件」で展開。
+  def action_group_phrase(group, actor:)
+    prefix, suffix = PHRASES.fetch(group.activities.first.action)
+    prefix = prefix.delete_prefix("が") unless actor
+    names = group.activities.reverse.map { |a| bracketed(subject_link(a)) }
+    safe_join([ prefix, subject_list(names), suffix ])
+  end
+
+  def subject_list(names)
+    return safe_join(names) if names.size <= ACTION_LIST_HEAD
+
+    shown = names.first(ACTION_LIST_HEAD)
+    rest  = names.drop(ACTION_LIST_HEAD)
+    # 隠し名は「先頭2件」と suffix の「間」に置くので、展開しても語順が崩れない。
+    tag.span(data: { controller: "disclosure" }) do
+      safe_join([
+        safe_join(shown),
+        tag.button("ほか#{rest.size}件", type: "button", class: "timeline-more",
+                   data: { action: "disclosure#toggle", "disclosure-target": "toggle" }),
+        tag.span(safe_join(rest), hidden: true, data: { "disclosure-target": "rest" })
+      ])
+    end
+  end
+
+  def bracketed(inner)
+    safe_join([ "「", inner, "」" ])
+  end
+
+  # 対象が存命ならタイトルをリンクに、削除済み（subject nil）なら素テキスト。
+  def subject_link(activity)
+    label = activity.subject_label
+    activity.subject ? link_to(label, activity.subject) : label
+  end
 end

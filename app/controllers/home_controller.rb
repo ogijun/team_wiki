@@ -1,7 +1,10 @@
 class HomeController < ApplicationController
   def index
     @recent_articles = Article.order(updated_at: :desc).limit(5)
-    @recent_activities = Activity.includes(:user, :subject).order(created_at: :desc).limit(10)
+    # グループ上限の約4倍を生取得してから頭打ち（squash 後もグループ数を確保するための余裕）。
+    @recent_activity_groups = ActivityGrouper.call(
+      Activity.includes(:user, :subject).order(created_at: :desc).limit(40)
+    ).first(10)
     @stub_articles = Article.where(status: %w[stub writing]).order(updated_at: :desc).limit(5)
     @stats = StatSnapshot.current_values
     @my_stats = Current.user.activity_stats

@@ -364,4 +364,20 @@ button.tag-chip:hover, button.tag-chip:focus {
 .stat-panel { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 0.8rem 1rem; }
 .stat-panel__head { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.35rem; }
 .activity-block { margin-bottom: 1.4rem; }
+
+/* タイムラインの「ほかN件」展開ボタン（テキストリンク風のインラインボタン） */
+.timeline-more {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+.timeline-more:hover {
+  text-decoration: underline;
+}
 .activity-block h2 { font-size: 1.05rem; margin: 0 0 0.6rem; }
