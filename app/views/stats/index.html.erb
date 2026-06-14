@@ -44,7 +44,6 @@
       <div class="stat-panel">
         <div class="stat-panel__head"><%= label %></div>
         <div class="heatmap-wrap"><%= activity_heatmap(@daily[:by_type][type], css: "heatmap--sm") %></div>
-        <%= hourly_bars(@hourly[:by_type][type], css: "hourly--sm") %>
       </div>
     <% end %>
   </div>
