@@ -289,9 +289,10 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create without extractable metadata adds neither date nor comment" do
+    file = fixture_file_upload("example-photo.png", "image/png")
     stub_singleton(MaterialMetadataExtractor, :call, { file_created_at: nil, details: {} }) do
       perform_enqueued_jobs do
-        post materials_url, params: link_params(title: "抽出なし")
+        post materials_url, params: { material: { file: file, title: "抽出なし" } }
       end
     end
     m = Material.find_by!(title: "抽出なし")
@@ -344,51 +345,23 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "example-photo", Material.order(:id).last.title
   end
 
-  test "create autofills title from og title for a (non-youtube) url when blank" do
-    stub_singleton(OgTitleFetcher, :call, "取得したページ題名") do
-      post materials_url, params: { material: { url: "https://example.com/page" } }
-    end
-    assert_equal "取得したページ題名", Material.order(:id).last.title
-  end
-
-  test "create autofills title from the video site api when blank" do
-    stub_singleton(VideoMetadata, :call, { title: "動画タイトル", published_on: nil }) do
-      post materials_url, params: { material: { url: "https://www.youtube.com/watch?v=oxCt6HYg4bo" } }
-    end
-    assert_equal "動画タイトル", Material.order(:id).last.title
-  end
-
-  test "create fills the blank published date from the video site api (day precision)" do
-    stub_singleton(VideoMetadata, :call, { title: "DM動画", published_on: Date.new(2012, 10, 13) }) do
-      post materials_url, params: { material: { url: "https://www.dailymotion.com/video/xualzi" } }
-    end
-    m = Material.order(:id).last
-    assert_equal "DM動画", m.title
-    assert_equal Time.zone.local(2012, 10, 13), m.published_at
-    assert_equal "day", m.published_precision
-  end
-
-  test "user-entered published date wins over the video site date" do
-    stub_singleton(VideoMetadata, :call, { title: "上書きしない", published_on: Date.new(2012, 10, 13) }) do
-      post materials_url, params: { material: {
-        url: "https://vimeo.com/838983799", title: "手動日付", published_year: "1991", published_month: "", published_day: ""
-      } }
-    end
-    m = Material.find_by!(title: "手動日付")
-    assert_equal 1991, m.published_at.year
-    assert_equal "year", m.published_precision
-  end
-
-  test "create falls back to the url as title when no title can be fetched" do
+  # URL メタデータ（サイトAPI/og:title）の取得は外部 I/O なので後処理ジョブへ委譲する。
+  # 詳細な補完ロジックは material_post_process_job_test を参照。ここは委譲の配線だけ確認する。
+  test "create defers url title autofill to the post-process job" do
     stub_singleton(VideoMetadata, :call, nil) do
-      stub_singleton(OgTitleFetcher, :call, nil) do
-        post materials_url, params: { material: { url: "https://example.com/no-title" } }
+      stub_singleton(OgTitleFetcher, :call, "後から取得した題名") do
+        assert_enqueued_with(job: MaterialPostProcessJob) do
+          post materials_url, params: { material: { url: "https://example.com/deferred" } }
+        end
+        # 保存直後は ensure_title の保険で url のまま（同期では外部取得しない）。
+        assert_equal "https://example.com/deferred", Material.order(:id).last.title
+        perform_enqueued_jobs
+        assert_equal "後から取得した題名", Material.order(:id).last.reload.title
       end
     end
-    assert_equal "https://example.com/no-title", Material.order(:id).last.title
   end
 
-  test "create keeps a given title without fetching og title" do
+  test "create keeps a given title (no autofill needed)" do
     post materials_url, params: { material: { url: "https://example.com/page", title: "手入力" } }
     assert_equal "手入力", Material.order(:id).last.title
   end

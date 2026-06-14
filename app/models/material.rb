@@ -161,7 +161,7 @@ class Material < ApplicationRecord
   end
 
   # 作成時、title 未記入なら url かファイル名（拡張子抜き）で必ず埋める（HTTP は行わない）。
-  # コントローラはこれより先に oEmbed/og:title でより良い title を入れるので、ここは最終保険。
+  # 後処理ジョブが後から oEmbed/og:title でより良い title に上書きするので、ここは即時の保険。
   def ensure_title
     return if title.present?
     self.title = url.presence || attached_basename

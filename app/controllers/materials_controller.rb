@@ -38,9 +38,9 @@ class MaterialsController < ApplicationController
 
   def create
     @material = Material.new(material_params.merge(user: Current.user))
-    autofill_from_url(@material)
     if save_material_with_stub(@material)
-      # 重い後処理（メタ抽出・PDF linearize）はリクエストから外して非同期で行う。
+      # 重い後処理（ファイル=メタ抽出/PDF linearize、URL=サイトAPI/og:title 補完）は
+      # 外部 I/O を含むのでリクエストから外して非同期で行う。
       MaterialPostProcessJob.perform_later(@material)
       Activity.record(actor: Current.user, action: "material.added", subject: @material)
       redirect_to @material
@@ -100,22 +100,5 @@ class MaterialsController < ApplicationController
     permitted += [ :file, :url ] unless @material&.persisted?
     permitted << :confidence if Current.user&.admin?
     params.require(:material).permit(*permitted)
-  end
-
-  # URL 資料の空欄をサイト側メタデータで補完する。
-  # title: 動画サイト(YouTube/Dailymotion/Vimeo)の API → だめなら og:title。
-  #        取得できなければ何もしない＝モデルの ensure_title が url で必ず埋める。
-  # 発行日: 動画の公開日が取れて未記入なら day 精度で設定（動画はサイト公開日≒発行日とみなす）。
-  def autofill_from_url(material)
-    return if material.file.attached? || material.url.blank?
-
-    video = VideoMetadata.call(material.url)
-    if material.title.blank?
-      material.title = video&.dig(:title) || OgTitleFetcher.call(material.url)
-    end
-    if material.published_at.nil? && (date = video&.dig(:published_on))
-      material.published_at = date.in_time_zone
-      material.published_precision = "day"
-    end
   end
 end
