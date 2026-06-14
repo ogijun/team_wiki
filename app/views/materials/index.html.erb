@@ -25,10 +25,10 @@
       <th><%= sortable("type", "種別") %></th>
       <th><%= sortable("name", "タイトル") %></th>
       <th><%= sortable("uploader", "By") %></th>
-      <th><%= sortable("created_at", "投稿日時") %></th>
-      <th><%= sortable("published", "発行日") %></th>
+      <th class="col-when"><%= sortable("created_at", "投稿日時") %></th>
+      <th class="col-when"><%= sortable("published", "発行日") %></th>
       <th>タグ</th>
-      <th>文字起こし</th>
+      <th class="col-status">文字起こし</th>
     </tr>
   </thead>
   <tbody>
@@ -37,10 +37,10 @@
         <td><%= render MaterialThumbComponent.new(material: m) %></td>
         <td><%= link_to m.title, material_path(m) %><% if m.comments_count > 0 %> <span class="muted"><%= icon("message-circle") %><%= m.comments_count %></span><% end %></td>
         <td><%= avatar_link(m.user, size: 24) %></td>
-        <td><%= m.created_at.to_fs(:jp) %></td>
-        <td><% if m.published %><%= m.published.label %><% else %><span class="muted">—</span><% end %></td>
-        <td><% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></td>
-        <td>
+        <td class="col-when"><%= m.created_at.to_date.to_fs(:jp) %><br><span class="muted"><%= m.created_at.strftime("%H:%M") %></span></td>
+        <td class="col-when"><% if m.published %><%= m.published.label %><% else %><span class="muted">—</span><% end %></td>
+        <td><div class="cell-tags"><% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %><% end %></div></td>
+        <td class="col-status">
           <% if (st = transcription_status_label(m)) %>
             <%= st %>
           <% else %>
