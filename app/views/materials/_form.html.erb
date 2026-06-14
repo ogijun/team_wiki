@@ -56,6 +56,11 @@
       </span>
     </div>
     <div class="field"><%= f.label :pages, "ページ範囲（出版物の一部のとき）" %><%= optional_badge %><%= f.text_field :pages, placeholder: "例: 12-15 / p.3 / 34-45, 52" %></div>
+    <div class="field">
+      <%= f.label :page_count, "総ページ数" %><%= optional_badge %>
+      <small class="field__hint">資料全体のページ数。PDF は取り込み時に自動で入ります（統計の総ページ数に使われます）。</small>
+      <%= f.number_field :page_count, in: 1..100_000, placeholder: "例: 266" %>
+    </div>
     <div class="field"><%= f.label :isbn, "ISBN" %><%= optional_badge %><%= f.text_field :isbn, placeholder: "例: 978-4-04-410103-3" %></div>
     <div class="field">
       <%= f.label :rights, "権利状態" %><%= optional_badge %>

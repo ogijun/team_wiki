@@ -243,14 +243,24 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal before, m.reload.file.blob.id
   end
 
-  test "transcribable? is true for media kinds, false for plain links" do
+  test "transcribable? is true for every material, including links" do
     audio = Material.new(user: @user)
     audio.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
     audio.save!
     assert audio.transcribable?
 
     link = Material.create!(user: @user, title: "外部記事", url: "https://example.com/article")
-    assert_not link.transcribable?
+    assert link.transcribable?
+  end
+
+  test "bibliography_present? includes page_count" do
+    assert Material.new(user: @user, url: "https://x.test/pc", page_count: 100).bibliography_present?
+  end
+
+  test "library_summary does not double-count an image that has a page_count" do
+    img = create(:material, :with_image)
+    img.update_column(:page_count, 1)   # 画像に明示的に page_count が入っても二重に数えない
+    assert_equal 1, Material.library_summary[:total_pages]
   end
 
   test "kind_for maps content types to media kinds" do
