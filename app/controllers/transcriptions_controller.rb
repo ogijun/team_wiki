@@ -25,9 +25,9 @@ class TranscriptionsController < ApplicationController
       if @transcription.saved_change_to_body?
         @transcription.revisions.create!(author: Current.user, body: @transcription.body)
       end
-      ActivityRecorder.record(actor: Current.user,
-                              action: was_new ? "transcription.created" : "transcription.edited",
-                              subject: @material)
+      Activity.record(actor: Current.user,
+                      action: was_new ? "transcription.created" : "transcription.edited",
+                      subject: @material)
       redirect_to @material, notice: "文字起こしを保存しました。"
     else
       render :edit, status: :unprocessable_entity

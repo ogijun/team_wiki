@@ -4,7 +4,7 @@ class CommentsController < ApplicationController
   def create
     @comment = @commentable.comments.build(body: params.dig(:comment, :body), author: Current.user)
     if @comment.save
-      ActivityRecorder.record(actor: Current.user, action: "comment.posted", subject: @commentable)
+      Activity.record(actor: Current.user, action: "comment.posted", subject: @commentable)
       redirect_to @commentable, notice: "コメントを投稿しました。"
     else
       redirect_to @commentable, alert: "コメントを入力してください。"

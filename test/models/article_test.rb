@@ -74,7 +74,7 @@ class ArticleTest < ActiveSupport::TestCase
 
   test "destroying an article nullifies activities that point at it" do
     article = Article.create!(title: "活動対象", created_by: @user)
-    act = ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
+    act = Activity.record(actor: @user, action: "article.created", subject: article)
 
     article.destroy
     act.reload

@@ -47,7 +47,7 @@ class ArticlesController < ApplicationController
   def destroy
     label = @article.title
     @article.destroy
-    ActivityRecorder.record(actor: Current.user, action: "article.deleted", subject_label: label)
+    Activity.record(actor: Current.user, action: "article.deleted", subject_label: label)
     redirect_to articles_url
   end
 

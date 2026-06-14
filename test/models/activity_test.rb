@@ -17,4 +17,31 @@ class ActivityTest < ActiveSupport::TestCase
     assert_nil a.reload.subject
     assert_equal "Subj", a.subject_label
   end
+
+  test "record with explicit label and nil subject" do
+    assert_difference("Activity.count", 1) do
+      Activity.record(actor: @user, action: "tag.deleted", subject_label: "ruby")
+    end
+    a = Activity.order(:id).last
+    assert_equal @user, a.user
+    assert_equal "tag.deleted", a.action
+    assert_nil a.subject
+    assert_equal "ruby", a.subject_label
+  end
+
+  test "record derives label from subject title" do
+    article = Article.create!(title: "導出", created_by: @user)
+    Activity.record(actor: @user, action: "article.created", subject: article)
+    assert_equal "導出", Activity.order(:id).last.subject_label
+  end
+
+  test "record derives label from subject title then name" do
+    material = Material.create!(user: @user, url: "https://example.com/x", title: "資料X")
+    Activity.record(actor: @user, action: "material.added", subject: material)
+    assert_equal "資料X", Activity.order(:id).last.subject_label
+
+    tag = Tag.create!(name: "lbl")
+    Activity.record(actor: @user, action: "tag.created", subject: tag)
+    assert_equal "lbl", Activity.order(:id).last.subject_label
+  end
 end

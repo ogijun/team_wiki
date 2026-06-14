@@ -33,14 +33,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "shows my personal streak line when I have activity" do
-    ActivityRecorder.record(actor: @user, action: "tag.created", subject_label: "今日の活動")
+    Activity.record(actor: @user, action: "tag.created", subject_label: "今日の活動")
     get root_url
     assert_select ".my-streak", text: /1.*日連続活動中.*最長.*1.*累計.*1/m
   end
 
   test "renders relative timestamps as auto-updating local-time elements" do
     article = Article.create!(title: "時刻記事", created_by: @user, status: "stub")
-    ActivityRecorder.record(actor: @user, action: "article.created", subject: article)
+    Activity.record(actor: @user, action: "article.created", subject: article)
     get root_url
     assert_response :success
     # 最近更新された記事 と 最近の動き の両方に time-ago 要素が出る

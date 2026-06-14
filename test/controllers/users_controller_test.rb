@@ -13,7 +13,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show displays name and recent activity" do
-    ActivityRecorder.record(actor: @user, action: "tag.created", subject_label: "テストタグ")
+    Activity.record(actor: @user, action: "tag.created", subject_label: "テストタグ")
     get user_url(@user)
     assert_response :success
     assert_select "h1", text: /プロフ太郎/
@@ -21,7 +21,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "profile timeline omits the actor name and shows the streak line" do
-    ActivityRecorder.record(actor: @user, action: "tag.created", subject_label: "主語なしタグ")
+    Activity.record(actor: @user, action: "tag.created", subject_label: "主語なしタグ")
     get user_url(@user)
     # 自分のページでは「◯◯が」を繰り返さない
     assert_select ".timeline strong", count: 0
