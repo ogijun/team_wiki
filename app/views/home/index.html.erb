@@ -19,13 +19,6 @@
   </p>
 <% end %>
 
-<section class="activity-block">
-  <h2><%= icon("activity") %> サイトの動き（直近26週）</h2>
-  <div class="heatmap-wrap"><%= activity_heatmap(@daily[:total]) %></div>
-  <%= hourly_bars(@hourly[:total]) %>
-  <p><%= link_to "統計をくわしく見る", stats_path %></p>
-</section>
-
 <div class="dashboard-grid">
   <section class="dashboard-card">
     <h2><%= icon("newspaper") %> 最近更新された記事</h2>
@@ -66,3 +59,11 @@
   <%= render "activities/timeline", activities: @recent_activities %>
   <p><%= link_to "すべて見る", activities_path %></p>
 </section>
+
+<section class="activity-block">
+  <h2><%= icon("activity") %> サイトの動き（直近26週）</h2>
+  <div class="heatmap-wrap"><%= activity_heatmap(@daily[:total]) %></div>
+  <%= hourly_bars(@hourly[:total]) %>
+  <p><%= link_to "統計をくわしく見る", stats_path %></p>
+</section>
+

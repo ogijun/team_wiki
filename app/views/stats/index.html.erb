@@ -2,27 +2,6 @@
 <%= link_to "← ホーム", root_path, class: "back-link" %>
 <div class="page-header"><h1>統計</h1></div>
 
-<section class="activity-block">
-  <h2>全体のアクティビティ（直近26週）</h2>
-  <div class="heatmap-wrap"><%= activity_heatmap(@daily[:total]) %></div>
-  <p class="stat-panel__head">時間帯（JST）</p>
-  <%= hourly_bars(@hourly[:total]) %>
-</section>
-
-<section class="activity-block">
-  <h2>種類別</h2>
-  <div class="stat-multiples">
-    <% { "article" => "記事", "material" => "資料", "comment" => "コメント",
-         "transcription" => "文字起こし", "tag" => "タグ" }.each do |type, label| %>
-      <div class="stat-panel">
-        <div class="stat-panel__head"><%= label %></div>
-        <div class="heatmap-wrap"><%= activity_heatmap(@daily[:by_type][type], css: "heatmap--sm") %></div>
-        <%= hourly_bars(@hourly[:by_type][type]) %>
-      </div>
-    <% end %>
-  </div>
-</section>
-
 <h2>累計の推移</h2>
 <% if @snapshots.empty? %>
   <div class="empty-state">
@@ -48,3 +27,24 @@
     <% end %>
   </div>
 <% end %>
+
+<section class="activity-block">
+  <h2>全体のアクティビティ（直近26週）</h2>
+  <div class="heatmap-wrap"><%= activity_heatmap(@daily[:total]) %></div>
+  <p class="stat-panel__head">時間帯（JST）</p>
+  <%= hourly_bars(@hourly[:total]) %>
+</section>
+
+<section class="activity-block">
+  <h2>種類別</h2>
+  <div class="stat-multiples">
+    <% { "article" => "記事", "material" => "資料", "comment" => "コメント",
+         "transcription" => "文字起こし", "tag" => "タグ" }.each do |type, label| %>
+      <div class="stat-panel">
+        <div class="stat-panel__head"><%= label %></div>
+        <div class="heatmap-wrap"><%= activity_heatmap(@daily[:by_type][type], css: "heatmap--sm") %></div>
+        <%= hourly_bars(@hourly[:by_type][type]) %>
+      </div>
+    <% end %>
+  </div>
+</section>
