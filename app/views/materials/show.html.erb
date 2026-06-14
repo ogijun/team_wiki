@@ -50,12 +50,15 @@
       <%# ファイル名クリックでオーバーレイのページビューア（PDF.js は初回オープン時に遅延ロード）。DLは隣のアイコンから %>
       <div data-controller="pdf" data-pdf-url-value="<%= pdf_material_path(@material) %>">
         <div class="placeholder">ファイル名をクリックするとページビューアで読めます（ページ単位で部分読み込み）</div>
-        <dialog class="lightbox lightbox--pdf" data-pdf-target="dialog" data-action="click->pdf#backdropClose">
+        <dialog class="lightbox lightbox--pdf" data-pdf-target="dialog" data-action="click->pdf#backdropClose keydown->pdf#key">
           <div class="pdf-viewer">
             <div class="pdf-viewer__bar">
-              <button type="button" class="btn-sm secondary outline" data-action="pdf#prev">前のページ</button>
-              <span class="pdf-viewer__page" data-pdf-target="page">…</span>
-              <button type="button" class="btn-sm secondary outline" data-action="pdf#next">次のページ</button>
+              <span class="pdf-viewer__nav" data-pdf-target="nav">
+                <button type="button" class="btn-sm secondary outline" data-action="pdf#prev">前のページ</button>
+                <span class="pdf-viewer__page" data-pdf-target="page">…</span>
+                <button type="button" class="btn-sm secondary outline" data-action="pdf#next">次のページ</button>
+              </span>
+              <button type="button" class="btn-sm secondary outline" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え">左開き</button>
               <span class="pdf-viewer__zoom">
                 <button type="button" class="btn-sm secondary outline" data-action="pdf#zoomOut" aria-label="縮小">−</button>
                 <span class="pdf-viewer__pct" data-pdf-target="pct">…</span>
