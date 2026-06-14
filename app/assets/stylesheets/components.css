@@ -296,6 +296,7 @@ button.tag-chip:hover, button.tag-chip:focus {
 .sparkline { width: 100%; height: 56px; }
 .sparkline polyline { stroke: var(--accent); stroke-width: 2; }
 .sparkline circle { fill: var(--accent); }
+.stat-chart__axis { display: flex; justify-content: space-between; font-size: 0.7rem; margin-top: 2px; }
 
 /* 検索結果のスニペット（マッチ前後の引用とハイライト） */
 .search-results li { margin-bottom: 0.7rem; }
@@ -326,3 +327,41 @@ button.tag-chip:hover, button.tag-chip:focus {
   flex-wrap: wrap;
   gap: 0.25rem 0.9rem;
 }
+
+/* アクティビティ草マップ（列=週・行=曜日）。横はみ出しはラッパで横スクロール。 */
+.heatmap-wrap { overflow-x: auto; }
+.heatmap { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 11px); gap: 2px; width: max-content; }
+.heat { width: 11px; height: 11px; border-radius: 2px; background: var(--hairline); }
+.heat-1 { background: #dfe6f0; }
+.heat-2 { background: #aab9d6; }
+.heat-3 { background: #6b82b0; }
+.heat-4 { background: var(--accent); }
+.heatmap--sm { grid-template-rows: repeat(7, 8px); }
+.heatmap--sm .heat { width: 8px; height: 8px; }
+/* 縦軸の曜日ラベル（草マップの7行に揃える）。 */
+.heatmap-cal { display: inline-flex; align-items: flex-start; gap: 4px; }
+.heatmap__days { display: grid; grid-template-rows: repeat(7, 11px); gap: 2px; }
+.heatmap__days span { font-size: 8px; line-height: 11px; color: var(--muted); }
+
+/* トップ等の「箱に入れて左右に並べる」アクティビティカード。狭い画面では縦積み。 */
+.activity-cards { display: flex; flex-wrap: wrap; gap: 1rem; }
+.activity-card { flex: 1 1 18rem; min-width: 0; background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 0.8rem 1rem; }
+.activity-card__head { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.5rem; }
+
+/* 草マップの色凡例。 */
+.heat-legend { display: inline-flex; align-items: center; gap: 3px; font-size: 0.75rem; }
+.heat-legend .heat { width: 11px; height: 11px; }
+
+/* 時間帯グラフ（24本の縦棒＋x軸＋ピーク）。 */
+.hourly__bars { display: flex; align-items: flex-end; gap: 1px; height: 48px; }
+.hourly__bar { flex: 1; min-height: 1px; background: #6b82b0; border-radius: 1px 1px 0 0; }
+.hourly--sm .hourly__bars { height: 30px; }
+.hourly__axis { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.hourly__peak { font-size: 0.75rem; margin-top: 0.1rem; }
+
+/* 種類別 small multiples。 */
+.stat-multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.stat-panel { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 0.8rem 1rem; }
+.stat-panel__head { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.35rem; }
+.activity-block { margin-bottom: 1.4rem; }
+.activity-block h2 { font-size: 1.05rem; margin: 0 0 0.6rem; }

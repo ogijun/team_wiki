@@ -23,6 +23,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /ダッシュ記事/
   end
 
+  test "home shows the site-wide activity heatmap" do
+    Activity.create!(user: @user, action: "article.created")
+    get root_url
+    assert_response :success
+    assert_select ".activity-block .heatmap"
+    assert_select ".activity-block .hourly"
+  end
+
   test "stats trends link is an accessible icon-only link" do
     get root_url
     # アイコンのみ＝可視テキストは無いが、リンク名は aria-label で読み上げ可能

@@ -36,4 +36,13 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".stat-chart__head", text: /保存容量/
     assert_select ".stat-chart__head", text: /総ページ数/
   end
+
+  test "renders the site-wide heatmap and hourly graph plus per-type panels" do
+    Activity.create!(user: @user, action: "article.created")
+    get stats_url
+    assert_response :success
+    assert_select ".activity-block .heatmap"              # 全体の草マップ
+    assert_select ".activity-block .hourly"               # 全体の時間帯
+    assert_select ".stat-multiples .stat-panel", count: 5 # 種類別パネル5つ
+  end
 end

@@ -1,0 +1,17 @@
+<%# 全体アクティビティの概観（草マップ＋時間帯を枠付きで左右に並べる）。home と /stats が共用。locals: daily, hourly %>
+<% first = ActivityStats.first_date %>
+<% if first %>
+  <div class="activity-cards">
+    <div class="activity-card">
+      <div class="activity-card__head">日別（<%= first.strftime("%Y/%m/%d") %> 〜）</div>
+      <div class="heatmap-wrap"><%= activity_heatmap(daily, labels: true) %></div>
+      <%= heat_legend %>
+    </div>
+    <div class="activity-card">
+      <div class="activity-card__head">時間帯（JST）</div>
+      <%= hourly_bars(hourly) %>
+    </div>
+  </div>
+<% else %>
+  <p class="muted">まだアクティビティがありません。最初の活動からここに草が生えていきます。</p>
+<% end %>

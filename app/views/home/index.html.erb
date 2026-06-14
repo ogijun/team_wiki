@@ -59,3 +59,10 @@
   <%= render "activities/timeline", activities: @recent_activities %>
   <p><%= link_to "すべて見る", activities_path %></p>
 </section>
+
+<section class="activity-block">
+  <h2><%= icon("activity") %> サイトの動き</h2>
+  <%= render "shared/activity_overview", daily: @daily[:total], hourly: @hourly[:total] %>
+  <p><%= link_to "統計をくわしく見る", stats_path %></p>
+</section>
+

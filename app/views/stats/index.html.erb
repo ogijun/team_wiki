@@ -1,28 +1,50 @@
-<% content_for :title, "統計の推移" %>
+<% content_for :title, "統計" %>
 <%= link_to "← ホーム", root_path, class: "back-link" %>
-<div class="page-header"><h1>統計の推移</h1></div>
+<div class="page-header"><h1>統計</h1></div>
 
-<% if @snapshots.empty? %>
-  <div class="empty-state">
-    まだスナップショットがありません。毎日 23:55（JST）にその日の統計が自動記録され、ここに推移グラフが育っていきます。
-  </div>
-<% else %>
-  <p class="muted"><%= @snapshots.first.date.to_fs(:jp) %> 〜 <%= @snapshots.last.date.to_fs(:jp) %>（<%= @snapshots.size %>日分）</p>
-  <div class="stat-charts">
-    <% {
-      "記事" => [ :articles_count, "pencil-line", :number ],
-      "資料" => [ :materials_count, "library-big", :number ],
-      "未確認資料" => [ :unconfirmed_materials_count, "search", :number ],
-      "文字起こし済（文字）" => [ :transcribed_chars, "pen-line", :number ],
-      "保存容量" => [ :total_file_bytes, "archive", :bytes ],
-      "総ページ数" => [ :total_pages, "file-text", :number ]
-    }.each do |label, (column, icon_name, fmt)| %>
-      <% values = @snapshots.map { |s| s.public_send(column).to_i } %>
-      <% last = fmt == :bytes ? number_to_human_size(values.last) : number_with_delimiter(values.last) %>
-      <div class="stat-chart">
-        <div class="stat-chart__head"><%= icon(icon_name) %> <%= label %> <strong><%= last %></strong></div>
-        <%= sparkline_svg(values) %>
+<section class="activity-block">
+  <h2>累計の推移</h2>
+  <% if @snapshots.empty? %>
+    <div class="empty-state">
+      まだスナップショットがありません。毎日 23:55（JST）にその日の統計が自動記録され、ここに推移グラフが育っていきます。
+    </div>
+  <% else %>
+    <p class="muted"><%= @snapshots.first.date.to_fs(:jp) %> 〜 <%= @snapshots.last.date.to_fs(:jp) %>（<%= @snapshots.size %>日分）</p>
+    <div class="stat-charts">
+      <% {
+        "記事" => [ :articles_count, "pencil-line", :number ],
+        "資料" => [ :materials_count, "library-big", :number ],
+        "未確認資料" => [ :unconfirmed_materials_count, "search", :number ],
+        "文字起こし済（文字）" => [ :transcribed_chars, "pen-line", :number ],
+        "保存容量" => [ :total_file_bytes, "archive", :bytes ],
+        "総ページ数" => [ :total_pages, "file-text", :number ]
+      }.each do |label, (column, icon_name, fmt)| %>
+        <% values = @snapshots.map { |s| s.public_send(column).to_i } %>
+        <% fmt_val = ->(v) { fmt == :bytes ? number_to_human_size(v) : number_with_delimiter(v) } %>
+        <div class="stat-chart">
+          <div class="stat-chart__head"><%= icon(icon_name) %> <%= label %> <strong><%= fmt_val.(values.last) %></strong></div>
+          <%= sparkline_svg(values) %>
+          <div class="stat-chart__axis muted"><span><%= fmt_val.(values.min) %></span><span><%= fmt_val.(values.max) %></span></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</section>
+
+<section class="activity-block">
+  <h2>全体のアクティビティ</h2>
+  <%= render "shared/activity_overview", daily: @daily[:total], hourly: @hourly[:total] %>
+</section>
+
+<section class="activity-block">
+  <h2>種類別</h2>
+  <div class="stat-multiples">
+    <% { "article" => "記事", "material" => "資料", "comment" => "コメント",
+         "transcription" => "文字起こし", "tag" => "タグ" }.each do |type, label| %>
+      <div class="stat-panel">
+        <div class="stat-panel__head"><%= label %></div>
+        <div class="heatmap-wrap"><%= activity_heatmap(@daily[:by_type][type], css: "heatmap--sm") %></div>
       </div>
     <% end %>
   </div>
-<% end %>
+</section>
