@@ -69,6 +69,12 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "資料A"
   end
 
+  test "index table is wrapped in a horizontal-scroll container (mobile)" do
+    Material.create!(user: @user, url: "https://x.test/scroll", title: "スクロール資料")
+    get materials_url
+    assert_select ".table-scroll table.materials-table"
+  end
+
   test "index shows the library summary band" do
     create(:material, :with_pdf)
     get materials_url

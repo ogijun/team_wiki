@@ -206,6 +206,11 @@ button.tag-chip:hover, button.tag-chip:focus {
 .material-thumb--icon { display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; background: var(--code-bg); }
 
 /* Materials table */
+/* 横スクロールするテーブルラッパ（多列テーブルの汎用）。テーブル幅は締めず、はみ出たらここで横スクロール。 */
+.table-scroll { overflow-x: auto; }
+/* テーブル自体は最小幅を確保して列を詰めすぎない。画面がこれより狭ければ .table-scroll が横スクロールする
+   （max-width は付けない＝広い画面で渋滞させない）。 */
+.materials-table { min-width: 48rem; }
 .materials-table th a.sort-link { color: inherit; text-decoration: none; }
 .materials-table th a.sort-link:hover { color: var(--accent); }
 .pagy { display: flex; gap: 0.4rem; flex-wrap: wrap; padding: 0.75rem 0; list-style: none; }
