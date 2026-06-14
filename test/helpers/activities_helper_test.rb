@@ -107,6 +107,14 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_empty missing, "MERGE_NOUNS rendering entry missing for: #{missing.inspect}"
   end
 
+  # noun と同様に動詞側も machine-check する（MERGEABLE_SETS に published 等を足して
+  # VERBS への追加を忘れると subject_group_phrase の VERBS.fetch が KeyError になるため）。
+  test "every mergeable-set verb has a VERBS rendering entry" do
+    verbs = ActivityGrouper::MERGEABLE_SETS.flatten.map { |a| a.split(".").last }.uniq
+    missing = verbs - ActivitiesHelper::VERBS.keys
+    assert_empty missing, "VERBS rendering entry missing for: #{missing.inspect}"
+  end
+
   test "subject group with actor: false drops the leading が" do
     article = Article.create!(title: "無主語記事", created_by: @user)
     a1 = Activity.new(user: @user, action: "article.created", subject: article, subject_label: article.title)
