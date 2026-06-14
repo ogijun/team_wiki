@@ -15,7 +15,7 @@ module StubArticleForMaterial
       article.save!
       ArticleRevisionCreator.call(article: article, body: body, author: author, edit_summary: "資料から自動作成")
     end
-    ActivityRecorder.record(actor: author, action: "article.created", subject: article)
+    Activity.record(actor: author, action: "article.created", subject: article)
     article
   end
 

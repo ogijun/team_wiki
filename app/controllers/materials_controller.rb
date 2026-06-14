@@ -42,7 +42,7 @@ class MaterialsController < ApplicationController
     if save_material_with_stub(@material)
       # 重い後処理（メタ抽出・PDF linearize）はリクエストから外して非同期で行う。
       MaterialPostProcessJob.perform_later(@material)
-      ActivityRecorder.record(actor: Current.user, action: "material.added", subject: @material)
+      Activity.record(actor: Current.user, action: "material.added", subject: @material)
       redirect_to @material
     else
       render :new, status: :unprocessable_entity
@@ -63,7 +63,7 @@ class MaterialsController < ApplicationController
   def destroy
     label = @material.title
     @material.destroy
-    ActivityRecorder.record(actor: Current.user, action: "material.deleted", subject_label: label)
+    Activity.record(actor: Current.user, action: "material.deleted", subject_label: label)
     redirect_to materials_url
   end
 

@@ -34,7 +34,7 @@ module ArticleSaver
       ArticleRevisionCreator.call(article: article, body: params[:body], author: author,
                                   edit_summary: params[:edit_summary])
     end
-    ActivityRecorder.record(actor: author, action: "article.#{action}", subject: article)
+    Activity.record(actor: author, action: "article.#{action}", subject: article)
     true
   rescue ActiveRecord::RecordInvalid
     false

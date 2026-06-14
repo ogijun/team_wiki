@@ -7,7 +7,7 @@ class TagsController < ApplicationController
   def create
     @tag = Tag.new(tag_params)
     if @tag.save
-      ActivityRecorder.record(actor: Current.user, action: "tag.created", subject: @tag)
+      Activity.record(actor: Current.user, action: "tag.created", subject: @tag)
       redirect_to tags_url
     else
       @tags = Tag.with_usage_count
@@ -25,7 +25,7 @@ class TagsController < ApplicationController
     if tag.taggings.none?
       label = tag.name
       tag.destroy
-      ActivityRecorder.record(actor: Current.user, action: "tag.deleted", subject_label: label)
+      Activity.record(actor: Current.user, action: "tag.deleted", subject_label: label)
     end
     redirect_to tags_url
   end
