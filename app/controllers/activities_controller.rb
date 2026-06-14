@@ -1,5 +1,7 @@
 class ActivitiesController < ApplicationController
   def index
-    @activities = Activity.includes(:user, :subject).order(created_at: :desc).limit(100)
+    @activity_groups = ActivityGrouper.call(
+      Activity.includes(:user, :subject).order(created_at: :desc).limit(150)
+    ).first(100)
   end
 end

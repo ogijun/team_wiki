@@ -8,6 +8,8 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    @activities = Activity.where(user: @user).includes(:user, :subject).order(created_at: :desc).limit(20)
+    @activity_groups = ActivityGrouper.call(
+      Activity.where(user: @user).includes(:user, :subject).order(created_at: :desc).limit(40)
+    ).first(15)
   end
 end
