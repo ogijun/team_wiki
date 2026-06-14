@@ -6,17 +6,42 @@ import { Controller } from "@hotwired/stimulus"
 // 大きな PDF でも表示ページに必要なチャンクだけ Range 取得して描画する。
 // 表示はページ本来のアスペクト比を厳密に維持し、既定はビューポートにフィット。拡大/縮小/等倍/フィット操作つき。
 export default class extends Controller {
-  static targets = ["dialog", "canvas", "page", "status", "pct", "stage"]
+  static targets = ["dialog", "canvas", "page", "status", "pct", "stage", "nav", "dir"]
   static values = { url: String }
 
   MIN_SCALE = 0.15
   MAX_SCALE = 4
   MAX_BITMAP = 4096 // 拡大時のメモリ暴走を防ぐビットマップ最大辺(px)
 
+  connect() {
+    this.rtl = false // 既定は左開き（洋書）。右開き（和書・縦書き）はビューア内トグルで切替（セッション内のみ）。
+    this.applyDirection()
+  }
+
   async open(event) {
     event.preventDefault()
     this.dialogTarget.showModal()
     await this.load()
+  }
+
+  // 綴じ方向トグル。右開きでは「次へ」が左に来るようナビを反転し、矢印キーの向きも入れ替える。
+  // ページ送りの番号（pageNum++）は方向に依らず同じ。保存はしない（セッション内のみ）。
+  toggleDirection() {
+    this.rtl = !this.rtl
+    this.applyDirection()
+  }
+
+  applyDirection() {
+    this.navTarget.classList.toggle("pdf-viewer__nav--rtl", this.rtl)
+    this.dirTarget.textContent = this.rtl ? "右開き" : "左開き"
+  }
+
+  // 矢印キーでのページ送り。左開きは →=次, 右開きは ←=次（読み進み方向に一致）。
+  key(event) {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return
+    event.preventDefault()
+    const advance = this.rtl ? event.key === "ArrowLeft" : event.key === "ArrowRight"
+    advance ? this.next() : this.prev()
   }
 
   close() {

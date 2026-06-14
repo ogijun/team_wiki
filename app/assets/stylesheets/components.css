@@ -245,6 +245,9 @@ button.tag-chip:hover, button.tag-chip:focus {
    ダイアログは中身ぴったりに縮み、ページは本来のアスペクト比でビューポート最大まで表示する。 */
 .pdf-viewer { padding: 0.7rem 0.8rem; display: flex; flex-direction: column; max-height: 94vh; }
 .pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+/* 前/次ナビ。右開きのときは並びを反転して「次へ」を左に置く（読み進み方向に一致）。 */
+.pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.5rem; }
+.pdf-viewer__nav--rtl { flex-direction: row-reverse; }
 .pdf-viewer__page { font-size: 0.85rem; color: var(--ink-soft); min-width: 4.5rem; text-align: center; }
 .pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.6rem; }
 .pdf-viewer__pct { font-size: 0.8rem; color: var(--ink-soft); min-width: 3.4rem; text-align: center; }
