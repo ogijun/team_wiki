@@ -63,4 +63,36 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_includes activity_icon(a), "#message-circle"
     assert_includes activity_icon(a), "timeline__icon"
   end
+
+  test "subject group merges verbs into 作成・編集 with a single linked title" do
+    article = Article.create!(title: "まとめ記事", created_by: @user)
+    a1 = Activity.new(user: @user, action: "article.created", subject: article, subject_label: article.title)
+    a2 = Activity.new(user: @user, action: "article.edited",  subject: article, subject_label: article.title)
+    group = ActivityGrouper::Group.new(kind: :subject, activities: [ a2, a1 ]) # 降順
+    html = activity_group_phrase(group)
+    assert_includes html, "記事"
+    assert_includes html, "を作成・編集しました"
+    assert_match %r{<a [^>]*>まとめ記事</a>}, html
+    assert_equal 1, html.scan("まとめ記事").size
+  end
+
+  test "action group shows first 2 names plus an expandable ほかN件" do
+    mats = Array.new(5) { |k| Material.create!(user: @user, url: "https://e.test/#{k}", title: "資料#{k}") }
+    acts = mats.map { |m| Activity.new(user: @user, action: "material.added", subject: m, subject_label: m.title) }
+    group = ActivityGrouper::Group.new(kind: :action, activities: acts.reverse) # 降順
+    html = activity_group_phrase(group)
+    assert_includes html, "を追加しました"
+    assert_includes html, "ほか3件"
+    assert_includes html, 'data-controller="disclosure"'
+    assert_includes html, 'data-disclosure-target="rest"'
+    assert_includes html, "hidden"
+    assert_includes html, "資料0"   # 先頭は常時表示
+    assert_includes html, "資料4"   # 残りも DOM 内には存在（隠れているだけ）
+  end
+
+  test "single group falls back to the existing per-activity phrase" do
+    a = Activity.new(user: @user, action: "comment.posted", subject_label: "対象")
+    group = ActivityGrouper::Group.new(kind: :single, activities: [ a ])
+    assert_equal activity_phrase(a), activity_group_phrase(group)
+  end
 end
