@@ -50,15 +50,24 @@
       <%# ファイル名クリックでオーバーレイのページビューア（PDF.js は初回オープン時に遅延ロード）。DLは隣のアイコンから %>
       <div data-controller="pdf" data-pdf-url-value="<%= pdf_material_path(@material) %>">
         <div class="placeholder">ファイル名をクリックするとページビューアで読めます（ページ単位で部分読み込み）</div>
-        <dialog class="lightbox" data-pdf-target="dialog" data-action="click->pdf#backdropClose">
+        <dialog class="lightbox lightbox--pdf" data-pdf-target="dialog" data-action="click->pdf#backdropClose">
           <div class="pdf-viewer">
             <div class="pdf-viewer__bar">
               <button type="button" class="btn-sm secondary outline" data-action="pdf#prev">前のページ</button>
               <span class="pdf-viewer__page" data-pdf-target="page">…</span>
               <button type="button" class="btn-sm secondary outline" data-action="pdf#next">次のページ</button>
+              <span class="pdf-viewer__zoom">
+                <button type="button" class="btn-sm secondary outline" data-action="pdf#zoomOut" aria-label="縮小">−</button>
+                <span class="pdf-viewer__pct" data-pdf-target="pct">…</span>
+                <button type="button" class="btn-sm secondary outline" data-action="pdf#zoomIn" aria-label="拡大">＋</button>
+                <button type="button" class="btn-sm secondary outline" data-action="pdf#actualSize">等倍</button>
+                <button type="button" class="btn-sm secondary outline" data-action="pdf#fit">フィット</button>
+              </span>
               <button type="button" class="btn-sm secondary outline pdf-viewer__close" data-action="pdf#close" aria-label="閉じる">×</button>
             </div>
-            <canvas data-pdf-target="canvas"></canvas>
+            <div class="pdf-viewer__stage">
+              <canvas data-pdf-target="canvas"></canvas>
+            </div>
             <p class="muted" data-pdf-target="status"></p>
           </div>
         </dialog>
