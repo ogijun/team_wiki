@@ -5,5 +5,7 @@ class HomeController < ApplicationController
     @stub_articles = Article.where(status: %w[stub writing]).order(updated_at: :desc).limit(5)
     @stats = StatSnapshot.current_values
     @my_stats = Current.user.activity_stats
+    @daily = ActivityStats.daily_by_type
+    @hourly = ActivityStats.hourly_by_type
   end
 end
