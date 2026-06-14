@@ -27,7 +27,6 @@ class Material < ApplicationRecord
   THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
   CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "unconfirmed" => "未確認" }.freeze
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
-  TRANSCRIBABLE_KINDS = %i[image video audio document].freeze
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
@@ -97,14 +96,17 @@ class Material < ApplicationRecord
   end
 
   # 資料コレクションの現在値の単一窓口。一覧ヘッダ帯と StatSnapshot.current_values が共用する。
-  # total_pages = PDF のページ数合計（SUM page_count）＋ 画像件数（画像1枚=1ページ）。
+  # total_pages = page_count の合計 ＋ page_count 未設定の画像の枚数（画像1枚=1ページ）。
+  # page_count を持つ画像は SUM 側で数えるので画像枚数からは除く（二重計上を防ぐ）。
   def self.library_summary
     kinds = kind_counts
     files = ActiveStorage::Attachment.where(record_type: "Material", name: "file")
+    images_without_pages = where(page_count: nil).joins(file_attachment: :blob)
+                             .where("active_storage_blobs.content_type LIKE ?", "image/%").count
     {
       file_count: files.count,
       total_bytes: files.joins(:blob).sum("active_storage_blobs.byte_size"),
-      total_pages: sum(:page_count).to_i + kinds[:image],
+      total_pages: sum(:page_count).to_i + images_without_pages,
       kind_counts: kinds
     }
   end
@@ -139,12 +141,13 @@ class Material < ApplicationRecord
     File.unlink(out) if out && File.exist?(out)
   end
 
-  def transcribable? = TRANSCRIBABLE_KINDS.include?(media_kind)
+  # すべての資料を文字起こし対象とする（ファイル/URL を問わず）。
+  def transcribable? = true
 
   # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。
   def bibliography_present?
     author.present? || source.present? || published_at.present? ||
-      volume.present? || publisher.present? || pages.present? || isbn.present?
+      volume.present? || publisher.present? || pages.present? || isbn.present? || page_count.present?
   end
 
   def confidence_label = CONFIDENCE_LEVELS[confidence]

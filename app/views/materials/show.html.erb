@@ -98,6 +98,7 @@
       <% if @material.publisher %><dt>出版社・発行元</dt><dd><%= @material.publisher %></dd><% end %>
       <% if @material.published %><dt>発行日</dt><dd><%= @material.published.label %></dd><% end %>
       <% if @material.pages %><dt>ページ</dt><dd><%= @material.pages %></dd><% end %>
+      <% if @material.page_count %><dt>総ページ数</dt><dd><%= number_with_delimiter(@material.page_count) %></dd><% end %>
       <% if @material.isbn %><dt>ISBN</dt><dd><%= @material.isbn %></dd><% end %>
       <% if @material.file_created_at %><dt>ファイル作成日</dt><dd><%= @material.file_created_at.to_fs(:jp) %> <small class="muted">（EXIF/PDF から自動抽出。発行日とは別）</small></dd><% end %>
       <% if tags.any? %>

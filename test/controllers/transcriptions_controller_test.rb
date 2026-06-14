@@ -142,12 +142,12 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "rejects transcription edit for non-media material" do
+  test "allows transcription edit for any material, including links" do
     get edit_material_transcription_url(@link)
-    assert_redirected_to material_url(@link)
+    assert_response :success
   end
 
-  test "index groups media materials by transcription status" do
+  test "index lists all materials grouped by transcription status" do
     todo = Material.new(user: @user, title: "未着手動画")
     todo.file.attach(io: StringIO.new("x"), filename: "v.mp4", content_type: "video/mp4")
     todo.save!
@@ -155,13 +155,13 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     done.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
     done.save!
     Transcription.create!(material: done, author: @user, body: "ok", status: "done")
-    Material.create!(user: @user, title: "リンク", url: "https://example.com/x") # 対象外
+    Material.create!(user: @user, title: "リンク", url: "https://example.com/x") # 全資料が対象
 
     get transcriptions_url
     assert_response :success
     assert_select "a", text: "未着手動画"
     assert_select "a", text: "完了音声"
-    assert_select "a", text: "リンク", count: 0
+    assert_select "a", text: "リンク"
 
     # 文字起こしがある行のタイトルは Transcription#show へ、資料へは landmark アイコンの別リンク
     assert_select "a[href=?]", material_transcription_path(done), text: "完了音声"

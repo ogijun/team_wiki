@@ -47,6 +47,21 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "show displays page_count in the bibliography when present" do
+    m = Material.create!(user: @user, url: "https://x.test/book", title: "本", page_count: 300)
+    get material_url(m)
+    assert_select ".bibliography dt", text: "総ページ数"
+    assert_select ".bibliography dd", text: /300/
+  end
+
+  test "edit form has an editable page_count field and update persists it" do
+    m = Material.create!(user: @user, url: "https://x.test/book2", title: "本2")
+    get edit_material_url(m)
+    assert_select "input[name='material[page_count]']"
+    patch material_url(m), params: { material: { page_count: 42 } }
+    assert_equal 42, m.reload.page_count
+  end
+
   test "index renders when logged in with a material" do
     Material.create!(user: @user, url: "https://example.com/a", title: "資料A")
     get materials_url
@@ -180,7 +195,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".usage a[role=button][href=?]", edit_material_transcription_path(media), text: "文字起こしを作成"
   end
 
-  test "progress strip includes transcription state only for transcribable materials" do
+  test "progress strip includes transcription state for every material, including links" do
     media = Material.new(user: @user, title: "音声S")
     media.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
     media.save!
@@ -189,7 +204,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
 
     link = Material.create!(user: @user, url: "https://example.com/nt", title: "リンクNT")
     get material_url(link)
-    assert_select ".progress-strip", text: /文字起こし/, count: 0
+    assert_select ".progress-strip a[href=?]", edit_material_transcription_path(link), text: /文字起こし/
   end
 
   test "show isolates delete in a danger zone, not the actions row" do
@@ -534,9 +549,9 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", edit_material_transcription_path(m)
   end
 
-  test "non-media material has no transcription section" do
+  test "every material, including a link, has a transcription section" do
     link = Material.create!(user: @user, title: "外部", url: "https://example.com/x")
     get material_url(link)
-    assert_select "a[href=?]", edit_material_transcription_path(link), count: 0
+    assert_select "a[href=?]", edit_material_transcription_path(link)
   end
 end
