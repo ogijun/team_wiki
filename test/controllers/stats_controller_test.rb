@@ -12,14 +12,16 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
-  test "index renders sparkline charts from snapshots" do
+  test "index renders trend bar charts from snapshots" do
     StatSnapshot.create!(date: Date.current - 1, articles_count: 3, materials_count: 5,
                          unconfirmed_materials_count: 2, transcribed_chars: 100)
     StatSnapshot.create!(date: Date.current, articles_count: 4, materials_count: 6,
                          unconfirmed_materials_count: 1, transcribed_chars: 1500)
     get stats_url
     assert_response :success
-    assert_select "svg polyline", minimum: 4
+    # 2スナップショット × 6指標 = 12本（0基準の縦棒）。x軸ラベル(.trend__xaxis)も出る。
+    assert_select ".stat-chart .trend__bar", minimum: 12
+    assert_select ".stat-chart .trend__xaxis"
     assert_select ".stat-chart", text: /1,500/
   end
 

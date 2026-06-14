@@ -42,26 +42,21 @@ module StatsHelper
             class: [ "hourly", css ].compact.join(" "))
   end
 
-  # 値の配列をスパークライン SVG にする（依存なし・サーバーサイド描画）。
-  # 値1個のときは線が描けないので点を打つ。
-  def sparkline_svg(values, width: 280, height: 56)
-    pad = 4
-    max = [ values.max, 1 ].max
-    min = values.min
-    range = [ max - min, 1 ].max
-    points = values.each_with_index.map do |v, i|
-      x = values.size == 1 ? width / 2.0 : pad + i * (width - pad * 2).to_f / (values.size - 1)
-      y = height - pad - (v - min).to_f / range * (height - pad * 2)
-      [ x.round(1), y.round(1) ]
+  # 累計推移の縦棒グラフ（0基準・依存ゼロ・サーバー描画）。
+  # series: [[Date, Integer], ...]（日付昇順）。棒の高さは最大値比（0基準）。
+  # 左に y 軸（最大値・0）、下に x 軸（最初/最後の日付）を添える。
+  # format: :number=区切り数字 / :bytes=人間可読サイズ（y軸ラベルと各棒の tooltip に適用）。
+  def trend_bars(series, format: :number)
+    scale = [ series.map(&:last).max.to_i, 1 ].max
+    fmt = ->(v) { format == :bytes ? number_to_human_size(v) : number_with_delimiter(v) }
+    bars = series.map do |date, v|
+      tag.span("", class: "trend__bar", style: "height: #{(v.to_f / scale * 100).round}%",
+                   title: "#{date.strftime('%Y/%m/%d')} · #{fmt.call(v)}")
     end
-
-    content_tag(:svg, viewBox: "0 0 #{width} #{height}", class: "sparkline",
-                preserveAspectRatio: "none", "aria-hidden": true) do
-      if points.size == 1
-        tag.circle(cx: points[0][0], cy: points[0][1], r: 3)
-      else
-        tag.polyline(points: points.map { |x, y| "#{x},#{y}" }.join(" "), fill: "none")
-      end
-    end
+    yaxis = tag.div(safe_join([ tag.span(fmt.call(scale)), tag.span("0") ]), class: "trend__yaxis muted")
+    xaxis = tag.div(safe_join([ tag.span(series.first.first.strftime("%-m/%-d")),
+                                tag.span(series.last.first.strftime("%-m/%-d")) ]), class: "trend__xaxis")
+    main = tag.div(safe_join([ tag.div(safe_join(bars), class: "trend__bars"), xaxis ]), class: "trend__main")
+    tag.div(safe_join([ yaxis, main ]), class: "trend")
   end
 end
