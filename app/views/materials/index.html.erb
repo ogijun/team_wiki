@@ -37,7 +37,7 @@
         <td><%= render MaterialThumbComponent.new(material: m) %></td>
         <td><%= link_to m.title, material_path(m), class: "cell-title" %><% if m.comments_count > 0 %> <span class="muted"><%= icon("message-circle") %><%= m.comments_count %></span><% end %></td>
         <td><%= avatar_link(m.user, size: 24) %></td>
-        <td class="col-when"><%= m.created_at.strftime("%Y/%m/%d") %><br><%= m.created_at.strftime("%H:%M") %></td>
+        <td class="col-when"><%= compact_date(m.created_at) %><br><%= m.created_at.strftime("%H:%M") %></td>
         <td class="col-when"><% if m.published %><%= m.published.slashes %><% else %><span class="muted">—</span><% end %></td>
         <td><div class="cell-tags">
           <% m.tags.first(3).each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %><% end %>
