@@ -3,7 +3,8 @@ class TranscriptionsController < ApplicationController
   before_action :set_transcription, only: %i[edit update]
 
   def index
-    materials = Material.includes(file_attachment: :blob, transcription: :author).select(&:transcribable?)
+    # 全資料が文字起こし対象（transcribable? は常に true）。状態でグルーピングして一覧する。
+    materials = Material.includes(file_attachment: :blob, transcription: :author)
     @groups = materials.group_by { |m| m.transcription&.status || "todo" }
   end
 

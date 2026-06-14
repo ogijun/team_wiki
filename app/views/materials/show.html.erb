@@ -46,7 +46,7 @@
           <%= link_to rails_blob_path(@material.file), title: "ダウンロード", class: "muted" do %><%= icon("download") %><% end %>
         </p>
       </div>
-    <% elsif @material.file.content_type == "application/pdf" %>
+    <% elsif @material.pdf? %>
       <%# ファイル名クリックでオーバーレイのページビューア（PDF.js は初回オープン時に遅延ロード）。DLは隣のアイコンから %>
       <div data-controller="pdf" data-pdf-url-value="<%= pdf_material_path(@material) %>">
         <div class="placeholder">ファイル名をクリックするとページビューアで読めます（ページ単位で部分読み込み）</div>

@@ -54,6 +54,7 @@ class Material < ApplicationRecord
 
   def file? = file.attached?
   def link? = url.present?
+  def pdf? = file.attached? && file.content_type == "application/pdf"
 
   def thumbnailable_file?
     file.attached? && THUMBNAIL_TYPES.include?(file.content_type)
@@ -115,7 +116,7 @@ class Material < ApplicationRecord
   def self.backfill_page_counts!
     updated = 0
     with_attached_file.where(page_count: nil).find_each do |m|
-      next unless m.file.attached? && m.file.content_type == "application/pdf"
+      next unless m.pdf?
       result = MaterialMetadataExtractor.call(m)
       next unless result[:page_count]
       m.update_column(:page_count, result[:page_count])
@@ -128,7 +129,7 @@ class Material < ApplicationRecord
   # has_one_attached の再 attach は旧 blob を purge_later で削除する（オーファンは出ない）。
   # 失敗（暗号化・破損・qpdf不在）は原本据え置き＋ログ。アップロードは既に成功しているので raise しない。
   def linearize_file!
-    return unless file.attached? && file.content_type == "application/pdf"
+    return unless pdf?
 
     out = nil
     file.open { |tmp| out = PdfLinearizer.linearize(tmp.path) unless PdfLinearizer.linearized?(tmp.path) }
