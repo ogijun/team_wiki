@@ -24,6 +24,13 @@ class StatsHelperTest < ActionView::TestCase
     assert_equal 5, Nokogiri::HTML(heat_legend).css(".heat").size
   end
 
+  test "activity_heatmap with labels adds 7 single-char weekday labels" do
+    travel_to Time.zone.local(2026, 6, 14, 12, 0) do
+      doc = Nokogiri::HTML(activity_heatmap({}, labels: true))
+      assert_equal %w[日 月 火 水 木 金 土], doc.css(".heatmap__days span").map(&:text)
+    end
+  end
+
   test "hourly_bars renders 24 bars, an axis and a peak caption" do
     html = hourly_bars(Array.new(24, 0).tap { |a| a[7] = 5 })
     doc = Nokogiri::HTML(html)

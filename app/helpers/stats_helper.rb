@@ -8,12 +8,17 @@ module StatsHelper
 
   # GitHub風の日別アクティビティマップ。列=週・行=曜日（日曜始まり7行）。依存ゼロ。
   # 範囲は ActivityStats.range_start（最初のデータの週）〜今日。データ前の空マスは出さない。
-  def activity_heatmap(counts_by_date, css: nil)
+  # labels: true で縦軸に曜日1文字（日〜土）を付ける。
+  def activity_heatmap(counts_by_date, css: nil, labels: false)
     cells = (ActivityStats.range_start..Date.current).map do |d|
       n = counts_by_date[d] || 0
       tag.span("", class: "heat heat-#{heat_level(n)}", title: "#{d.strftime('%Y/%m/%d')} · #{n}件")
     end
-    tag.div(safe_join(cells), class: [ "heatmap", css ].compact.join(" "))
+    grid = tag.div(safe_join(cells), class: [ "heatmap", css ].compact.join(" "))
+    return grid unless labels
+
+    weekdays = tag.div(safe_join(%w[日 月 火 水 木 金 土].map { |w| tag.span(w) }), class: "heatmap__days")
+    tag.div(safe_join([ weekdays, grid ]), class: "heatmap-cal")
   end
 
   # 草マップの色の凡例（少→多）。
