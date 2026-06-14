@@ -35,11 +35,14 @@
     <% @materials.each do |m| %>
       <tr>
         <td><%= render MaterialThumbComponent.new(material: m) %></td>
-        <td><%= link_to m.title, material_path(m) %><% if m.comments_count > 0 %> <span class="muted"><%= icon("message-circle") %><%= m.comments_count %></span><% end %></td>
+        <td><%= link_to m.title, material_path(m), class: "cell-title" %><% if m.comments_count > 0 %> <span class="muted"><%= icon("message-circle") %><%= m.comments_count %></span><% end %></td>
         <td><%= avatar_link(m.user, size: 24) %></td>
-        <td class="col-when"><%= m.created_at.to_date.to_fs(:jp) %><br><span class="muted"><%= m.created_at.strftime("%H:%M") %></span></td>
-        <td class="col-when"><% if m.published %><%= m.published.label %><% else %><span class="muted">—</span><% end %></td>
-        <td><div class="cell-tags"><% m.tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %><% end %></div></td>
+        <td class="col-when"><%= m.created_at.strftime("%Y/%m/%d %H:%M") %></td>
+        <td class="col-when"><% if m.published %><%= m.published.slashes %><% else %><span class="muted">—</span><% end %></td>
+        <td><div class="cell-tags">
+          <% m.tags.first(3).each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %><% end %>
+          <% if m.tags.size > 3 %><span class="muted">+<%= m.tags.size - 3 %></span><% end %>
+        </div></td>
         <td class="col-status">
           <% if (st = transcription_status_label(m)) %>
             <%= st %>

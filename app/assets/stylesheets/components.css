@@ -212,12 +212,13 @@ button.tag-chip:hover, button.tag-chip:focus {
    （max-width は付けない＝広い画面で渋滞させない）。 */
 .materials-table { min-width: 48rem; }
 .materials-table td { vertical-align: top; } /* 行高がタイトルの行数に揃うよう上寄せ */
-/* 日付・ステータス列は折返さない（CJKの1字ずつ折返しや日付の途中改行を防ぎ、行を2〜3行に収める）。
-   投稿日時は「日付/時刻」の2行、発行日・文字起こしは1行で収まる。 */
+/* 日付・ステータス列は折返さない（CJKの1字ずつ折返しや日付の途中改行を防ぐ）。
+   日付は時刻と同じ数字＋区切り表記（例 2026/06/14 13:38 / 発行日 2020/03）で1行に収まる。 */
 .materials-table .col-when, .materials-table .col-status { white-space: nowrap; }
-.materials-table .col-when .muted { font-size: 0.85em; }
-/* タグはチップを横に詰めて折返す（1行1個の縦積みを避ける）。 */
-.cell-tags { display: flex; flex-wrap: wrap; gap: 0.15rem 0.5rem; }
+/* タイトルは2行でクランプ（長文を全部出さず行を抑える）。 */
+.cell-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* タグは小さめの字でチップを横に詰めて折返す（全部は出さず先頭数件＋「+N」）。 */
+.cell-tags { display: flex; flex-wrap: wrap; gap: 0.1rem 0.4rem; font-size: 0.8rem; }
 .materials-table th a.sort-link { color: inherit; text-decoration: none; }
 .materials-table th a.sort-link:hover { color: var(--accent); }
 .pagy { display: flex; gap: 0.4rem; flex-wrap: wrap; padding: 0.75rem 0; list-style: none; }
