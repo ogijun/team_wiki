@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { get, post } from "@rails/request.js"
 
 // toast-ui editor を textarea に重ねて初期化し、保存時に Markdown を textarea へ書き戻す。
-// ツールバーに「出典」ボタンを追加し、資料を選んで [[ref:slug]] を挿入できる。
+// ツールバーに「引用」ボタンを追加し、資料を選んで [[ref:slug]] を挿入できる。
 export default class extends Controller {
   static targets = ["source"]
 
@@ -16,7 +16,7 @@ export default class extends Controller {
     this.editor = new toastui.Editor({
       el: this.holder,
       height: "500px",
-      initialEditType: "markdown",
+      initialEditType: "wysiwyg",
       previewStyle: "vertical",
       initialValue: this.textarea.value,
       hooks: {
@@ -60,11 +60,11 @@ export default class extends Controller {
     }
   }
 
-  // ツールバーに「出典」ボタン + 資料ピッカーのポップアップを追加する。
+  // ツールバーに「引用」ボタン + 資料ピッカーのポップアップを追加する。
   addCitationButton() {
     const button = document.createElement("button")
     button.type = "button"
-    button.textContent = "出典"
+    button.textContent = "引用"
     button.className = "citation-btn"
 
     const popup = document.createElement("div")
@@ -82,7 +82,7 @@ export default class extends Controller {
 
     this.editor.insertToolbarItem(
       { groupIndex: 3, itemIndex: 0 },
-      { name: "ref", tooltip: "出典を挿入", el: button, popup: { body: popup, style: { width: "320px" } } }
+      { name: "ref", tooltip: "引用を挿入", el: button, popup: { body: popup, style: { width: "320px" } } }
     )
 
     this.citationList = list
