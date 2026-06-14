@@ -27,6 +27,12 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_nil fuzzy_part(nil, :year)
   end
 
+  test "compact_date drops the year in the current year, keeps it otherwise" do
+    this_year = Time.zone.local(Date.current.year, 6, 14, 13, 38)
+    assert_equal "06/14", compact_date(this_year)
+    assert_equal "2000/03/01", compact_date(Time.zone.local(2000, 3, 1))
+  end
+
   test "brand_name falls back to default when setting blank" do
     SiteSetting.instance.update!(brand_name: nil)
     assert_equal "Team Wiki", brand_name

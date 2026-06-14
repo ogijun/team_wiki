@@ -38,6 +38,11 @@ module ApplicationHelper
     end
   end
 
+  # 一覧用のコンパクト日付（数字＋スラッシュ）。当年なら年を省いて月日だけ（例 06/14）、他年は 2025/12/08。
+  def compact_date(time)
+    time.strftime(time.year == Date.current.year ? "%m/%d" : "%Y/%m/%d")
+  end
+
   # ── フォームの必須/任意バッジ（ラベル横に置く）──
   def required_badge = tag.span("必須", class: "field-badge field-badge--req")
   def optional_badge = tag.span("任意", class: "field-badge field-badge--opt")
