@@ -1,6 +1,7 @@
 class HomeController < ApplicationController
   def index
     @recent_articles = Article.order(updated_at: :desc).limit(5)
+    # グループ上限の約4倍を生取得してから頭打ち（squash 後もグループ数を確保するための余裕）。
     @recent_activity_groups = ActivityGrouper.call(
       Activity.includes(:user, :subject).order(created_at: :desc).limit(40)
     ).first(10)

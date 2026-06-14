@@ -48,7 +48,7 @@ class ActivitiesControllerTest < ActionDispatch::IntegrationTest
     get activities_url
     assert_response :success
     assert_select "ul.timeline > li", count: 1            # 5件が1行に圧縮
-    assert_select "li .timeline-more", text: /ほか3件/     # 先頭2件＋ほか3件
+    assert_select "li .timeline-more", text: /ほか3件/     # 先頭ACTION_LIST_HEAD(=2)件＋残り3件
     assert_select "li [data-controller=disclosure]"
   end
 end
