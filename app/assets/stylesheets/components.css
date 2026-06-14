@@ -354,13 +354,14 @@ button.tag-chip:hover, button.tag-chip:focus {
 
 /* 時間帯グラフ（24本の縦棒＋x軸＋ピーク）。 */
 .hourly__bars { display: flex; align-items: flex-end; gap: 1px; height: 48px; }
-.hourly__bar { flex: 1; min-height: 1px; background: var(--accent-weak); border-radius: 1px 1px 0 0; }
+.hourly__bar { flex: 1; min-height: 1px; background: #6b82b0; border-radius: 1px 1px 0 0; }
 .hourly--sm .hourly__bars { height: 30px; }
 .hourly__axis { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
 .hourly__peak { font-size: 0.75rem; margin-top: 0.1rem; }
 
 /* 種類別 small multiples。 */
 .stat-multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.stat-panel { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 0.8rem 1rem; }
 .stat-panel__head { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.35rem; }
 .activity-block { margin-bottom: 1.4rem; }
 .activity-block h2 { font-size: 1.05rem; margin: 0 0 0.6rem; }
