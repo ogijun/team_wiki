@@ -1,9 +1,15 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
+# 新規 cop（plugin 含む）を opt-in。plugin の cop は pending だと実質無効になるため。
+AllCops:
+  NewCops: enable
+
 # マイグレーション安全 lint (r7kamura/rubocop-migration)
+# Minitest idiom lint (rubocop-minitest): assert_equal の引数順・assert_empty/assert_nil 等の idiom 化
 plugins:
   - rubocop-migration
+  - rubocop-minitest
 
 # 本番 DB は SQLite のため、PostgreSQL/MySQL 専用の cop は対象外にする。
 Migration/AddIndexConcurrently: { Enabled: false } # PG の algorithm: :concurrently
@@ -11,6 +17,11 @@ Migration/Jsonb:                { Enabled: false } # PG の jsonb 型
 Migration/ReservedWordMysql:    { Enabled: false } # MySQL 予約語
 Migration/AddCheckConstraint:   { Enabled: false } # PG の NOT VALID 前提
 Migration/ChangeColumnNull:     { Enabled: false } # PG の制約検証前提
+
+# Minitest: 価値の高い idiom 系は有効。ノイズ/メトリクス系は無効化（結合テストの書き方と合わない）。
+Minitest/EmptyLineBeforeAssertionMethods: { Enabled: false } # 純粋な空行スタイル・全体で過剰
+Minitest/MultipleAssertions:              { Enabled: false } # 結合テストは多数 assert_select が正常
+Minitest/AssertWithExpectedArgument:      { Enabled: false } # `assert x.valid?, x.errors...` の失敗メッセージ用途を誤検知
 
 # Overwrite or add rules to create your own house style
 #

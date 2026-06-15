@@ -24,7 +24,7 @@ class ChronicleControllerTest < ActionDispatch::IntegrationTest
     assert_select "li", text: /1990年の出来事/
     assert_select "li", text: /無日付/, count: 0
     body = @response.body
-    assert body.index("1980年の出来事") < body.index("1990年の出来事"), "oldest first"
+    assert_operator body.index("1980年の出来事"), :<, body.index("1990年の出来事"), "oldest first"
   end
 
   test "index shows fuzzy label and range" do

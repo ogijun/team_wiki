@@ -123,7 +123,7 @@ class StorageMigratorTest < ActiveSupport::TestCase
     failed = result[:failed].first
     assert_equal missing.id, failed[:blob_id]
     assert_equal missing.key, failed[:key]
-    assert failed[:error].present?
+    assert_predicate failed[:error], :present?
     assert_equal FROM, missing.reload.service_name
     assert_not target.exist?(missing.key)
   end

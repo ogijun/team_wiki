@@ -10,13 +10,13 @@ class TranscriptionTest < ActiveSupport::TestCase
 
   test "valid with body, author, status" do
     t = Transcription.new(material: @material, author: @user, body: "書き起こし本文", status: "drafting")
-    assert t.valid?, t.errors.full_messages.join(", ")
+    assert_predicate t, :valid?, t.errors.full_messages.join(", ")
   end
 
   test "requires body" do
     t = Transcription.new(material: @material, author: @user, body: "", status: "drafting")
     assert_not t.valid?
-    assert t.errors[:body].any?
+    assert_predicate t.errors[:body], :any?
   end
 
   test "rejects unknown status" do
@@ -38,16 +38,16 @@ class TranscriptionTest < ActiveSupport::TestCase
   test "accepts known creation methods and rejects unknown" do
     %w[manual ai ai_assisted].each do |m|
       t = Transcription.new(material: @material, author: @user, body: "x", status: "drafting", creation_method: m)
-      assert t.valid?, "#{m}: #{t.errors.full_messages.join(", ")}"
+      assert_predicate t, :valid?, "#{m}: #{t.errors.full_messages.join(", ")}"
     end
     bad = Transcription.new(material: @material, author: @user, body: "x", status: "drafting", creation_method: "bogus")
     assert_not bad.valid?
-    assert bad.errors[:creation_method].any?
+    assert_predicate bad.errors[:creation_method], :any?
   end
 
   test "creation_method is optional and blank normalizes to nil" do
     t = Transcription.new(material: @material, author: @user, body: "x", status: "drafting", creation_method: "")
-    assert t.valid?, t.errors.full_messages.join(", ")
+    assert_predicate t, :valid?, t.errors.full_messages.join(", ")
     assert_nil t.creation_method
   end
 
@@ -82,7 +82,7 @@ class TranscriptionTest < ActiveSupport::TestCase
 
     long_body = (1..(Transcription::PREVIEW_LINES + 5)).map { |i| "行#{i}" }.join("\n")
     long = Transcription.new(body: long_body)
-    assert long.long?
+    assert_predicate long, :long?
     assert_equal Transcription::PREVIEW_LINES, long.preview_body.lines.size
     assert_equal 5, long.overflow_lines
   end

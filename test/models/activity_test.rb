@@ -7,7 +7,7 @@ class ActivityTest < ActiveSupport::TestCase
 
   test "valid with user and action" do
     a = Activity.new(user: @user, action: "article.created", subject_label: "X")
-    assert a.valid?, a.errors.full_messages.join(", ")
+    assert_predicate a, :valid?, a.errors.full_messages.join(", ")
   end
 
   test "subject is optional and survives subject deletion" do

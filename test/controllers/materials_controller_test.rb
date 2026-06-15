@@ -418,7 +418,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     get materials_url(sort: "name", dir: "asc")
     assert_response :success
     body = @response.body
-    assert body.index("Alpha") < body.index("Bravo"), "Alpha should come before Bravo"
+    assert_operator body.index("Alpha"), :<, body.index("Bravo"), "Alpha should come before Bravo"
   end
 
   test "index sorts by created_at desc by default" do
@@ -426,7 +426,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     Material.create!(user: @user, url: "https://example.com/new", title: "NEWONE")
     get materials_url
     body = @response.body
-    assert body.index("NEWONE") < body.index("OLDONE"), "newest first by default"
+    assert_operator body.index("NEWONE"), :<, body.index("OLDONE"), "newest first by default"
   end
 
   test "index ignores invalid sort and per" do

@@ -7,7 +7,7 @@ class StubArticleForMaterialTest < ActiveSupport::TestCase
     m = Material.create!(user: @user, url: "https://example.com/x", title: "資料X")
     article = StubArticleForMaterial.call(material: m, author: @user)
 
-    assert article.persisted?
+    assert_predicate article, :persisted?
     assert_equal "stub", article.status
     assert_equal "資料X", article.title
     assert_equal @user, article.created_by
@@ -37,6 +37,6 @@ class StubArticleForMaterialTest < ActiveSupport::TestCase
     article = StubArticleForMaterial.call(material: m, author: @user)
     assert_not_equal "資料Y", article.title
     assert article.title.start_with?("資料Y")
-    assert article.persisted?
+    assert_predicate article, :persisted?
   end
 end

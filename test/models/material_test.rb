@@ -28,7 +28,7 @@ class MaterialTest < ActiveSupport::TestCase
 
   test "blank rights is normalized to nil (フォームの未設定=空文字を許容)" do
     m = Material.new(user: @user, url: "https://example.com/x", title: "t", rights: "")
-    assert m.valid?, m.errors.full_messages.join(", ")
+    assert_predicate m, :valid?, m.errors.full_messages.join(", ")
     assert_nil m.rights
   end
 
@@ -45,7 +45,7 @@ class MaterialTest < ActiveSupport::TestCase
 
   test "file-type material is valid" do
     m = attach_png(Material.new(user: @user, title: "図"))
-    assert m.valid?, m.errors.full_messages.join(", ")
+    assert_predicate m, :valid?, m.errors.full_messages.join(", ")
   end
 
   test "bibliographic detail fields store values and normalize blanks to nil" do
@@ -64,11 +64,11 @@ class MaterialTest < ActiveSupport::TestCase
 
   test "isbn accepts loose ISBN shapes and rejects letters" do
     base = { user: @user, url: "https://x.test/i", title: "i" }
-    assert Material.new(base.merge(isbn: "978-4-04-410103-3")).valid?
-    assert Material.new(base.merge(isbn: "404410103X")).valid?
+    assert_predicate Material.new(base.merge(isbn: "978-4-04-410103-3")), :valid?
+    assert_predicate Material.new(base.merge(isbn: "404410103X")), :valid?
     bad = Material.new(base.merge(isbn: "ABC-DEF"))
     assert_not bad.valid?
-    assert bad.errors[:isbn].any?
+    assert_predicate bad.errors[:isbn], :any?
   end
 
   test "per-file upload limit is 1 gigabyte" do
@@ -86,12 +86,12 @@ class MaterialTest < ActiveSupport::TestCase
   test "accepts a file at exactly MAX_BYTES" do
     m = attach_png(Material.new(user: @user))
     m.file.blob.define_singleton_method(:byte_size) { Material::MAX_BYTES }
-    assert m.valid?, m.errors.full_messages.join(", ")
+    assert_predicate m, :valid?, m.errors.full_messages.join(", ")
   end
 
   test "link-type material is valid" do
     m = Material.new(user: @user, url: "https://youtu.be/abc123")
-    assert m.valid?, m.errors.full_messages.join(", ")
+    assert_predicate m, :valid?, m.errors.full_messages.join(", ")
   end
 
   test "requires exactly one of file or url - neither is invalid" do
@@ -167,12 +167,12 @@ class MaterialTest < ActiveSupport::TestCase
   test "published_at and published_precision must be both present or both blank" do
     bad = Material.new(user: @user, url: "https://x.test/a", published_at: Time.zone.local(1998))
     assert_not bad.valid?
-    assert bad.errors[:published_precision].any?
+    assert_predicate bad.errors[:published_precision], :any?
   end
 
   test "thumbnailable_file? is true for image, false for non-image and links" do
     img = attach_png(Material.new(user: @user))
-    assert img.thumbnailable_file?
+    assert_predicate img, :thumbnailable_file?
     link = Material.new(user: @user, url: "https://youtu.be/dQw4w9WgXcQ")
     assert_not link.thumbnailable_file?
   end
@@ -201,15 +201,15 @@ class MaterialTest < ActiveSupport::TestCase
   test "confidence must be one of CONFIDENCE_LEVELS" do
     m = Material.new(user: @user, url: "https://x.test/a", confidence: "bogus")
     assert_not m.valid?
-    assert m.errors[:confidence].any?
+    assert_predicate m.errors[:confidence], :any?
   end
 
   test "rights allows nil and valid values, rejects others" do
-    assert Material.new(user: @user, url: "https://x.test/a", rights: nil).valid?
-    assert Material.new(user: @user, url: "https://x.test/a", rights: "quotable").valid?
+    assert_predicate Material.new(user: @user, url: "https://x.test/a", rights: nil), :valid?
+    assert_predicate Material.new(user: @user, url: "https://x.test/a", rights: "quotable"), :valid?
     bad = Material.new(user: @user, url: "https://x.test/a", rights: "bogus")
     assert_not bad.valid?
-    assert bad.errors[:rights].any?
+    assert_predicate bad.errors[:rights], :any?
   end
 
   test "labels map slug to Japanese; rights nil label is 未設定" do
@@ -247,14 +247,14 @@ class MaterialTest < ActiveSupport::TestCase
     audio = Material.new(user: @user)
     audio.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
     audio.save!
-    assert audio.transcribable?
+    assert_predicate audio, :transcribable?
 
     link = Material.create!(user: @user, title: "外部記事", url: "https://example.com/article")
-    assert link.transcribable?
+    assert_predicate link, :transcribable?
   end
 
   test "bibliography_present? includes page_count" do
-    assert Material.new(user: @user, url: "https://x.test/pc", page_count: 100).bibliography_present?
+    assert_predicate Material.new(user: @user, url: "https://x.test/pc", page_count: 100), :bibliography_present?
   end
 
   test "library_summary does not double-count an image that has a page_count" do
@@ -282,7 +282,7 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal 3, s[:file_count]          # 画像+PDF+音声（リンクはファイル無し）
     assert_equal({ link: 1, image: 1, document: 1, audio: 1 }, s[:kind_counts])
     assert_equal 13, s[:total_pages]        # PDF 12 + 画像 1
-    assert s[:total_bytes].positive?
+    assert_predicate s[:total_bytes], :positive?
   end
 
   test "library_summary total_bytes counts only material files, not avatars" do

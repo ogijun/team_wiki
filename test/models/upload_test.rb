@@ -6,7 +6,7 @@ class UploadTest < ActiveSupport::TestCase
   test "valid png attachment" do
     upload = Upload.new(user: @user)
     upload.file.attach(io: StringIO.new("data"), filename: "a.png", content_type: "image/png")
-    assert upload.valid?
+    assert_predicate upload, :valid?
   end
 
   test "rejects disallowed content type" do

@@ -76,6 +76,9 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Minitest 専用 cop（assert_equal の引数順・assert_empty/assert_nil 等の idiom 化）
+  gem "rubocop-minitest", require: false
 end
 
 group :development do
