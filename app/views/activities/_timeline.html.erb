@@ -9,9 +9,7 @@
         <span class="muted"><%= local_time_ago(rep.created_at) %></span>
       </li>
     <% else %>
-      <li class="timeline__overflow muted">
-        <%= link_to display_name(item.user), item.user %> の活動 ほか<%= item.count %>件
-      </li>
+      <li class="timeline__overflow muted" title="<%= display_name(item.user) %> のほか<%= item.count %>件の活動">ほか<%= item.count %>件</li>
     <% end %>
   <% end %>
 </ul>
