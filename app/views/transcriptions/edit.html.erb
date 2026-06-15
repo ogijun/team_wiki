@@ -1,38 +1,5 @@
-<% content_for :title, "文字起こし — #{@material.title}" %>
-
+<% content_for :title, "文字起こし編集 — #{@material.title}" %>
 <p><%= link_to "← 資料へ戻る", @material %></p>
-<div class="page-header"><h1>文字起こし</h1></div>
-<p class="muted"><%= @material.title %></p>
-<p class="muted">この資料の音声・文字をテキストに書き起こします。聞き取れた／読み取れた範囲でOK。完璧でなくて大丈夫、あとから直せます。</p>
-
-<%= form_with model: @transcription, url: material_transcription_path(@material), method: :patch, class: "stacked-form" do |f| %>
-  <%= render "shared/error_messages", record: @transcription %>
-
-  <div class="field">
-    <%= f.label :status, "状態" %><%= optional_badge %>
-    <%= f.select :status, Transcription::STATUSES.map { |slug, label| [label, slug] } %>
-  </div>
-  <div class="field">
-    <%= f.label :creation_method, "作成方法" %><%= optional_badge %>
-    <%= f.select :creation_method,
-                 Transcription::CREATION_METHODS.map { |slug, label| [label, slug] },
-                 include_blank: "（未記録）" %>
-  </div>
-  <div class="field">
-    <%= f.label :ai_service, "AIサービス" %><%= optional_badge %>
-    <small class="field__hint">AI（またはAI＋人手修正）で作成した場合に記入。例: OpenAI、Google</small>
-    <%= f.text_field :ai_service, placeholder: "例: OpenAI" %>
-  </div>
-  <div class="field">
-    <%= f.label :ai_model, "AIモデル" %><%= optional_badge %>
-    <small class="field__hint">使ったモデル名がわかれば。例: whisper-large-v3</small>
-    <%= f.text_field :ai_model, placeholder: "例: whisper-large-v3" %>
-  </div>
-  <div class="field">
-    <%= f.label :body, "本文" %><%= required_badge %>
-    <small class="field__hint">改行はそのまま保持されます。長尺は「p.3」「0:12:34」などの見出しを本文内に書いてください。</small>
-    <%= f.text_area :body, rows: 18 %>
-  </div>
-
-  <%= f.submit "保存" %>
-<% end %>
+<div class="page-header"><h1>文字起こしを編集</h1></div>
+<p class="muted"><%= @material.title %> ・ <%= @transcription.display_label %></p>
+<%= render "form" %>

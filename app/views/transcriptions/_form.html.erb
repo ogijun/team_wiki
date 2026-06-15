@@ -1,0 +1,37 @@
+<%= form_with model: [ @material, @transcription ], class: "stacked-form" do |f| %>
+  <%= render "shared/error_messages", record: @transcription %>
+  <%= f.hidden_field :lock_version %>
+
+  <div class="field">
+    <%= f.label :label, "パート見出し" %><%= optional_badge %>
+    <small class="field__hint">例: 「0:00–10:00」「p.1–20」「前半」「話者A」。空なら「パート{番号}」。</small>
+    <%= f.text_field :label, placeholder: "例: 0:00–10:00" %>
+  </div>
+  <div class="field">
+    <%= f.label :assignee_id, "担当" %><%= optional_badge %>
+    <%= f.collection_select :assignee_id, User.order(:name), :id, ->(u) { display_name(u) }, include_blank: "未割当" %>
+  </div>
+  <div class="field">
+    <%= f.label :status, "状態" %><%= optional_badge %>
+    <%= f.select :status, Transcription::STATUSES.map { |slug, label| [ label, slug ] } %>
+  </div>
+  <div class="field">
+    <%= f.label :creation_method, "作成方法" %><%= optional_badge %>
+    <%= f.select :creation_method, Transcription::CREATION_METHODS.map { |slug, label| [ label, slug ] }, include_blank: "（未記録）" %>
+  </div>
+  <div class="field">
+    <%= f.label :ai_service, "AIサービス" %><%= optional_badge %>
+    <%= f.text_field :ai_service, placeholder: "例: OpenAI" %>
+  </div>
+  <div class="field">
+    <%= f.label :ai_model, "AIモデル" %><%= optional_badge %>
+    <%= f.text_field :ai_model, placeholder: "例: whisper-large-v3" %>
+  </div>
+  <div class="field">
+    <%= f.label :body, "本文" %><%= required_badge %>
+    <small class="field__hint">改行はそのまま保持されます。</small>
+    <%= f.text_area :body, rows: 18 %>
+  </div>
+
+  <%= f.submit "保存" %>
+<% end %>

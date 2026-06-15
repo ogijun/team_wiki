@@ -1,37 +1,56 @@
 class TranscriptionsController < ApplicationController
-  before_action :set_material, only: %i[show edit update]
-  before_action :set_transcription, only: %i[edit update]
+  before_action :set_material, only: %i[new create show edit update destroy]
+  before_action :set_transcription, only: %i[show edit update destroy]
 
-  def index
-    # 全資料が文字起こし対象（transcribable? は常に true）。状態でグルーピングして一覧する。
-    materials = Material.includes(file_attachment: :blob, transcription: :author)
-    @groups = materials.group_by { |m| m.transcription&.status || "todo" }
+  # 全体ダッシュボード（資料を集約ステータスでグルーピング）。
+  def dashboard
+    materials = Material.includes(:transcriptions, file_attachment: :blob)
+    @groups = materials.group_by(&:transcription_status)
+    render :index
+  end
+
+  def new
+    @transcription = @material.transcriptions.build
+  end
+
+  def create
+    @transcription = @material.transcriptions.build(transcription_params)
+    @transcription.author = Current.user
+    @transcription.position = @material.transcriptions.maximum(:position).to_i + 1
+    if @transcription.save
+      @transcription.revisions.create!(author: Current.user, body: @transcription.body) if @transcription.body.present?
+      Activity.record(actor: Current.user, action: "transcription.created", subject: @material)
+      redirect_to @material, notice: "文字起こしパートを作成しました。"
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def show
-    @transcription = @material.transcription
-    redirect_to @material if @transcription.nil?
   end
 
   def edit
   end
 
   def update
-    was_new = @transcription.new_record?
     @transcription.assign_attributes(transcription_params)
     @transcription.author = Current.user
     if @transcription.save
-      # 本文が変わった保存だけ版を追記（状態・作成手法のみの変更では版を作らない）。
-      if @transcription.saved_change_to_body?
-        @transcription.revisions.create!(author: Current.user, body: @transcription.body)
-      end
-      Activity.record(actor: Current.user,
-                      action: was_new ? "transcription.created" : "transcription.edited",
-                      subject: @material)
+      @transcription.revisions.create!(author: Current.user, body: @transcription.body) if @transcription.saved_change_to_body?
+      Activity.record(actor: Current.user, action: "transcription.edited", subject: @material)
       redirect_to @material, notice: "文字起こしを保存しました。"
     else
       render :edit, status: :unprocessable_entity
     end
+  rescue ActiveRecord::StaleObjectError
+    @transcription.reload
+    flash.now[:alert] = "他の人が先に更新しました。最新の内容を確認してから保存し直してください。"
+    render :edit, status: :unprocessable_entity
+  end
+
+  def destroy
+    @transcription.destroy
+    redirect_to @material, notice: "文字起こしパートを削除しました。"
   end
 
   private
@@ -42,10 +61,10 @@ class TranscriptionsController < ApplicationController
   end
 
   def set_transcription
-    @transcription = @material.transcription || @material.build_transcription
+    @transcription = @material.transcriptions.find(params[:id])
   end
 
   def transcription_params
-    params.require(:transcription).permit(:body, :status, :creation_method, :ai_service, :ai_model)
+    params.require(:transcription).permit(:body, :status, :creation_method, :ai_service, :ai_model, :label, :assignee_id, :lock_version)
   end
 end
