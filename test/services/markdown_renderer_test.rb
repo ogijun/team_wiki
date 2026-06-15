@@ -86,6 +86,24 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_empty result.references
   end
 
+  # ── セキュリティ回帰 ──
+
+  # 壊れた出典マーカーに handle をそのまま出すため、handle 経由で実行可能 HTML にならないことを固定。
+  test "broken ref handle cannot inject live HTML" do
+    result = render_full("[[ref:<script>alert(1)</script>]]", {})
+    assert_includes result.html, "ref-broken"
+    assert_not_includes result.html, "<script>" # 生スクリプトにならない（Commonmarker＋html_escape の二重防御）
+  end
+
+  # build_anchor は href を生挿入するため、悪意あるタイトルでアンカーに余計な属性を注入できない
+  # ことを統合で固定（Commonmarker の文字エスケープ＋実 resolver の URL エンコードの二重防御）。
+  test "a malicious wikilink title cannot inject extra anchor attributes" do
+    html = MarkdownRenderer.new(link_resolver: WikiLinkResolver.method(:call)).render('[[a" onmouseover="x]]').html
+    anchor = Nokogiri::HTML.fragment(html).at_css("a")
+    assert anchor, "アンカーが描画される"
+    assert_equal %w[class href], anchor.attribute_nodes.map(&:name).sort # href と class のみ・注入なし
+  end
+
   test "renders nil and non-UTF-8 input without raising" do
     # nil.to_s は US-ASCII。Commonmarker は UTF-8 必須なので境界で変換される。
     assert_equal "", render(nil).strip
