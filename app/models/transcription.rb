@@ -10,6 +10,7 @@ class Transcription < ApplicationRecord
   PREVIEW_LINES = 20
 
   belongs_to :material
+  belongs_to :assignee, class_name: "User", optional: true
   belongs_to :author, class_name: "User"
   has_many :revisions, class_name: "TranscriptionRevision", dependent: :destroy
 
@@ -18,12 +19,14 @@ class Transcription < ApplicationRecord
   validates :body, presence: true
   validates :status, inclusion: { in: STATUSES.keys }
   validates :creation_method, inclusion: { in: CREATION_METHODS.keys }, allow_nil: true
-  validates :material_id, uniqueness: true
+  validates :label, length: { maximum: 120 }, allow_blank: true
 
   # 手書き等で AI 情報が残らないようにする（状態の整合性を保つ）。
   before_validation { self.ai_service = self.ai_model = nil unless ai? }
 
   def status_label = STATUSES[status]
+
+  def display_label = label.presence || "パート#{position}"
 
   def ai? = AI_METHODS.include?(creation_method)
 
