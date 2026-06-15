@@ -51,7 +51,7 @@ export default class extends Controller {
   async upload(blob, callback) {
     const data = new FormData()
     data.append("file", blob)
-    const res = await post("/uploads", { body: data })
+    const res = await post("/editor_uploads", { body: data })
     if (res.ok) {
       const json = await res.json
       callback(json.url, "uploaded")
