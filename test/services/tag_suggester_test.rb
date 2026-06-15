@@ -33,7 +33,7 @@ class TagSuggesterTest < ActiveSupport::TestCase
 
   test "suggests from article title and current body" do
     a = Article.create!(title: "歴史総集篇", created_by: @user)
-    ArticleRevisionCreator.call(article: a, body: "宇宙との比較", author: @user)
+    a.revise!(body: "宇宙との比較", author: @user)
     assert_equal [ @space, @unrelated ].map(&:name).sort, TagSuggester.call(a).map(&:name).sort
   end
 
