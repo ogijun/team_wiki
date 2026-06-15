@@ -49,7 +49,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 # Cloudflare R2 (S3-compatible) for Active Storage in production
-gem "aws-sdk-s3", "~> 1.224", require: false
+gem "aws-sdk-s3", "~> 1.225", require: false
 
 # Pagination
 gem "pagy", "~> 9.3"
