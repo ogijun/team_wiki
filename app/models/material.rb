@@ -6,10 +6,6 @@ class Material < ApplicationRecord
   has_one_attached :file
   # パート分割: 1資料に複数の文字起こしパート。position 昇順。
   has_many :transcriptions, -> { order(:position) }, dependent: :destroy
-  # 移行互換の読み取りシム（呼び出し箇所を順次 transcriptions へ移すまでの一時措置・最終タスクで削除）。
-  # メソッドだけでは joins/includes(:transcription) を解決できないので read-only な has_one も残す
-  # （破棄は has_many 側が担うため dependent は付けない）。position 先頭を先頭パートとして返す。
-  has_one :transcription, -> { order(:position) }, class_name: "Transcription"
   has_many :citations, dependent: :nullify
   has_many :citing_articles, -> { distinct }, through: :citations, source: :article
   has_many :comments, as: :commentable, dependent: :destroy

@@ -21,7 +21,7 @@ module MaterialsHelper
   # 対象メディアで未作成なら「未着手」、ありなら作業中/完了。
   def transcription_status_label(material)
     return nil unless material.transcribable?
-    material.transcription&.status_label || "未着手"
+    { "todo" => "未着手", "drafting" => "作業中", "done" => "完了" }[material.transcription_status]
   end
 
   # 資料詳細の進行ストリップ。資料のライフサイクル

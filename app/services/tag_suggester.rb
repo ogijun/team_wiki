@@ -19,7 +19,7 @@ module TagSuggester
       when Material
         [ taggable.title, taggable.description, taggable.author, taggable.source,
           taggable.publisher, taggable.volume, taggable.pages, taggable.isbn,
-          taggable.transcription&.body ]
+          taggable.transcriptions.map(&:body).join("\n") ]
       when Article
         [ taggable.title, taggable.current_revision&.body ]
       else

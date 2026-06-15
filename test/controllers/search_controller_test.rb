@@ -32,6 +32,17 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     assert_select ".search-results a mark", text: "イデオン" # タイトル内マッチもハイライト
   end
 
+  test "search matches any transcription part body" do
+    m = Material.new(user: @user, title: "検索対象音声")
+    m.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
+    m.save!
+    m.transcriptions.create!(author: @user, body: "前半はりんごの話", position: 1)
+    m.transcriptions.create!(author: @user, body: "後半はみかんの話", position: 2)
+    get search_url(q: "みかん")
+    assert_response :success
+    assert_select "a", text: /検索対象音声/
+  end
+
   test "mixes articles and materials sorted by updated_at desc" do
     @hit.update!(updated_at: 2.hours.ago)
     m = Material.create!(user: @user, url: "https://example.com/mix", title: "新しいRubyの資料")

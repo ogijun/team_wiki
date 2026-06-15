@@ -17,6 +17,13 @@ class TagSuggesterTest < ActiveSupport::TestCase
     assert_equal [ @gundam, @pamph ].map(&:name).sort, TagSuggester.call(m).map(&:name).sort
   end
 
+  test "suggests tags found in any transcription part body" do
+    m = create(:material, :with_audio)
+    m.transcriptions.create!(author: @user, body: "本編は無関係", position: 1)
+    m.transcriptions.create!(author: @user, body: "後半にパンフレットが出る", position: 2)
+    assert_includes TagSuggester.call(m), @pamph
+  end
+
   test "excludes tags already attached" do
     m = Material.create!(user: @user, url: "https://example.com/t", title: "ガンダム特集")
     m.tag_names = "ガンダム"

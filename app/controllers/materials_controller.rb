@@ -12,7 +12,7 @@ class MaterialsController < ApplicationController
   }.freeze
 
   def index
-    scope = Material.includes(:tags, :transcription, user: { avatar_attachment: :blob }).with_attached_file
+    scope = Material.includes(:tags, :transcriptions, user: { avatar_attachment: :blob }).with_attached_file
     scope = scope.joins(:tags).where(tags: { slug: params[:tag] }) if params[:tag].present?
 
     sort_key = SORTS.key?(params[:sort]) ? params[:sort] : "created_at"
