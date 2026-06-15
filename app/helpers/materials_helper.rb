@@ -36,12 +36,12 @@ module MaterialsHelper
     end
 
     if material.transcribable?
-      t = material.transcription
-      steps << if t&.status == "done"
+      done, total = material.transcription_progress
+      steps << if total.positive? && material.transcription_status == "done"
         { text: "文字起こし", done: true }
       else
-        { text: "文字起こし #{t ? t.status_label : "未着手"}", done: false,
-          path: edit_material_transcription_path(material) }
+        label = total.positive? ? "文字起こし #{done}/#{total}" : "文字起こし 未着手"
+        { text: label, done: false, path: new_material_transcription_path(material) }
       end
     end
 

@@ -207,7 +207,21 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     media.file.attach(io: StringIO.new("x"), filename: "c.mp3", content_type: "audio/mpeg")
     media.save!
     get material_url(media)
-    assert_select ".transcription-section a[role=button][href=?]", edit_material_transcription_path(media), text: "文字起こしを作成"
+    assert_select ".transcription-section a[role=button][href=?]", new_material_transcription_path(media), text: /パート|作成/
+  end
+
+  test "material detail lists transcription parts with edit links and an add link" do
+    m = Material.new(user: @user, title: "パート音声")
+    m.file.attach(io: StringIO.new("x"), filename: "p.mp3", content_type: "audio/mpeg")
+    m.save!
+    t1 = m.transcriptions.create!(author: @user, body: "前半本文", position: 1, label: "前半", status: "done")
+    t2 = m.transcriptions.create!(author: @user, body: "後半本文", position: 2, label: "後半", status: "drafting")
+    get material_url(m)
+    assert_select ".transcription-section .transcript-part", count: 2
+    assert_select "a[href=?]", edit_material_transcription_path(m, t1)
+    assert_select "a[href=?]", edit_material_transcription_path(m, t2)
+    assert_select ".transcription-section a[href=?]", new_material_transcription_path(m), text: /パート/
+    assert_select ".transcription-section", text: /1\s*\/\s*2/  # 完了 1/2
   end
 
   test "progress strip includes transcription state for every material, including links" do
@@ -215,11 +229,11 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     media.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
     media.save!
     get material_url(media)
-    assert_select ".progress-strip a[href=?]", edit_material_transcription_path(media), text: /文字起こし/
+    assert_select ".progress-strip a[href=?]", new_material_transcription_path(media), text: /文字起こし/
 
     link = Material.create!(user: @user, url: "https://example.com/nt", title: "リンクNT")
     get material_url(link)
-    assert_select ".progress-strip a[href=?]", edit_material_transcription_path(link), text: /文字起こし/
+    assert_select ".progress-strip a[href=?]", new_material_transcription_path(link), text: /文字起こし/
   end
 
   test "show isolates delete in a danger zone, not the actions row" do
@@ -533,12 +547,12 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     m.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
     m.save!
     get material_url(m)
-    assert_select "a[href=?]", edit_material_transcription_path(m)
+    assert_select "a[href=?]", new_material_transcription_path(m)
   end
 
   test "every material, including a link, has a transcription section" do
     link = Material.create!(user: @user, title: "外部", url: "https://example.com/x")
     get material_url(link)
-    assert_select "a[href=?]", edit_material_transcription_path(link)
+    assert_select "a[href=?]", new_material_transcription_path(link)
   end
 end
