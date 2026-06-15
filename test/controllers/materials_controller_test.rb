@@ -202,12 +202,12 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".progress-strip .strip-step--done", text: /引用 1件/
   end
 
-  test "transcribable material without a transcription shows a clear 作成 CTA in the usage zone" do
+  test "transcribable material without a transcription shows a clear 作成 CTA in the transcription zone" do
     media = Material.new(user: @user, title: "未起こし音声")
     media.file.attach(io: StringIO.new("x"), filename: "c.mp3", content_type: "audio/mpeg")
     media.save!
     get material_url(media)
-    assert_select ".usage a[role=button][href=?]", edit_material_transcription_path(media), text: "文字起こしを作成"
+    assert_select ".transcription-section a[role=button][href=?]", edit_material_transcription_path(media), text: "文字起こしを作成"
   end
 
   test "progress strip includes transcription state for every material, including links" do
@@ -267,7 +267,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "td .muted", text: /1/
   end
 
-  test "create stores the extracted file date and posts a candidates comment" do
+  test "create stores the extracted file date without posting a candidates comment" do
     extracted = { file_created_at: Time.zone.local(2020, 3, 16, 10, 0),
                   details: { "タイトル (PDF)" => "Sample Doc", "撮影日時 (EXIF)" => "2020年3月16日 10:00" } }
     file = fixture_file_upload("example-photo.png", "image/png")
@@ -279,9 +279,8 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     end
     m = Material.find_by!(title: "抽出資料")
     assert_equal Time.zone.local(2020, 3, 16, 10, 0), m.file_created_at
-    comment = m.comments.first
-    assert_includes comment.body, "自動抽出"
-    assert_includes comment.body, "タイトル (PDF): Sample Doc"
+    # メタデータ候補コメントの自動投稿は廃止（カラムへの記録のみ）。
+    assert_equal 0, m.comments.count
 
     get material_url(m)
     assert_select ".bibliography dt", text: "ファイル作成日"

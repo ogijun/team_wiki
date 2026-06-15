@@ -12,7 +12,7 @@ module TagSuggester
     Tag.where.not(id: attached_ids).select { |tag| text.include?(tag.name) }
   end
 
-  # タイトル・書誌メタデータ全項目・文字起こし・コメント（EXIF/PDF 自動抽出コメント含む）を対象にする。
+  # タイトル・書誌メタデータ全項目・文字起こし・コメントを対象にする。
   def searchable_text(taggable)
     parts =
       case taggable
