@@ -40,7 +40,7 @@ module ActivitiesHelper
       prefix = prefix.delete_prefix("が")
       suffix = suffix.delete_prefix("が") if prefix.empty?
     end
-    label = activity.subject_label
+    label = activity_label(activity)
     return safe_join([ prefix, suffix ]) if label.blank?
 
     # 対象が存命ならタイトル自体をリンクに（末尾に同じタイトルを再掲しないため）。
@@ -117,7 +117,16 @@ module ActivitiesHelper
 
   # 対象が存命ならタイトルをリンクに、削除済み（subject nil）なら素テキスト。
   def subject_link(activity)
-    label = activity.subject_label
+    label = activity_label(activity)
     activity.subject ? link_to(label, activity.subject) : label
+  end
+
+  # タイムラインの表示名。対象が存命ならその現在の title/name を引く
+  # （URL資料の非同期タイトル取得など、記録後に名前が変わるケースに自動追従）。
+  # 削除済みは記録時の subject_label（墓標）にフォールバック。
+  def activity_label(activity)
+    subject = activity.subject
+    return activity.subject_label unless subject
+    (subject.try(:title) || subject.try(:name)).presence || activity.subject_label
   end
 end

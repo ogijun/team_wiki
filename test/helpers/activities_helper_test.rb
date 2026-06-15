@@ -49,6 +49,17 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_no_match %r{<a }, html
   end
 
+  test "phrase uses the subject's current title, not the stale recorded label" do
+    # 非同期でタイトルが後から付くケース: 記録時は url 等が subject_label に入るが、
+    # 対象が存命なら表示は現在の title を引く（subject_label は墓標としてのフォールバック）。
+    article = Article.create!(title: "あとから付いた題名", created_by: @user)
+    a = Activity.new(user: @user, action: "article.edited", subject: article,
+                     subject_label: "https://example.com/old")
+    html = activity_phrase(a)
+    assert_includes html, "あとから付いた題名"
+    refute_includes html, "https://example.com/old"
+  end
+
   # action の追加時に表示文言の追加を忘れると沈黙の汎用フォールバックに落ちるのを防ぐ。
   test "every Activity action has a display phrase" do
     assert_equal Activity::ACTIONS.sort, ActivitiesHelper::PHRASES.keys.sort
