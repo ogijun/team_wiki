@@ -16,6 +16,13 @@ class StubArticleForMaterialTest < ActiveSupport::TestCase
     assert_equal [ article.id ], m.reload.citing_articles.pluck(:id)
   end
 
+  test "does not record a timeline activity (stub is a byproduct of the material upload)" do
+    m = Material.create!(user: @user, url: "https://example.com/na", title: "活動なし資料")
+    assert_no_difference "Activity.count" do
+      StubArticleForMaterial.call(material: m, author: @user)
+    end
+  end
+
   test "copies the material's published fuzzy date to the article chronicle date" do
     m = Material.create!(user: @user, url: "https://example.com/d", title: "日付資料",
                          published_year: 1991, published_month: 3)

@@ -49,6 +49,17 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_no_match %r{<a }, html
   end
 
+  test "phrase uses the subject's current title, not the stale recorded label" do
+    # 非同期でタイトルが後から付くケース: 記録時は url 等が subject_label に入るが、
+    # 対象が存命なら表示は現在の title を引く（subject_label は墓標としてのフォールバック）。
+    article = Article.create!(title: "あとから付いた題名", created_by: @user)
+    a = Activity.new(user: @user, action: "article.edited", subject: article,
+                     subject_label: "https://example.com/old")
+    html = activity_phrase(a)
+    assert_includes html, "あとから付いた題名"
+    refute_includes html, "https://example.com/old"
+  end
+
   # action の追加時に表示文言の追加を忘れると沈黙の汎用フォールバックに落ちるのを防ぐ。
   test "every Activity action has a display phrase" do
     assert_equal Activity::ACTIONS.sort, ActivitiesHelper::PHRASES.keys.sort
@@ -123,5 +134,29 @@ class ActivitiesHelperTest < ActionView::TestCase
     html = activity_group_phrase(group, actor: false)
     assert html.start_with?("記事"), "actor:false は先頭の「が」を落とす（記事…で始まる）"
     refute_includes html, "が記事"
+  end
+
+  # ── 連続同一ユーザの畳み込み（ホームのタイムライン用） ──
+
+  def single_group(user)
+    ActivityGrouper::Group.new(kind: :single,
+      activities: [ Activity.new(user: user, action: "comment.posted", subject_label: "x") ])
+  end
+
+  test "collapse_consecutive_actors keeps the first 2 of a same-user run and summarizes the rest" do
+    other = User.create!(email_address: "o@example.com", password: "password123", name: "Other")
+    groups = [ single_group(@user), single_group(@user), single_group(@user), single_group(@user), single_group(other) ]
+    out = collapse_consecutive_actors(groups, keep: 2)
+    assert_equal 4, out.size                 # 2グループ ＋ overflow ＋ other 1グループ
+    assert_respond_to out[0], :activities
+    assert_respond_to out[1], :activities
+    assert_not_respond_to out[2], :activities # overflow マーカー
+    assert_equal 2, out[2].count
+    assert_equal @user, out[2].user
+    assert_respond_to out[3], :activities
+  end
+
+  test "collapse_consecutive_actors leaves runs of 2 or fewer untouched" do
+    assert_equal 2, collapse_consecutive_actors([ single_group(@user), single_group(@user) ]).size
   end
 end

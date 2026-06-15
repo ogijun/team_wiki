@@ -1,6 +1,8 @@
 # 資料アップロード時に、その資料を引用するスタブ記事を1つ自動生成する。
 # 本文は案内一文＋[[ref:資料slug]] のみ。保存時に ArticleRevisionCreator が
 # citations を張るので、Material↔Article の多対多が永続化される。
+# タイムライン活動は記録しない: スタブ生成は「資料を追加した」副産物であり、
+# material.added と同内容の article.created が二重に並ぶのを避ける（独立した執筆イベントではない）。
 module StubArticleForMaterial
   module_function
 
@@ -15,7 +17,6 @@ module StubArticleForMaterial
       article.save!
       ArticleRevisionCreator.call(article: article, body: body, author: author, edit_summary: "資料から自動作成")
     end
-    Activity.record(actor: author, action: "article.created", subject: article)
     article
   end
 
