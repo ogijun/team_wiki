@@ -79,6 +79,9 @@ group :development, :test do
 
   # Minitest 専用 cop（assert_equal の引数順・assert_empty/assert_nil 等の idiom 化）
   gem "rubocop-minitest", require: false
+
+  # スレッド安全 cop（単一 Puma の複数スレッド運用向け・可変クラス状態の検出）
+  gem "rubocop-thread_safety", require: false
 end
 
 group :development do

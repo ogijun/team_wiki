@@ -10,6 +10,7 @@ AllCops:
 plugins:
   - rubocop-migration
   - rubocop-minitest
+  - rubocop-thread_safety
 
 # 本番 DB は SQLite のため、PostgreSQL/MySQL 専用の cop は対象外にする。
 Migration/AddIndexConcurrently: { Enabled: false } # PG の algorithm: :concurrently
