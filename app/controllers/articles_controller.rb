@@ -23,12 +23,17 @@ class ArticlesController < ApplicationController
 
   def create
     @article = Article.new(created_by: Current.user)
-    if ArticleSaver.call(article: @article, params: article_params, author: Current.user, action: "created")
-      add_first_comment(@article, params[:first_comment])
-      redirect_to @article
-    else
-      render :new, status: :unprocessable_entity
+    @article.assign_attributes(article_attributes)
+    if article_params[:body].blank?
+      @article.errors.add(:body, "を入力してください")
+      return render(:new, status: :unprocessable_entity)
     end
+    @article.revise!(body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary])
+    Activity.record(actor: Current.user, action: "article.created", subject: @article)
+    add_first_comment(@article, params[:first_comment])
+    redirect_to @article
+  rescue ActiveRecord::RecordInvalid
+    render :new, status: :unprocessable_entity
   end
 
   def edit
@@ -37,11 +42,16 @@ class ArticlesController < ApplicationController
   end
 
   def update
-    if ArticleSaver.call(article: @article, params: article_params, author: Current.user, action: "edited")
-      redirect_to @article
-    else
-      rerender_edit
+    @article.assign_attributes(article_attributes)
+    if article_params[:body].blank?
+      @article.errors.add(:body, "を入力してください")
+      return rerender_edit
     end
+    @article.revise!(body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary])
+    Activity.record(actor: Current.user, action: "article.edited", subject: @article)
+    redirect_to @article
+  rescue ActiveRecord::RecordInvalid
+    rerender_edit
   end
 
   def destroy
@@ -52,6 +62,22 @@ class ArticlesController < ApplicationController
   end
 
   private
+
+  # Article 実体の属性のみ（body/edit_summary は revise! へ渡す Revision 側）。
+  def article_attributes
+    {
+      title: article_params[:title],
+      tag_names: article_params[:tag_names],
+      kind: article_params[:kind].presence,
+      status: article_params[:status].presence || @article.status || "stub",
+      start_year: article_params[:start_year], start_month: article_params[:start_month],
+      start_day: article_params[:start_day], start_hour: article_params[:start_hour],
+      start_minute: article_params[:start_minute],
+      end_year: article_params[:end_year], end_month: article_params[:end_month],
+      end_day: article_params[:end_day], end_hour: article_params[:end_hour],
+      end_minute: article_params[:end_minute]
+    }
+  end
 
   def rerender_edit
     @body = article_params[:body]
