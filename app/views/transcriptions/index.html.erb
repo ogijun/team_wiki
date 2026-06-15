@@ -24,14 +24,10 @@
         <ul class="rows">
           <% items.each do |m| %>
             <li class="row">
-              <% t = m.transcription %>
-              <%# タイトルは文字起こし本文（show）へ。まだ無い未着手だけは従来どおり資料へ %>
-              <span class="row__main"><%= media_icon(m) %> <%= link_to m.title, (t ? material_transcription_path(m) : m) %></span>
-              <% if t %>
-                <span class="meta"><%= avatar_tag(t.author, size: 20) %> <%= display_name(t.author) %> · <%= t.updated_at.to_fs(:jp) %></span>
-                <%= icon_link "landmark", m, label: "資料ページへ", css: "meta" %>
-              <% end %>
-              <%= link_to (key == "todo" ? "作成" : "編集"), edit_material_transcription_path(m), class: "btn-sm" %>
+              <% done, total = m.transcription_progress %>
+              <span class="row__main"><%= media_icon(m) %> <%= link_to m.title, m %></span>
+              <% if total.positive? %><span class="meta"><span class="pill"><%= done %> / <%= total %></span></span><% end %>
+              <%= link_to (key == "todo" ? "作成" : "編集"), m, class: "btn-sm" %>
             </li>
           <% end %>
         </ul>
