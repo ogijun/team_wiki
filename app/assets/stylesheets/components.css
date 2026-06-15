@@ -79,6 +79,33 @@ button.tag-chip:hover, button.tag-chip:focus {
 
 /* 見出し＋付随要素（件数バッジ等） */
 .section-head { display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; margin: 0 0 0.5rem; }
+
+/* タブ（文字起こし進捗など）。JS無効時は全パネルが見えるだけで機能は損なわない */
+.tabs { display: flex; gap: 0.3rem; border-bottom: 1px solid var(--hairline); margin: 0 0 0.8rem; flex-wrap: wrap; }
+.tab {
+  background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 0.4rem 0.7rem; cursor: pointer; font: inherit; color: var(--ink-soft);
+}
+.tab:hover { color: var(--ink); }
+.tab.is-active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ホームの「新規作成」ドロップダウン（native details・JS不要） */
+.create-menu { position: relative; }
+.create-menu > summary { cursor: pointer; list-style: none; }
+.create-menu > summary::-webkit-details-marker { display: none; }
+.create-menu > summary::after { content: " ▾"; font-size: 0.8em; }
+.create-menu ul {
+  position: absolute; right: 0; z-index: 30; margin: 0.35rem 0 0; padding: 0.3rem;
+  list-style: none; min-width: 12rem;
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(20, 17, 15, 0.12);
+}
+.create-menu li { margin: 0; }
+.create-menu li a {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.6rem;
+  border-radius: 6px; color: var(--ink); text-decoration: none;
+}
+.create-menu li a:hover { background: var(--accent-weak); color: var(--accent); }
 /* 詳細ページのゾーン見出し: h1(タイトル)と競合しない控えめなサイズに統一。
    ゾーン内の小見出し(h3)はさらに一段小さく、ラベル寄りの色にする。 */
 .bibliography-section h2, .usage h2, .transcription-section h2, .comments h2 {

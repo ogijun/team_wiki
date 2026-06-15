@@ -170,6 +170,16 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", material_path(todo), text: "未着手動画"
   end
 
+  test "index organizes the status groups into tabs" do
+    get transcriptions_url
+    assert_response :success
+    assert_select "[data-controller=tabs]"
+    assert_select ".tabs .tab", count: 3                 # 未着手 / 作業中 / 完了
+    assert_select ".tab-panel[data-key=todo]"
+    assert_select ".tab-panel[data-key=drafting]"
+    assert_select ".tab-panel[data-key=done]"
+  end
+
   test "index shows the assignee for in-progress transcripts" do
     worker = User.create!(email_address: "w@example.com", name: "ワーカー", provider: "discord", uid: "worker")
     Transcription.create!(material: @media, author: worker, body: "途中まで", status: "drafting")
