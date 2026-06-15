@@ -8,7 +8,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "show isolates delete in a danger zone, not the actions row" do
     article = Article.create!(title: "削除テスト", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    article.revise!(body: "本文", author: @user)
     get article_url(article)
     assert_select ".danger-zone button", text: "削除"
     assert_select ".actions button", text: "削除", count: 0
@@ -37,7 +37,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "show renders current revision body" do
     article = Article.create!(title: "表示", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "# 見出し", author: @user)
+    article.revise!(body: "# 見出し", author: @user)
     get article_url(article)
     assert_response :success
     assert_select "h1", text: "見出し"
@@ -52,7 +52,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "update with blank body keeps previous revision and re-renders" do
     article = Article.create!(title: "本文必須", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "元の本文", author: @user)
+    article.revise!(body: "元の本文", author: @user)
     assert_no_difference("article.revisions.count") do
       patch article_url(article), params: { article: { title: article.title, body: "", tag_names: "" } }
     end
@@ -64,7 +64,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     article = Article.create!(title: "出来事", created_by: @user,
                               starts_at: Time.zone.local(1939, 9, 1), starts_precision: "day",
                               ends_at: Time.zone.local(1945, 8, 1), ends_precision: "month")
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    article.revise!(body: "本文", author: @user)
     get article_url(article)
     assert_response :success
     assert_select ".when", text: /1939年9月1日 〜 1945年8月/
@@ -72,7 +72,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "show omits date line when no date" do
     article = Article.create!(title: "日付なし", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    article.revise!(body: "本文", author: @user)
     get article_url(article)
     assert_response :success
     assert_select ".when", count: 0
@@ -80,7 +80,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "update creates a new revision" do
     article = Article.create!(title: "更新", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "旧", author: @user)
+    article.revise!(body: "旧", author: @user)
     assert_difference("article.revisions.count", 1) do
       patch article_url(article), params: { article: { title: "更新", body: "新", tag_names: "" } }
     end
@@ -89,7 +89,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "update changes the title" do
     article = Article.create!(title: "元タイトル", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    article.revise!(body: "本文", author: @user)
     patch article_url(article), params: { article: { title: "新タイトル", body: "本文", tag_names: "" } }
     assert_equal "新タイトル", article.reload.title
   end
@@ -102,7 +102,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "update records article.edited activity" do
     article = Article.create!(title: "記録更新", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "旧", author: @user)
+    article.revise!(body: "旧", author: @user)
     assert_difference("Activity.where(action: 'article.edited').count", 1) do
       patch article_url(article), params: { article: { title: article.title, body: "新" } }
     end
@@ -142,7 +142,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "update can set fuzzy date" do
     article = Article.create!(title: "あとで日付", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    article.revise!(body: "本文", author: @user)
     patch article_url(article), params: { article: {
       title: article.title, body: "本文",
       start_year: "2000", start_month: "1", start_day: "", start_hour: "", start_minute: ""
@@ -154,8 +154,8 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   test "show displays contributor avatars linking to users" do
     bob = User.create!(email_address: "bob2@example.com", name: "Bob", provider: "discord", uid: "art-bob")
     article = Article.create!(title: "貢献者表示", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "1", author: @user)
-    ArticleRevisionCreator.call(article: article, body: "2", author: bob)
+    article.revise!(body: "1", author: @user)
+    article.revise!(body: "2", author: bob)
     get article_url(article)
     assert_response :success
     assert_select ".page-meta .contributors a[href=?]", user_path(@user)
@@ -165,7 +165,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   test "show renders citations section linking to materials" do
     material = Material.create!(user: @user, url: "https://example.com/src", title: "出典資料")
     article = Article.create!(title: "引用あり", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "主張[[ref:#{material.slug}]]", author: @user)
+    article.revise!(body: "主張[[ref:#{material.slug}]]", author: @user)
     get article_url(article)
     assert_response :success
     assert_select "sup.ref a", text: "[1]"
@@ -174,7 +174,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "show marks broken citation" do
     article = Article.create!(title: "壊れ引用", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "主張[[ref:nosuch99]]", author: @user)
+    article.revise!(body: "主張[[ref:nosuch99]]", author: @user)
     get article_url(article)
     assert_response :success
     assert_select "sup.ref-broken"
@@ -192,7 +192,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "update without status param preserves existing status" do
     article = Article.create!(title: "完成済み", created_by: @user, status: "done")
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    article.revise!(body: "本文", author: @user)
     patch article_url(article), params: { article: { title: "完成済み", body: "更新本文" } }
     assert_equal "done", article.reload.status
   end

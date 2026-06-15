@@ -5,8 +5,8 @@ class RevisionsControllerTest < ActionDispatch::IntegrationTest
     @user = User.create!(email_address: "rv@example.com", name: "RV", provider: "discord", uid: "rev-user")
     sign_in_as(@user)
     @article = Article.create!(title: "Hist", created_by: @user)
-    @r1 = ArticleRevisionCreator.call(article: @article, body: "一行目", author: @user)
-    @r2 = ArticleRevisionCreator.call(article: @article, body: "一行目\n二行目", author: @user)
+    @r1 = @article.revise!(body: "一行目", author: @user)
+    @r2 = @article.revise!(body: "一行目\n二行目", author: @user)
   end
 
   test "index lists revisions newest first" do
@@ -32,8 +32,8 @@ class RevisionsControllerTest < ActionDispatch::IntegrationTest
   # エスケープすることをロックする回帰テスト（崩れたら XSS なので必ず気づける）。
   test "diff escapes HTML in revision bodies (no XSS through the html_safe diff)" do
     payload = "<script>alert('XSS-DIFF')</script>"
-    a = ArticleRevisionCreator.call(article: @article, body: "安全な行", author: @user)
-    b = ArticleRevisionCreator.call(article: @article, body: "安全な行\n#{payload}", author: @user)
+    a = @article.revise!(body: "安全な行", author: @user)
+    b = @article.revise!(body: "安全な行\n#{payload}", author: @user)
     get article_revision_url(@article, b), params: { a: a.id }
     assert_response :success
     assert_no_match %r{<script>alert\('XSS-DIFF'\)}, @response.body # 生スクリプトとしては出力されない

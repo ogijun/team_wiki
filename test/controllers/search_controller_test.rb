@@ -5,9 +5,9 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     @user = User.create!(email_address: "s@example.com", name: "S", provider: "discord", uid: "srch-user")
     sign_in_as(@user)
     @hit = Article.create!(title: "Ruby入門", created_by: @user)
-    ArticleRevisionCreator.call(article: @hit, body: "本文にキーワード含む", author: @user)
+    @hit.revise!(body: "本文にキーワード含む", author: @user)
     @miss = Article.create!(title: "別物", created_by: @user)
-    ArticleRevisionCreator.call(article: @miss, body: "無関係", author: @user)
+    @miss.revise!(body: "無関係", author: @user)
   end
 
   test "matches title" do

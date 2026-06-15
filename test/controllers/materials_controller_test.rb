@@ -195,7 +195,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     m = Material.create!(user: @user, url: "https://example.com/done", title: "完了資料",
                          source: "サンプル誌", confidence: "confirmed")
     article = Article.create!(title: "引用元記事", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "[[ref:#{m.slug}]]", author: @user)
+    article.revise!(body: "[[ref:#{m.slug}]]", author: @user)
     get material_url(m)
     assert_select ".progress-strip .strip-step--done", text: /書誌/
     assert_select ".progress-strip .strip-step--done", text: /原本確認済/
@@ -411,7 +411,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   test "material page lists articles that cite it" do
     m = Material.create!(user: @user, url: "https://example.com/d", title: "出典資料")
     article = Article.create!(title: "引用する記事", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "本文[[ref:#{m.slug}]]", author: @user)
+    article.revise!(body: "本文[[ref:#{m.slug}]]", author: @user)
     get material_url(m)
     assert_response :success
     assert_select "a", text: "引用する記事"

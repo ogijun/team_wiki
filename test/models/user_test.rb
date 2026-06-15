@@ -43,8 +43,8 @@ class UserContributionTest < ActiveSupport::TestCase
     other = create(:user)
     a1 = create(:article, created_by: @user)
     create(:article, created_by: other)
-    ArticleRevisionCreator.call(article: a1, body: "v1", author: @user)
-    ArticleRevisionCreator.call(article: a1, body: "v2", author: @user)
+    a1.revise!(body: "v1", author: @user)
+    a1.revise!(body: "v2", author: @user)
 
     t = create(:transcription, author: @user)
     t.revisions.create!(author: @user, body: "v1")

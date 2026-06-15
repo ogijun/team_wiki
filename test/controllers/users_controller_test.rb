@@ -31,7 +31,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test "profile shows contribution counts" do
     article = Article.create!(title: "貢献記事", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "本文", author: @user)
+    article.revise!(body: "本文", author: @user)
     get user_url(@user)
     assert_select ".page-meta", text: /記事.*1.*本作成/m
     assert_select ".page-meta", text: /編集.*1.*回/m

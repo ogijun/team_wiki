@@ -26,9 +26,9 @@ class ArticleTest < ActiveSupport::TestCase
   test "contributors are distinct revision authors in first-appearance order" do
     bob = User.create!(email_address: "bob@example.com", password: "password123", name: "Bob")
     article = Article.create!(title: "共同編集", created_by: @user)
-    ArticleRevisionCreator.call(article: article, body: "1", author: @user)
-    ArticleRevisionCreator.call(article: article, body: "2", author: bob)
-    ArticleRevisionCreator.call(article: article, body: "3", author: @user)
+    article.revise!(body: "1", author: @user)
+    article.revise!(body: "2", author: bob)
+    article.revise!(body: "3", author: @user)
     assert_equal [ @user, bob ], article.contributors
   end
 
@@ -64,7 +64,7 @@ class ArticleTest < ActiveSupport::TestCase
   test "destroying an article removes its citations but keeps the cited material" do
     article = Article.create!(title: "NullifyMe", created_by: @user)
     m = Material.create!(user: @user, url: "https://example.com/x", title: "被引用資料")
-    ArticleRevisionCreator.call(article: article, body: "[[ref:#{m.slug}]]", author: @user)
+    article.revise!(body: "[[ref:#{m.slug}]]", author: @user)
     assert_equal 1, m.reload.citing_articles.count
 
     article.destroy

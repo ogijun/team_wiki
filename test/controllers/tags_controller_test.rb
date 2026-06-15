@@ -6,7 +6,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
     @article = Article.create!(title: "Tagged", created_by: @user)
     @article.tag_names = "ruby"
-    ArticleRevisionCreator.call(article: @article, body: "x", author: @user)
+    @article.revise!(body: "x", author: @user)
     @tag = Tag.find_by(name: "ruby")
   end
 
