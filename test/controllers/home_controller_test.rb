@@ -31,6 +31,21 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "details.create-menu a[href=?]", new_material_path, text: /資料/
   end
 
+  test "home collapses a long same-user activity run into a +N summary and fills the feed with others" do
+    # 同一ユーザの連続を多数作る（>30分間隔で別グループに）＋ 別ユーザの活動も。
+    base = Time.zone.local(2026, 6, 15, 12, 0)
+    6.times { |i| Activity.create!(user: @user, action: "comment.posted", subject_label: "C#{i}", created_at: base - (i * 40).minutes) }
+    other = User.create!(email_address: "o@example.com", name: "Other", provider: "discord", uid: "o-user")
+    Activity.create!(user: other, action: "tag.created", subject_label: "T", created_at: base - 300.minutes)
+
+    get root_url
+    assert_response :success
+    # 先頭2つの後に「ほかN件」の要約行が出る
+    assert_select ".timeline__overflow", text: /ほか.*件/
+    # 畳んだぶん他ユーザの活動が繰り上がって表示される
+    assert_select ".timeline a", text: /Other/
+  end
+
   test "home shows the site-wide activity heatmap" do
     Activity.create!(user: @user, action: "article.created")
     get root_url

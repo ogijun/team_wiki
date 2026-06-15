@@ -62,7 +62,8 @@
 
 <section class="dashboard-card recent-activity">
   <h2><%= icon("activity") %> 最近の動き</h2>
-  <%= render "activities/timeline", groups: @recent_activity_groups %>
+  <%# 連続同一ユーザを畳んでから 10 行に頭打ち（cap 後に畳むと行数が減るため、ホームのみ） %>
+  <%= render "activities/timeline", groups: collapse_consecutive_actors(@recent_activity_groups).first(10) %>
   <p><%= link_to "すべて見る", activities_path %></p>
 </section>
 
