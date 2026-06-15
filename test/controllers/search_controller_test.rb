@@ -24,12 +24,12 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     media = Material.new(user: @user, title: "検索音声")
     media.file.attach(io: StringIO.new("x"), filename: "q.mp3", content_type: "audio/mpeg")
     media.save!
-    Transcription.create!(material: media, author: @user, body: "文字起こしに固有語イデオン含む", status: "drafting")
-    Material.create!(user: @user, url: "https://example.com/t", title: "タイトル一致イデオン資料")
+    Transcription.create!(material: media, author: @user, body: "文字起こしに固有語サンプル語含む", status: "drafting")
+    Material.create!(user: @user, url: "https://example.com/t", title: "タイトル一致サンプル語資料")
 
-    get search_url, params: { q: "イデオン" }
+    get search_url, params: { q: "サンプル語" }
     assert_select "a", text: "検索音声"
-    assert_select ".search-results a mark", text: "イデオン" # タイトル内マッチもハイライト
+    assert_select ".search-results a mark", text: "サンプル語" # タイトル内マッチもハイライト
   end
 
   test "search matches any transcription part body" do
