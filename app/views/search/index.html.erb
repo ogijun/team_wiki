@@ -17,7 +17,8 @@
             <% end %>
           <% else %>
             <%= media_icon(r) %> <%= link_to search_mark(r.title, @q), r %>
-            <% if (snippet = search_snippet(r.transcription&.body, @q)) %>
+            <% body = r.transcriptions.find { |t| t.body&.include?(@q) }&.body || r.transcriptions.first&.body %>
+            <% if (snippet = search_snippet(body, @q)) %>
               <div class="search-snippet muted">文字起こし: <%= snippet %></div>
             <% end %>
           <% end %>

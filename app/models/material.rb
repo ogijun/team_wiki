@@ -4,7 +4,8 @@ class Material < ApplicationRecord
 
   belongs_to :user
   has_one_attached :file
-  has_one :transcription, dependent: :destroy
+  # パート分割: 1資料に複数の文字起こしパート。position 昇順。
+  has_many :transcriptions, -> { order(:position) }, dependent: :destroy
   has_many :citations, dependent: :nullify
   has_many :citing_articles, -> { distinct }, through: :citations, source: :article
   has_many :comments, as: :commentable, dependent: :destroy
@@ -153,6 +154,19 @@ class Material < ApplicationRecord
 
   def confidence_label = CONFIDENCE_LEVELS[confidence]
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
+
+  # パート集約: 0件=todo / 全完了=done / それ以外=drafting。
+  def transcription_status
+    parts = transcriptions.to_a
+    return "todo" if parts.empty?
+    parts.all? { |t| t.status == "done" } ? "done" : "drafting"
+  end
+
+  # 表示用 [完了数, 総数]。
+  def transcription_progress
+    parts = transcriptions.to_a
+    [ parts.count { |t| t.status == "done" }, parts.size ]
+  end
 
   private
 

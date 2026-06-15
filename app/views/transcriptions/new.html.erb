@@ -1,0 +1,6 @@
+<% content_for :title, "文字起こしパート作成 — #{@material.title}" %>
+<p><%= link_to "← 資料へ戻る", @material %></p>
+<div class="page-header"><h1>文字起こしパートを作成</h1></div>
+<p class="muted"><%= @material.title %></p>
+<p class="muted">この資料の音声・文字をテキストに書き起こします。パートに分けて複数人で分担できます。聞き取れた範囲でOK。</p>
+<%= render "form" %>

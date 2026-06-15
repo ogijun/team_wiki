@@ -135,25 +135,34 @@
 
 </section>
 
-<%# ── ④ 文字起こし ── %>
+<%# ── ④ 文字起こし（複数パート） ── %>
 <% if @material.transcribable? %>
 <section class="transcription-section">
-  <% if (t = @material.transcription) %>
-    <h2>文字起こし <%= render BadgeComponent.new(text: t.status_label, variant: :status) %></h2>
-    <div class="transcript-box">
-      <% if t.creation_summary %>
-        <p class="meta muted">作成: <%= t.creation_summary %></p>
-      <% end %>
-      <div class="prewrap"><%= t.preview_body %></div>
-      <% if t.long? %>
-        <p class="transcript-box__more"><%= link_to "続きを読む（あと#{number_with_delimiter(t.overflow_lines)}行）", material_transcription_path(@material) %></p>
-      <% end %>
-    </div>
-    <p><%= link_to "文字起こしを編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
+  <% parts = @material.transcriptions.includes(:author, :assignee).to_a %>
+  <% done, total = @material.transcription_progress %>
+  <h2>文字起こし<% if total.positive? %> <span class="pill"><%= done %> / <%= total %></span><% end %></h2>
+
+  <% if parts.any? %>
+    <% parts.each do |t| %>
+      <div class="transcript-part">
+        <div class="transcript-part__head">
+          <strong><%= t.display_label %></strong>
+          <%= render BadgeComponent.new(text: t.status_label, variant: :status) %>
+          <% if t.assignee %><span class="meta"><%= avatar_tag(t.assignee, size: 18) %> <%= display_name(t.assignee) %></span><% end %>
+        </div>
+        <div class="transcript-box">
+          <div class="prewrap"><%= t.body.to_s.lines.first(3).join %></div>
+          <p class="transcript-box__more">
+            <%= link_to "全文", material_transcription_path(@material, t) %>
+            ・<%= link_to "編集", edit_material_transcription_path(@material, t) %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+    <p><%= link_to "パートを追加", new_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
   <% else %>
-    <h2>文字起こし</h2>
-    <p class="muted">このメディアはまだ文字起こしされていません。聞き取れた／読み取れた範囲でOKです。</p>
-    <%= link_to "文字起こしを作成", edit_material_transcription_path(@material), role: "button", class: "btn-sm" %>
+    <p class="muted">このメディアはまだ文字起こしされていません。聞き取れた／読み取れた範囲でOKです。パートに分けて複数人で分担できます。</p>
+    <%= link_to "最初のパートを作成", new_material_transcription_path(@material), role: "button", class: "btn-sm" %>
   <% end %>
 </section>
 <% end %>

@@ -5,7 +5,7 @@
       "note": "Diffy::Diff#to_s(:html) HTML-escapes the diffed line content; only the diff markup is html_safe. Reviewed safe."
     },
     {
-      "fingerprint": "2176c2424b61e393f9a3a946efdc7375c3e07fa5c86f44f0fd699b955c6b8504",
+      "fingerprint": "5fbb71f439e77bfde02e109e19b57219ae02021034963a50bdfc800470538fde",
       "note": "Same Diffy :html diff as article revisions (transcription revisions view); content is escaped by Diffy. Reviewed safe."
     },
     {

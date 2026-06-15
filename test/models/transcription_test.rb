@@ -24,12 +24,6 @@ class TranscriptionTest < ActiveSupport::TestCase
     assert_not t.valid?
   end
 
-  test "one transcription per material" do
-    Transcription.create!(material: @material, author: @user, body: "a", status: "drafting")
-    dup = Transcription.new(material: @material, author: @user, body: "b", status: "drafting")
-    assert_not dup.valid?
-  end
-
   test "status_label maps to japanese" do
     t = Transcription.new(status: "done")
     assert_equal "完了", t.status_label
@@ -95,5 +89,21 @@ class TranscriptionTest < ActiveSupport::TestCase
                  Transcription.new(creation_method: "ai", ai_service: "OpenAI", ai_model: "whisper-large-v3").creation_summary
     assert_equal "AI下書き＋人手修正（OpenAI）",
                  Transcription.new(creation_method: "ai_assisted", ai_service: "OpenAI").creation_summary
+  end
+
+  test "belongs to an optional assignee" do
+    m = create(:material)
+    assignee = create(:user)
+    t = m.transcriptions.create!(author: @user, body: "x", position: 1, assignee: assignee)
+    assert_equal assignee, t.assignee
+    t2 = m.transcriptions.create!(author: @user, body: "y", position: 2)
+    assert_nil t2.assignee
+  end
+
+  test "two parts can coexist on one material (uniqueness removed)" do
+    m = create(:material)
+    m.transcriptions.create!(author: @user, body: "1", position: 1)
+    second = m.transcriptions.create!(author: @user, body: "2", position: 2)
+    assert_predicate second, :persisted?
   end
 end

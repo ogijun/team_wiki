@@ -19,7 +19,6 @@ class TranscriptionRevisionsController < ApplicationController
 
   def set_transcription
     @material = Material.find(params[:material_id])
-    @transcription = @material.transcription
-    redirect_to @material if @transcription.nil?
+    @transcription = @material.transcriptions.find(params[:transcription_id])
   end
 end

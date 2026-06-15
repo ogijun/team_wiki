@@ -121,6 +121,8 @@ button.tag-chip:hover, button.tag-chip:focus {
 .transcript-box .prewrap { line-height: 1.75; }
 .transcript-box .meta { margin: 0 0 0.6rem; font-size: 0.8rem; }
 .transcript-box__more { margin: 0.7rem 0 0; }
+.transcript-part { margin: 0 0 1rem; }
+.transcript-part__head { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.3rem; }
 
 /* 「未実装/予定」を示す破線プレースホルダー */
 .placeholder { margin: 1rem 0; padding: 2rem 1rem; text-align: center; border: 1px dashed var(--hairline); border-radius: 6px; font-size: 0.85rem; color: var(--muted); }

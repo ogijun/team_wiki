@@ -20,13 +20,13 @@ Rails.application.routes.draw do
   get "stats", to: "stats#index"
   resources :materials do
     get "pdf", on: :member, to: "materials/pdf#show"
-    resource :transcription, only: %i[show edit update] do
+    resources :transcriptions, except: [ :index ] do
       resources :revisions, only: %i[index show], controller: "transcription_revisions"
     end
     resources :comments, only: :create
     resources :taggings, only: :create
   end
-  get "transcriptions", to: "transcriptions#index"
+  get "transcriptions", to: "transcriptions#dashboard"
   resources :uploads, only: :create
   root "home#index"
   resource :settings, only: %i[edit update]

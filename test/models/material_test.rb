@@ -302,4 +302,35 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal 1, m.reload.page_count
     assert_equal 0, Material.backfill_page_counts!   # 2回目は対象なし（冪等）
   end
+
+  test "has_many transcriptions ordered by position" do
+    m = create(:material)
+    b = m.transcriptions.create!(author: @user, body: "B", position: 2)
+    a = m.transcriptions.create!(author: @user, body: "A", position: 1)
+    assert_equal [ a, b ], m.transcriptions.to_a
+  end
+
+  test "transcription_status aggregates parts (todo/drafting/done)" do
+    m = create(:material)
+    assert_equal "todo", m.transcription_status
+    m.transcriptions.create!(author: @user, body: "x", position: 1, status: "drafting")
+    assert_equal "drafting", m.reload.transcription_status
+    m.transcriptions.update_all(status: "done")
+    assert_equal "done", m.reload.transcription_status
+  end
+
+  test "transcription_progress returns done/total counts" do
+    m = create(:material)
+    m.transcriptions.create!(author: @user, body: "x", position: 1, status: "done")
+    m.transcriptions.create!(author: @user, body: "y", position: 2, status: "drafting")
+    assert_equal [ 1, 2 ], m.reload.transcription_progress
+  end
+
+  test "destroying a material destroys its transcription parts" do
+    m = create(:material)
+    m.transcriptions.create!(author: @user, body: "x", position: 1)
+    assert_difference "Transcription.count", -1 do
+      m.destroy
+    end
+  end
 end
