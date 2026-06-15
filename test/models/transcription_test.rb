@@ -74,17 +74,17 @@ class TranscriptionTest < ActiveSupport::TestCase
     assert_equal [ @user, bob ], t.contributors
   end
 
-  test "preview helpers truncate long bodies and report the overflow" do
-    short = Transcription.new(body: "短い本文")
+  test "preview helpers truncate long bodies by line count and report overflow lines" do
+    short = Transcription.new(body: "1行目\n2行目\n3行目")
     assert_not short.long?
-    assert_equal "短い本文", short.preview_body
-    assert_equal 0, short.overflow_chars
+    assert_equal "1行目\n2行目\n3行目", short.preview_body
+    assert_equal 0, short.overflow_lines
 
-    long_body = "あ" * (Transcription::PREVIEW_LIMIT + 250)
+    long_body = (1..(Transcription::PREVIEW_LINES + 5)).map { |i| "行#{i}" }.join("\n")
     long = Transcription.new(body: long_body)
     assert long.long?
-    assert_equal Transcription::PREVIEW_LIMIT, long.preview_body.length
-    assert_equal 250, long.overflow_chars
+    assert_equal Transcription::PREVIEW_LINES, long.preview_body.lines.size
+    assert_equal 5, long.overflow_lines
   end
 
   test "creation_summary renders per method" do

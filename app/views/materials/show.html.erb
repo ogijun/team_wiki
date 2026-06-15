@@ -133,27 +133,32 @@
     </ul>
   <% end %>
 
-  <% if @material.transcribable? && @material.transcription.nil? %>
-    <h3>文字起こし</h3>
+</section>
+
+<%# ── ④ 文字起こし ── %>
+<% if @material.transcribable? %>
+<section class="transcription-section">
+  <% if (t = @material.transcription) %>
+    <h2>文字起こし <%= render BadgeComponent.new(text: t.status_label, variant: :status) %></h2>
+    <div class="transcript-box">
+      <% if t.creation_summary %>
+        <p class="meta muted">作成: <%= t.creation_summary %></p>
+      <% end %>
+      <div class="prewrap"><%= t.preview_body %></div>
+      <% if t.long? %>
+        <p class="transcript-box__more"><%= link_to "続きを読む（あと#{number_with_delimiter(t.overflow_lines)}行）", material_transcription_path(@material) %></p>
+      <% end %>
+    </div>
+    <p><%= link_to "文字起こしを編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
+  <% else %>
+    <h2>文字起こし</h2>
     <p class="muted">このメディアはまだ文字起こしされていません。聞き取れた／読み取れた範囲でOKです。</p>
     <%= link_to "文字起こしを作成", edit_material_transcription_path(@material), role: "button", class: "btn-sm" %>
   <% end %>
-  <% if @material.transcribable? && (t = @material.transcription) %>
-    <h3>文字起こし
-      <%= render BadgeComponent.new(text: t.status_label, variant: :status) %>
-    </h3>
-    <% if t.creation_summary %>
-      <p class="meta">作成: <%= t.creation_summary %></p>
-    <% end %>
-    <div class="prewrap"><%= t.preview_body %></div>
-    <% if t.long? %>
-      <p><%= link_to "続きを読む（あと#{number_with_delimiter(t.overflow_chars)}文字）", material_transcription_path(@material) %></p>
-    <% end %>
-    <p><%= link_to "文字起こしを編集", edit_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
-  <% end %>
 </section>
+<% end %>
 
-<%# ── ④ 議論 ── %>
+<%# ── ⑤ 議論 ── %>
 <%= render "comments/comments", commentable: @material %>
 
 <div class="danger-zone">

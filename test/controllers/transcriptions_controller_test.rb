@@ -23,12 +23,12 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to material_url(@media)
   end
 
-  test "material page truncates a long transcription with an overflow link" do
-    Transcription.create!(material: @media, author: @user,
-                          body: "き" * (Transcription::PREVIEW_LIMIT + 123), status: "drafting")
+  test "material page truncates a long transcription by line count with an overflow link" do
+    body = (1..(Transcription::PREVIEW_LINES + 7)).map { |i| "行#{i}" }.join("\n")
+    Transcription.create!(material: @media, author: @user, body: body, status: "drafting")
     get material_url(@media)
-    assert_select ".prewrap", text: /\Aき{#{Transcription::PREVIEW_LIMIT}}\z/
-    assert_select "a[href=?]", material_transcription_path(@media), text: /続きを読む（あと123文字）/
+    assert_select ".transcript-box .prewrap"
+    assert_select "a[href=?]", material_transcription_path(@media), text: /続きを読む（あと7行）/
   end
 
   test "material page shows a short transcription in full without the overflow link" do
