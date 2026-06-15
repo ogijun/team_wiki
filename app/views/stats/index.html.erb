@@ -19,12 +19,11 @@
         "保存容量" => [ :total_file_bytes, "archive", :bytes ],
         "総ページ数" => [ :total_pages, "file-text", :number ]
       }.each do |label, (column, icon_name, fmt)| %>
-        <% values = @snapshots.map { |s| s.public_send(column).to_i } %>
+        <% series = @snapshots.map { |s| [ s.date, s.public_send(column).to_i ] } %>
         <% fmt_val = ->(v) { fmt == :bytes ? number_to_human_size(v) : number_with_delimiter(v) } %>
         <div class="stat-chart">
-          <div class="stat-chart__head"><%= icon(icon_name) %> <%= label %> <strong><%= fmt_val.(values.last) %></strong></div>
-          <%= sparkline_svg(values) %>
-          <div class="stat-chart__axis muted"><span><%= fmt_val.(values.min) %></span><span><%= fmt_val.(values.max) %></span></div>
+          <div class="stat-chart__head"><%= icon(icon_name) %> <%= label %> <strong><%= fmt_val.(series.last.last) %></strong></div>
+          <%= trend_bars(series, format: fmt) %>
         </div>
       <% end %>
     </div>

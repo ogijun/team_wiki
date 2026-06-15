@@ -38,4 +38,29 @@ class StatsHelperTest < ActionView::TestCase
     assert doc.at_css(".hourly__axis"), "x軸ラベルがある"
     assert_match(/最多 5/, doc.at_css(".hourly__peak").text)
   end
+
+  test "trend_bars renders one 0-baseline bar per point with y-axis max/0 and x-axis dates" do
+    series = [ [ Date.new(2026, 6, 1), 0 ], [ Date.new(2026, 6, 2), 5 ], [ Date.new(2026, 6, 3), 10 ] ]
+    doc = Nokogiri::HTML(trend_bars(series))
+    bars = doc.css(".trend__bar")
+    assert_equal 3, bars.size
+    # 0基準: 値0→高さ0%、値=最大→100%、その間は比例
+    assert_includes bars[0]["style"], "height: 0%"
+    assert_includes bars[1]["style"], "height: 50%"
+    assert_includes bars[2]["style"], "height: 100%"
+    # y軸に最大値と 0
+    yaxis = doc.at_css(".trend__yaxis").text
+    assert_includes yaxis, "10"
+    assert_includes yaxis, "0"
+    # x軸に最初と最後の日付
+    xaxis = doc.at_css(".trend__xaxis").text
+    assert_includes xaxis, "6/1"
+    assert_includes xaxis, "6/3"
+  end
+
+  test "trend_bars formats the y-axis max as a human size for :bytes" do
+    series = [ [ Date.new(2026, 6, 1), 1024 ], [ Date.new(2026, 6, 2), 1_048_576 ] ]
+    doc = Nokogiri::HTML(trend_bars(series, format: :bytes))
+    assert_match(/MB|KB/, doc.at_css(".trend__yaxis").text)
+  end
 end
