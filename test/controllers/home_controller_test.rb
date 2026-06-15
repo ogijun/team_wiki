@@ -23,6 +23,14 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /ダッシュ記事/
   end
 
+  test "新規作成 is a dropdown offering both article and material creation" do
+    get root_url
+    assert_response :success
+    assert_select "details.create-menu summary", text: "新規作成"
+    assert_select "details.create-menu a[href=?]", new_article_path, text: /記事/
+    assert_select "details.create-menu a[href=?]", new_material_path, text: /資料/
+  end
+
   test "home shows the site-wide activity heatmap" do
     Activity.create!(user: @user, action: "article.created")
     get root_url
