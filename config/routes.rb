@@ -26,7 +26,8 @@ Rails.application.routes.draw do
     resources :comments, only: :create
     resources :taggings, only: :create
   end
-  get "transcriptions", to: "transcriptions#dashboard"
+  # 全資料の文字起こし進捗ボード（Transcription レコードの index ではなく Material の進捗一覧）。
+  get "transcriptions", to: "transcription_progress#index"
   resources :uploads, only: :create
   root "home#index"
   resource :settings, only: %i[edit update]

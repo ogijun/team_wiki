@@ -2,13 +2,6 @@ class TranscriptionsController < ApplicationController
   before_action :set_material, only: %i[new create show edit update destroy]
   before_action :set_transcription, only: %i[show edit update destroy]
 
-  # 全体ダッシュボード（資料を集約ステータスでグルーピング）。
-  def dashboard
-    materials = Material.includes(:transcriptions, file_attachment: :blob)
-    @groups = materials.group_by(&:transcription_status)
-    render :index
-  end
-
   def new
     @transcription = @material.transcriptions.build
   end
