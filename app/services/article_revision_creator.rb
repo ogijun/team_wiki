@@ -1,45 +1,8 @@
+# 移行用シム: ロジックは Article#revise! へ移動済み。呼び出し元を順次差し替えたら本ファイルを削除する。
 module ArticleRevisionCreator
   module_function
 
   def call(article:, body:, author:, edit_summary: nil)
-    ApplicationRecord.transaction do
-      # 本文が前版と同一なら版行を作らない（タイトル/タグ等だけの保存で同一本文が積み上がるのを防ぐ。
-      # 文字起こし側と同じ方針）。リンク/引用/逆リンクの再同期はタイトル変更等に効くので常に通す。
-      if article.current_revision&.body != body
-        revision = article.revisions.create!(body: body, author: author, edit_summary: edit_summary)
-        article.update!(current_revision: revision)
-      end
-      sync_links(article, body)
-      sync_citations(article, body)
-      backfill_inbound_links(article)
-      article.current_revision
-    end
-  end
-
-  # 本文の [[ref:handle]] を citations に張り直す（Link と同じ方式）。
-  # handle(=資料slug) を解決し、未解決なら material_id=null で残す。
-  def sync_citations(article, body)
-    handles = RefExtractor.call(body)
-    article.citations.delete_all # コールバック不要の張り直しなので一括 DELETE で十分
-    by_slug = Material.where(slug: handles).index_by(&:slug)
-    handles.each do |handle|
-      article.citations.create!(material_handle: handle, material: by_slug[handle])
-    end
-  end
-
-  def sync_links(article, body)
-    titles = WikiLinkExtractor.call(body)
-    article.outgoing_links.delete_all # 同上
-    by_title = Article.where(title: titles).index_by(&:title)
-    titles.each do |title|
-      article.outgoing_links.create!(target_title: title, target_article_id: by_title[title]&.id)
-    end
-  end
-
-  # 自分のタイトルを指す未解決リンクを埋め戻す（冪等）
-  def backfill_inbound_links(article)
-    Link.where(target_title: article.title, target_article_id: nil)
-        .where.not(source_article_id: article.id)
-        .update_all(target_article_id: article.id)
+    article.revise!(body: body, author: author, edit_summary: edit_summary)
   end
 end

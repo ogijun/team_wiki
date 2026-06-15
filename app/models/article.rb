@@ -47,7 +47,61 @@ class Article < ApplicationRecord
     ids.map { |id| by_id[id] }
   end
 
+  # 本文を改訂する。自身の属性変更を保存し、本文が前版と異なる時だけ版を追記して
+  # current_revision を差し替え、リンク/引用/逆リンクを同期する（同期はタイトル変更等に
+  # 効くので本文不変でも通す）。current_revision を返す。activity はコントローラの責務。
+  def revise!(body:, author:, edit_summary: nil)
+    transaction do
+      save!
+      if current_revision&.body != body
+        revision = revisions.create!(body: body, author: author, edit_summary: edit_summary)
+        update!(current_revision: revision)
+      end
+      sync_outgoing_links(body)
+      sync_citations(body)
+      backfill_inbound_links
+      current_revision
+    end
+  end
+
+  # 過去版の本文へ復元する（現在のタグを引き継ぐ）。activity はコントローラの責務。
+  # tag_names= は CSV 文字列を期待する（Taggable#sync_tags）ので join してから渡す。
+  def restore_revision!(revision, author:)
+    self.tag_names = tags.pluck(:name).join(", ")
+    revise!(body: revision.body, author: author, edit_summary: "リビジョン##{revision.id} を復元")
+  end
+
+  # 新規作成＋初版を作る。activity はコントローラ/呼び出し側の責務。
+  def self.create_with_revision!(attributes, body:, author:, edit_summary: nil)
+    article = new(attributes)
+    article.revise!(body: body, author: author, edit_summary: edit_summary)
+    article
+  end
+
   private
+
+  # 本文の [[タイトル]] を outgoing_links に張り直す（未解決は target_article_id=null で残す）。
+  def sync_outgoing_links(body)
+    titles = WikiLinkExtractor.call(body)
+    outgoing_links.delete_all
+    by_title = Article.where(title: titles).index_by(&:title)
+    titles.each { |t| outgoing_links.create!(target_title: t, target_article_id: by_title[t]&.id) }
+  end
+
+  # 本文の [[ref:handle]] を citations に張り直す（handle=資料slug を解決、未解決は material=nil）。
+  def sync_citations(body)
+    handles = RefExtractor.call(body)
+    citations.delete_all
+    by_slug = Material.where(slug: handles).index_by(&:slug)
+    handles.each { |h| citations.create!(material_handle: h, material: by_slug[h]) }
+  end
+
+  # 自分のタイトルを指す未解決リンクを埋め戻す（冪等）。
+  def backfill_inbound_links
+    Link.where(target_title: title, target_article_id: nil)
+        .where.not(source_article_id: id)
+        .update_all(target_article_id: id)
+  end
 
   def date_range_consistent
     errors.add(:starts_at, "が必要です") if ends_at.present? && starts_at.blank?
