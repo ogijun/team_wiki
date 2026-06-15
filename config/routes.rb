@@ -28,7 +28,7 @@ Rails.application.routes.draw do
   end
   # 全資料の文字起こし進捗ボード（Transcription レコードの index ではなく Material の進捗一覧）。
   get "transcriptions", to: "transcription_progress#index"
-  resources :uploads, only: :create
+  resources :editor_uploads, only: :create # エディタのインライン画像/動画アップロード受け口
   root "home#index"
   resource :settings, only: %i[edit update]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
