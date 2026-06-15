@@ -12,7 +12,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       post uploads_url, params: { file: file }
     end
     assert_response :success
-    assert JSON.parse(response.body)["url"].present?
+    assert_predicate JSON.parse(response.body)["url"], :present?
   end
 
   test "create rejects invalid type" do

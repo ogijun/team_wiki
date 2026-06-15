@@ -8,13 +8,13 @@ class CommentTest < ActiveSupport::TestCase
 
   test "valid with body, author, commentable" do
     c = Comment.new(commentable: @article, author: @user, body: "コメント本文")
-    assert c.valid?, c.errors.full_messages.join(", ")
+    assert_predicate c, :valid?, c.errors.full_messages.join(", ")
   end
 
   test "requires body" do
     c = Comment.new(commentable: @article, author: @user, body: "")
     assert_not c.valid?
-    assert c.errors[:body].any?
+    assert_predicate c.errors[:body], :any?
   end
 
   test "increments the commentable comments_count via counter_cache" do

@@ -41,7 +41,7 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     assert_select ".search-results", count: 1 # セクション分けせず単一リスト
     body = response.body
     # タイトル内のマッチは <mark> で分断されるので、マーク境界を跨がない部分で順序を見る
-    assert body.index("の資料") < body.index("入門"), "新しい方が先に出る"
+    assert_operator body.index("の資料"), :<, body.index("入門"), "新しい方が先に出る"
   end
 
   test "results show highlighted snippets around the match" do

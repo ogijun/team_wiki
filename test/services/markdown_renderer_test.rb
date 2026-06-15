@@ -41,7 +41,7 @@ class MarkdownRendererTest < ActiveSupport::TestCase
   end
 
   test "output html is html_safe" do
-    assert render("ok").html_safe?
+    assert_predicate render("ok"), :html_safe?
   end
 
   test "ref becomes numbered footnote and is collected" do

@@ -5,13 +5,13 @@ class ArticleTest < ActiveSupport::TestCase
 
   test "blank kind is normalized to nil (フォームの未分類=空文字を許容)" do
     a = Article.new(title: "未分類記事", created_by: @user, kind: "")
-    assert a.valid?, a.errors.full_messages.join(", ")
+    assert_predicate a, :valid?, a.errors.full_messages.join(", ")
     assert_nil a.kind
   end
 
   test "clearing all date parts removes the fuzzy date" do
     a = Article.create!(title: "日付クリア", created_by: @user, start_year: 1998)
-    assert a.starts.present?
+    assert_predicate a.starts, :present?
     a.update!(start_year: "", start_month: "", start_day: "", start_hour: "", start_minute: "")
     assert_nil a.reload.starts_at
     assert_nil a.starts_precision
@@ -20,7 +20,7 @@ class ArticleTest < ActiveSupport::TestCase
   test "a save that does not touch date parts keeps the stored date" do
     a = Article.create!(title: "日付保持", created_by: @user, start_year: 1998)
     Article.find(a.id).update!(status: "done") # 仮想アクセサ未代入(=nil)の save
-    assert a.reload.starts.present?
+    assert_predicate a.reload.starts, :present?
   end
 
   test "contributors are distinct revision authors in first-appearance order" do
@@ -35,7 +35,7 @@ class ArticleTest < ActiveSupport::TestCase
   test "requires title" do
     article = Article.new(created_by: @user)
     assert_not article.valid?
-    assert article.errors[:title].any?
+    assert_predicate article.errors[:title], :any?
   end
 
   test "slug is a random token not derived from title" do
@@ -93,7 +93,7 @@ class ArticleTest < ActiveSupport::TestCase
   test "requires starts_at and starts_precision together" do
     a = Article.new(title: "片方", created_by: @user, starts_at: Time.zone.local(1979))
     assert_not a.valid?
-    assert a.errors[:starts_precision].any?
+    assert_predicate a.errors[:starts_precision], :any?
   end
 
   test "rejects invalid precision" do
@@ -107,14 +107,14 @@ class ArticleTest < ActiveSupport::TestCase
                     starts_at: Time.zone.local(1980), starts_precision: "year",
                     ends_at: Time.zone.local(1979), ends_precision: "year")
     assert_not a.valid?
-    assert a.errors[:ends_at].any?
+    assert_predicate a.errors[:ends_at], :any?
   end
 
   test "ends requires starts" do
     a = Article.new(title: "終わりだけ", created_by: @user,
                     ends_at: Time.zone.local(1979), ends_precision: "year")
     assert_not a.valid?
-    assert a.errors[:starts_at].any?
+    assert_predicate a.errors[:starts_at], :any?
   end
 
   test "chronicled scope returns dated articles oldest first" do
@@ -134,15 +134,15 @@ class ArticleTest < ActiveSupport::TestCase
   test "status must be one of STATUSES" do
     article = Article.new(title: "状態不正", created_by: @user, status: "bogus")
     assert_not article.valid?
-    assert article.errors[:status].any?
+    assert_predicate article.errors[:status], :any?
   end
 
   test "kind allows nil and valid values, rejects others" do
-    assert Article.new(title: "k1", created_by: @user, kind: nil).valid?
-    assert Article.new(title: "k2", created_by: @user, kind: "work").valid?
+    assert_predicate Article.new(title: "k1", created_by: @user, kind: nil), :valid?
+    assert_predicate Article.new(title: "k2", created_by: @user, kind: "work"), :valid?
     bad = Article.new(title: "k3", created_by: @user, kind: "bogus")
     assert_not bad.valid?
-    assert bad.errors[:kind].any?
+    assert_predicate bad.errors[:kind], :any?
   end
 
   test "labels map slug to Japanese, nil kind is 未分類" do

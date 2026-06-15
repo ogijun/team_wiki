@@ -412,6 +412,10 @@ GEM
       lint_roller (>= 1.1)
       rubocop (>= 1.72.1)
       rubocop-rails (>= 2.24)
+    rubocop-minitest (0.39.1)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.75.0, < 2.0)
+      rubocop-ast (>= 1.38.0, < 2.0)
     rubocop-performance (1.26.1)
       lint_roller (~> 1.1)
       rubocop (>= 1.75.0, < 2.0)
@@ -549,6 +553,7 @@ DEPENDENCIES
   rails (~> 8.1.3)
   requestjs-rails
   rubocop-migration (~> 0.7.1)
+  rubocop-minitest
   rubocop-rails-omakase
   selenium-webdriver
   solid_cable
@@ -711,6 +716,7 @@ CHECKSUMS
   rubocop (1.87.0) sha256=b9d9ddf55116a513f8ef2c7ae660662d8b49301f118d3f0df61865b33a5c188d
   rubocop-ast (1.49.1) sha256=4412f3ee70f6fe4546cc489548e0f6fcf76cafcfa80fa03af67098ffed755035
   rubocop-migration (0.7.1) sha256=33700209a6d28e4e60d50171e6037c8d21f387129dfa54b67feff0568b887674
+  rubocop-minitest (0.39.1) sha256=998398d6da4026d297f0f9bf709a1eac5f2b6947c24431f94af08138510cf7ed
   rubocop-performance (1.26.1) sha256=cd19b936ff196df85829d264b522fd4f98b6c89ad271fa52744a8c11b8f71834
   rubocop-rails (2.35.3) sha256=6edd45410866912b9b2e90ae3aeafd31d576df2bb2a9c9408f1667a50c32c7de
   rubocop-rails-omakase (1.1.0) sha256=2af73ac8ee5852de2919abbd2618af9c15c19b512c4cfc1f9a5d3b6ef009109d

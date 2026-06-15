@@ -12,25 +12,25 @@ class SiteSettingTest < ActiveSupport::TestCase
     s = SiteSetting.instance
     s.logo.attach(io: StringIO.new("x"), filename: "a.txt", content_type: "text/plain")
     assert_not s.valid?
-    assert s.errors[:logo].any?
+    assert_predicate s.errors[:logo], :any?
   end
 
   test "accepts an image logo" do
     s = SiteSetting.instance
     s.logo.attach(io: StringIO.new("x"), filename: "logo.png", content_type: "image/png")
-    assert s.valid?, s.errors.full_messages.join(", ")
+    assert_predicate s, :valid?, s.errors.full_messages.join(", ")
   end
 
   test "rejects a non-image icon" do
     s = SiteSetting.instance
     s.icon.attach(io: StringIO.new("x"), filename: "a.txt", content_type: "text/plain")
     assert_not s.valid?
-    assert s.errors[:icon].any?
+    assert_predicate s.errors[:icon], :any?
   end
 
   test "accepts an image icon" do
     s = SiteSetting.instance
     s.icon.attach(io: StringIO.new("x"), filename: "icon.png", content_type: "image/png")
-    assert s.valid?, s.errors.full_messages.join(", ")
+    assert_predicate s, :valid?, s.errors.full_messages.join(", ")
   end
 end

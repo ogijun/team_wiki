@@ -47,7 +47,7 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     s = SiteSetting.instance
     s.icon.attach(io: StringIO.new("x"), filename: "i.png", content_type: "image/png")
     s.save!
-    assert SiteSetting.instance.icon.attached?
+    assert_predicate SiteSetting.instance.icon, :attached?
     patch settings_url, params: { site_setting: { brand_name: "x" }, remove_icon: "1" }
     assert_not SiteSetting.instance.icon.attached?
   end

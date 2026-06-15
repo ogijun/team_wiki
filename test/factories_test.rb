@@ -8,6 +8,6 @@ class FactoriesTest < ActiveSupport::TestCase
       [ factory ] + factory.definition.defined_traits.map { |t| [ factory.name, t.name ] }
     end
     FactoryBot.lint(traits: true)
-    assert factories.any?
+    assert_predicate factories, :any?
   end
 end
