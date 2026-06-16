@@ -48,9 +48,9 @@ module MaterialsHelper
     steps << if material.confidence == "confirmed"
       { text: "原本確認済", done: true }
     else
-      # 信頼度の確定は admin のみ操作できるため、editor にはテキストで状態だけ示す
+      # 信頼度の確定は admin のみ操作できるため、editor にはテキストで状態だけ示す（権限は述語に集約）
       { text: "原本未確認", done: false,
-        path: Current.user&.admin? ? edit_material_path(material) : nil }
+        path: material.confidence_editable_by?(Current.user) ? edit_material_path(material) : nil }
     end
 
     count = material.citing_articles.count

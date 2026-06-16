@@ -9,6 +9,14 @@ class ArticleTest < ActiveSupport::TestCase
     assert_nil a.kind
   end
 
+  test "authorization predicates: editable/deletable by any logged-in member" do
+    a = Article.create!(title: "認可記事", created_by: @user)
+    assert a.editable_by?(@user)
+    assert a.deletable_by?(@user)
+    assert_not a.editable_by?(nil)
+    assert_not a.deletable_by?(nil)
+  end
+
   test "invalid date parts make the record invalid instead of raising (500)" do
     a = Article.new(title: "不正日付記事", created_by: @user, start_year: "2020", start_month: "99")
     assert_nothing_raised { a.valid? }

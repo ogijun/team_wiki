@@ -98,7 +98,8 @@ class MaterialsController < ApplicationController
                  :published_year, :published_month, :published_day ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。
     permitted += [ :file, :url ] unless @material&.persisted?
-    permitted << :confidence if Current.user&.admin?
+    # 信頼度の権限は Material の述語に集約（create 時は @material 未設定なので新規インスタンスで判定）。
+    permitted << :confidence if (@material || Material.new).confidence_editable_by?(Current.user)
     params.require(:material).permit(*permitted)
   end
 end

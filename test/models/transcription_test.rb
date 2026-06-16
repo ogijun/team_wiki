@@ -8,6 +8,12 @@ class TranscriptionTest < ActiveSupport::TestCase
     @material.save!
   end
 
+  test "authorization predicate: editable by any logged-in member (future: assignee+admin)" do
+    t = @material.transcriptions.create!(author: @user, body: "x", position: 1)
+    assert t.editable_by?(@user)
+    assert_not t.editable_by?(nil)
+  end
+
   test "valid with body, author, status" do
     t = Transcription.new(material: @material, author: @user, body: "書き起こし本文", status: "drafting")
     assert_predicate t, :valid?, t.errors.full_messages.join(", ")

@@ -5,6 +5,18 @@ class MaterialTest < ActiveSupport::TestCase
     @user = User.create!(email_address: "mat@example.com", password: "password123", name: "Mat")
   end
 
+  test "authorization predicates: editable/deletable by any member, confidence admin-only" do
+    admin = User.create!(email_address: "adm@example.com", password: "password123", name: "Adm", role: "admin")
+    m = Material.create!(user: @user, url: "https://x.test/authz", title: "認可")
+    assert m.editable_by?(@user)
+    assert m.deletable_by?(@user)
+    assert_not m.editable_by?(nil)
+    assert_not m.deletable_by?(nil)
+    assert m.confidence_editable_by?(admin)
+    assert_not m.confidence_editable_by?(@user)   # editor 不可
+    assert_not m.confidence_editable_by?(nil)
+  end
+
   def attach_png(material)
     material.file.attach(io: StringIO.new("x"), filename: "a.png", content_type: "image/png")
     material
