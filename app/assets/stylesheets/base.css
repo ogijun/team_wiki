@@ -128,9 +128,14 @@ body > header.topbar {
     padding: 1rem 0.9rem 1.3rem; overflow-y: auto;
     background: var(--panel); border-left: 1px solid var(--hairline);
   }
-  /* 右サイドバー表示時は本文を左右サイドバーの間で中央寄せに戻す（左寄せのままだと右サイドバーとの
-     間にだけ非対称な余白が空くため）。余った幅は左右に均等配分し、左 border も対称に復活させる。 */
-  body > main { margin: 0 auto; border-left: 1px solid var(--hairline); }
+  /* 右サイドバー表示時は本文パネルを左右サイドバーの間いっぱいに広げ（margin の余白を見せない）、
+     余った幅は padding に回して中身を --page 幅に保つ（box-sizing:border-box なので
+     padding=(幅-62rem)/2 で中身が中央 62rem になる）。狭い時は最低 2.2rem を確保。 */
+  body > main {
+    margin: 0; max-width: none;
+    padding-left: max(2.2rem, (100% - var(--page)) / 2);
+    padding-right: max(2.2rem, (100% - var(--page)) / 2);
+  }
 }
 
 .site-footer {
