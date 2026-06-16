@@ -140,6 +140,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller=pdf][data-pdf-url-value=?]", pdf_material_path(pdf) do
       assert_select ".placeholder"                            # 既定はプレースホルダ表示
       assert_select "dialog.lightbox:not([open]) .pdf-viewer" # オーバーレイは閉じた状態
+      assert_select "input.pdf-viewer__pageinput[data-action=?]", "change->pdf#jump" # 番号入力でページジャンプ
       assert_select "a[data-action='pdf#open']", text: /doc\.pdf/
       assert_select "a[href=?] svg use[href*=download]", rails_blob_path(pdf.file)
       assert_select "a[href=?][aria-label=?]", rails_blob_path(pdf.file), "ダウンロード" # アイコンのみDLリンクのアクセシブル名
