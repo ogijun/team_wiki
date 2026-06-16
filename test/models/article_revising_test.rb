@@ -21,6 +21,16 @@ class ArticleRevisingTest < ActiveSupport::TestCase
     assert_equal "New", article.reload.title
   end
 
+  test "revise! bumps updated_at when the body changes" do
+    article = create_article("Bump")
+    article.revise!(body: "v1", author: @user)
+    original = article.reload.updated_at
+    travel 1.second do
+      article.revise!(body: "v2", author: @user)
+    end
+    assert_operator article.reload.updated_at, :>, original
+  end
+
   test "revise! does not create a new revision when body is unchanged" do
     article = create_article("NoOp")
     article.revise!(body: "本文", author: @user)
