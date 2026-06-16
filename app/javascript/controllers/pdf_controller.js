@@ -140,8 +140,13 @@ export default class extends Controller {
   // canvas だけが枠内で拡大縮小・スクロールする。+2px は canvas の枠線分。
   sizeStage() {
     const fs = this.fitScaleFor(this.baseViewport)
-    this.stageTarget.style.width = `${this.baseViewport.width * fs + 2}px`
+    const w = this.baseViewport.width * fs + 2 // +2 は canvas の枠線分
+    this.stageTarget.style.width = `${w}px`
     this.stageTarget.style.height = `${this.baseViewport.height * fs + 2}px`
+    // dialog がページをぎりぎり囲むよう、viewer 幅をステージ幅＋左右パディング(0.8rem×2)に揃える
+    // （box-sizing: border-box 前提）。ツールバーはこの幅内で折り返し、dialog は中身に追従する。
+    const viewer = this.stageTarget.closest(".pdf-viewer")
+    if (viewer) viewer.style.maxWidth = `calc(${w}px + 1.6rem)`
   }
 
   async render() {
