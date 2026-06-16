@@ -306,7 +306,9 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* 前/次ナビ。右開きのときは並びを反転して「次へ」を左に置く（読み進み方向に一致）。 */
 .pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.5rem; }
 .pdf-viewer__nav--rtl { flex-direction: row-reverse; }
-.pdf-viewer__page { font-size: 0.85rem; color: var(--ink-soft); min-width: 4.5rem; text-align: center; }
+.pdf-viewer__page { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.85rem; color: var(--ink-soft); }
+.pdf-viewer__pageinput { width: 3.2rem; text-align: right; padding: 0.1rem 0.3rem; margin: 0; font-size: 0.85rem; }
+.pdf-viewer__pagesep { color: var(--muted); }
 .pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.6rem; }
 .pdf-viewer__pct { font-size: 0.8rem; color: var(--ink-soft); min-width: 3.4rem; text-align: center; }
 .pdf-viewer__close { margin-left: auto; }
@@ -316,6 +318,9 @@ button.tag-chip:hover, button.tag-chip:focus {
    だとはみ出した先頭がスクロールできない問題を回避）。 */
 .pdf-viewer__stage { overflow: auto; max-width: 92vw; max-height: 82vh; margin: 0 auto; text-align: center; background: var(--surface); border-radius: 4px; }
 .pdf-viewer__stage canvas { display: inline-block; vertical-align: top; border: 1px solid var(--hairline); background: #fff; }
+/* 拡大でスクロール可能なときだけ掴めるカーソルに（パン中は握り） */
+.pdf-viewer__stage.is-pannable { cursor: grab; }
+.pdf-viewer__stage.is-panning { cursor: grabbing; }
 
 /* ── ホーム・統計・検索・年表 ──────────────── */
 

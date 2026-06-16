@@ -55,7 +55,12 @@
             <div class="pdf-viewer__bar">
               <span class="pdf-viewer__nav" data-pdf-target="nav">
                 <button type="button" class="btn-sm secondary outline" data-action="pdf#prev">前のページ</button>
-                <span class="pdf-viewer__page" data-pdf-target="page">…</span>
+                <span class="pdf-viewer__page">
+                  <input type="number" min="1" class="pdf-viewer__pageinput" data-pdf-target="pageInput"
+                         data-action="change->pdf#jump" aria-label="ページ番号へ移動">
+                  <span class="pdf-viewer__pagesep">/</span>
+                  <span data-pdf-target="pageTotal">…</span>
+                </span>
                 <button type="button" class="btn-sm secondary outline" data-action="pdf#next">次のページ</button>
               </span>
               <button type="button" class="btn-sm secondary outline" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え">左開き</button>
