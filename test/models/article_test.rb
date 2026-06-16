@@ -9,6 +9,20 @@ class ArticleTest < ActiveSupport::TestCase
     assert_nil a.kind
   end
 
+  test "invalid date parts make the record invalid instead of raising (500)" do
+    a = Article.new(title: "不正日付記事", created_by: @user, start_year: "2020", start_month: "99")
+    assert_nothing_raised { a.valid? }
+    assert_not_predicate a, :valid?
+    assert_nil a.starts_at
+    assert_predicate a.errors, :any?
+  end
+
+  test "non-numeric date parts make the record invalid instead of raising" do
+    a = Article.new(title: "数値以外日付記事", created_by: @user, start_year: "abc")
+    assert_nothing_raised { a.valid? }
+    assert_not_predicate a, :valid?
+  end
+
   test "clearing all date parts removes the fuzzy date" do
     a = Article.create!(title: "日付クリア", created_by: @user, start_year: 1998)
     assert_predicate a.starts, :present?

@@ -39,6 +39,24 @@ class FuzzyDateTest < ActiveSupport::TestCase
     assert_nil FuzzyDate.from_parts(year: nil, month: 5, day: 12, hour: nil, minute: nil)
   end
 
+  test "from_parts raises InvalidParts on non-numeric input" do
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: "abc", month: nil, day: nil, hour: nil, minute: nil) }
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 2020, month: "x", day: nil, hour: nil, minute: nil) }
+  end
+
+  test "from_parts raises InvalidParts on out-of-range parts" do
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 0, month: nil, day: nil, hour: nil, minute: nil) }
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 2020, month: 99, day: nil, hour: nil, minute: nil) }
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 2020, month: 0, day: nil, hour: nil, minute: nil) }
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 2020, month: 1, day: 99, hour: nil, minute: nil) }
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 2020, month: 1, day: 1, hour: 24, minute: nil) }
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 2020, month: 1, day: 1, hour: 1, minute: 60) }
+  end
+
+  test "from_parts raises InvalidParts on an impossible calendar date" do
+    assert_raises(FuzzyDate::InvalidParts) { FuzzyDate.from_parts(year: 2021, month: 2, day: 31, hour: nil, minute: nil) }
+  end
+
   test "wrap returns nil when at or precision nil" do
     assert_nil FuzzyDate.wrap(nil, "year")
     assert_nil FuzzyDate.wrap(Time.zone.local(1979), nil)
