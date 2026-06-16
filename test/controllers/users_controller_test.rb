@@ -38,11 +38,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select ".page-meta", text: /文字起こし.*0.*件/m
   end
 
-  test "own profile links to account settings; sidebar name links to the public profile" do
+  test "own profile links to account settings; top user menu links to profile and settings" do
     get user_url(@user)
     assert_select ".actions a[href=?]", edit_account_path
-    assert_select ".sidebar__user a[href=?]", user_path(@user)
-    assert_select ".sidebar__user a[href=?] svg use[href*=settings]", edit_account_path
+    assert_select ".topbar__user-menu a[href=?]", user_path(@user)
+    assert_select ".topbar__user-menu a[href=?] svg use[href*=settings]", edit_account_path
+    assert_select ".topbar__user-menu form[action=?]", session_path
 
     other = User.create!(email_address: "oth@example.com", name: "他人", provider: "discord", uid: "oth-u")
     get user_url(other)

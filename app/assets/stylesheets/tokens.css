@@ -23,6 +23,7 @@
   --border:     #e7e6e0;
   --page:       62rem;     /* shared width: header inner === content panel */
   --sidebar-width: 15rem;
+  --topbar-height: 3.25rem;
 
   /* Map PicoCSS to our palette/typography */
   --pico-font-family-sans-serif: "IBM Plex Sans JP", system-ui, sans-serif;

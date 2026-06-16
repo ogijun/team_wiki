@@ -38,15 +38,25 @@
     <header class="topbar">
       <button type="button" class="topbar__toggle" data-action="sidebar#toggle" aria-label="メニューを開閉"><%= icon("menu") %></button>
       <strong class="brand"><%= link_to brand_display, root_path %></strong>
+      <div class="topbar__spacer"></div>
+      <form class="topbar__search" action="<%= search_path %>" method="get" role="search">
+        <input type="search" name="q" placeholder="検索…" aria-label="検索">
+      </form>
+      <% if Current.user %>
+        <details class="topbar__user-menu">
+          <summary aria-label="ユーザーメニューを開く">
+            <%= avatar_tag(Current.user, size: 32) %>
+          </summary>
+          <div class="topbar__menu" role="menu">
+            <%= link_to Current.user, role: "menuitem" do %><%= icon("user") %> <strong><%= display_name(Current.user) %></strong><% end %>
+            <%= link_to edit_account_path, role: "menuitem" do %><%= icon("settings") %> 設定<% end %>
+            <%= button_to session_path, method: :delete, class: "topbar__logout", role: "menuitem" do %><%= icon("log-out") %> ログアウト<% end %>
+          </div>
+        </details>
+      <% end %>
     </header>
 
     <aside class="sidebar">
-      <strong class="brand sidebar__brand"><%= link_to brand_display, root_path %></strong>
-
-      <form class="sidebar__search" action="<%= search_path %>" method="get" role="search">
-        <input type="search" name="q" placeholder="検索…" aria-label="検索">
-      </form>
-
       <nav class="sidebar__nav" data-action="click->sidebar#close">
         <%= link_to root_path do %><%= icon("house") %> ホーム<% end %>
         <div class="nav-group">
@@ -64,22 +74,8 @@
             <%= link_to edit_settings_path do %><%= icon("settings") %> 設定<% end %>
           </div>
         <% end %>
+        <%= link_to about_path, class: "sidebar__about" do %><%= icon("info") %> このサイトについて<% end %>
       </nav>
-      <div class="sidebar__bottom">
-        <% if Current.user %>
-          <div class="sidebar__user">
-            <span>
-              <%# 名前は公開プロフィールへ。アカウント設定は隣の歯車から %>
-              <%= link_to Current.user, class: "user-link" do %>
-                <%= avatar_tag(Current.user, size: 24) %> <%= display_name(Current.user) %>
-              <% end %>
-              <%= icon_link "settings", edit_account_path, label: "アカウント設定", css: "user-link" %>
-            </span>
-            <%= button_to "ログアウト", session_path, method: :delete, class: "secondary outline btn-sm" %>
-          </div>
-        <% end %>
-        <%= link_to about_path, class: "sidebar__about", data: { action: "click->sidebar#close" } do %><%= icon("info") %> このサイトについて<% end %>
-      </div>
     </aside>
 
     <div class="backdrop" data-action="click->sidebar#close"></div>
