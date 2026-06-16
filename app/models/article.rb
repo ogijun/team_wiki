@@ -52,11 +52,21 @@ class Article < ApplicationRecord
   # 効くので本文不変でも通す）。current_revision を返す。activity はコントローラの責務。
   def revise!(body:, author:, edit_summary: nil)
     transaction do
-      save!
+      creating = new_record?
+      # 新規は revision の外部キー用に先に id を確定（article→revision→current_revision の循環のため）。
+      save! if creating
       if current_revision&.body != body
         revision = revisions.create!(body: body, author: author, edit_summary: edit_summary)
-        update!(current_revision: revision)
+        if creating
+          # 挿入直後＝属性もタグも変わらないので、ポインタ設定に validation/callback は不要。
+          update_column(:current_revision_id, revision.id)
+        else
+          self.current_revision = revision
+        end
       end
+      # 更新は属性変更（FuzzyDate パーツ・タグ等の仮想属性含む）と current_revision を1回の save! で
+      # 永続化し、validation/callback を1回に抑える。新規は上で確定済みなのでスキップ。
+      save! unless creating
       sync_outgoing_links(body)
       sync_citations(body)
       backfill_inbound_links
