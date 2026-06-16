@@ -18,6 +18,7 @@ module FuzzyDateAttributable
       attr_accessor(*parts.map { |p| :"#{acc}_#{p}" })
 
       validate :"#{col}_columns_consistent"
+      validate :"#{col}_parts_valid"
       before_validation :"assign_#{col}_from_parts"
 
       define_method(col) { FuzzyDate.wrap(send("#{col}_at"), send("#{col}_precision")) }
@@ -28,17 +29,30 @@ module FuzzyDateAttributable
         errors.add("#{col}_precision", "が必要です") if at.present? ^ precision.present?
       end
 
+      # 不正なフォーム入力（数値以外/範囲外/暦上ありえない）を validation error にする（500 を避ける）。
+      define_method(:"#{col}_parts_valid") do
+        errors.add(:base, "日付の入力が不正です（数値・範囲を確認してください）") if instance_variable_get("@#{col}_invalid")
+      end
+
       define_method(:"assign_#{col}_from_parts") do
+        instance_variable_set("@#{col}_invalid", false)
         values = parts.map { |p| send("#{acc}_#{p}") }
         # 仮想アクセサが一つも代入されていない（全 nil）save では触らない＝既存値を保つ。
         # フォーム経由は空欄でも "" が入る（≠nil）ので、全空欄なら nil 代入＝クリアできる。
         return if values.all?(&:nil?)
 
-        fd = FuzzyDate.from_parts(
-          year: values[0], month: values[1], day: values[2], hour: values[3], minute: values[4]
-        )
-        send("#{col}_at=", fd&.at)
-        send("#{col}_precision=", fd&.precision)
+        begin
+          fd = FuzzyDate.from_parts(
+            year: values[0], month: values[1], day: values[2], hour: values[3], minute: values[4]
+          )
+          send("#{col}_at=", fd&.at)
+          send("#{col}_precision=", fd&.precision)
+        rescue FuzzyDate::InvalidParts
+          # 不正入力は列をクリアし、フラグを立てて #{col}_parts_valid でエラーにする。
+          send("#{col}_at=", nil)
+          send("#{col}_precision=", nil)
+          instance_variable_set("@#{col}_invalid", true)
+        end
       end
     end
   end

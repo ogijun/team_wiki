@@ -50,6 +50,14 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "create with malicious out-of-range date returns 422, not 500, and persists nothing" do
+    assert_no_difference("Article.count") do
+      post articles_url, params: { article: { title: "不正日付", body: "本文", tag_names: "",
+                                              start_year: "2020", start_month: "99" } }
+    end
+    assert_response :unprocessable_entity
+  end
+
   test "update with blank body keeps previous revision and re-renders" do
     article = Article.create!(title: "本文必須", created_by: @user)
     article.revise!(body: "元の本文", author: @user)
