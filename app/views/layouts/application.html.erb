@@ -80,6 +80,9 @@
 
     <div class="backdrop" data-action="click->sidebar#close"></div>
 
+    <%# 右サイドバー: 用途未定の足場。十分広い画面でのみCSSで表示。各ページから content_for :aside で中身を差せる %>
+    <aside class="sidebar-right"><%= yield :aside %></aside>
+
     <main>
       <% flash.each do |type, message| %>
         <div class="flash flash--<%= type %>"><%= message %></div>

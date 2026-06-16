@@ -23,6 +23,7 @@
   --border:     #e7e6e0;
   --page:       62rem;     /* shared width: header inner === content panel */
   --sidebar-width: 15rem;
+  --sidebar-right-width: 16rem; /* 右サイドバー（用途未定の足場。十分広い画面でのみ表示） */
   --topbar-height: 3.25rem;
 
   /* Map PicoCSS to our palette/typography */
