@@ -110,9 +110,9 @@ body > header.topbar {
 .sidebar__about { margin-top: 0.9rem; }
 
 /* 右サイドバー: 用途未定の足場。本文(--page)＋左右サイドバーが重ならない十分広い画面でのみ表示。
-   閾値 96rem ≒ 左15rem + 本文62rem + 右16rem + 余白（未満では本文が縮むので出さない）。 */
+   閾値 98rem ≒ 左15rem + 本文62rem + 右20rem + 余白（未満では本文が縮むので出さない）。 */
 .sidebar-right { display: none; }
-@media (min-width: 96rem) {
+@media (min-width: 98rem) {
   body { padding-right: var(--sidebar-right-width); }
   .sidebar-right {
     display: block; position: fixed; top: var(--topbar-height); right: 0; bottom: 0;
