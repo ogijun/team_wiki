@@ -155,6 +155,14 @@ class Material < ApplicationRecord
   def confidence_label = CONFIDENCE_LEVELS[confidence]
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
 
+  # ── 認可述語（自作。モデルに `*_able_by?(user)` を置く方針。規則が増えたら Pundit へ。詳細は
+  #    [[project-authorization-approach]]）。Comment#deletable_by? と同じ書き味で揃える。──
+  # 現状: メタデータ編集・削除はログイン済みメンバーなら誰でも可（wiki 的）。将来絞るならここを変える。
+  def editable_by?(user) = user.present?
+  def deletable_by?(user) = user.present?
+  # 信頼度（原本検証の確定）は admin のみ。インスタンス状態に依存しない役割判定。
+  def confidence_editable_by?(user) = user&.admin? || false
+
   # パート集約: 0件=todo / 全完了=done / それ以外=drafting。
   def transcription_status
     parts = transcriptions.to_a

@@ -28,6 +28,10 @@ class Transcription < ApplicationRecord
 
   def display_label = label.presence || "パート#{position}"
 
+  # 認可述語（自作。詳細は [[project-authorization-approach]]）。現状はメンバーなら誰でも編集可。
+  # 将来は割り当てワークフロー（assignee 中心＋admin）に絞る想定＝ここを変える唯一の窓口。
+  def editable_by?(user) = user.present?
+
   def ai? = AI_METHODS.include?(creation_method)
 
   # 版の author を初参加順（最初に貢献した順）で重複除去して返す（Article#contributors と同形）。

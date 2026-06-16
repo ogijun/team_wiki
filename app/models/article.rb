@@ -40,6 +40,11 @@ class Article < ApplicationRecord
   def kind_label = kind ? KINDS[kind] : "未分類"
   def status_label = STATUSES[status]
 
+  # 認可述語（自作。詳細は [[project-authorization-approach]]）。現状は編集・削除ともログイン済み
+  # メンバーなら可（wiki 的）。将来 author/admin 等に絞るならここを変える＝唯一の窓口。
+  def editable_by?(user) = user.present?
+  def deletable_by?(user) = user.present?
+
   # リビジョンの author を初参加順（最初に貢献した順）で重複除去して返す。
   def contributors
     ids = revisions.order(:created_at).pluck(:author_id).uniq
