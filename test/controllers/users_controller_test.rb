@@ -41,6 +41,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   test "own profile links to account settings; top user menu links to profile and settings" do
     get user_url(@user)
     assert_select ".actions a[href=?]", edit_account_path
+    assert_select ".topbar__user-menu[data-controller=menu]" # 外側クリック/Escで閉じる
     assert_select ".topbar__user-menu a[href=?]", user_path(@user)
     assert_select ".topbar__user-menu a[href=?] svg use[href*=settings]", edit_account_path
     assert_select ".topbar__user-menu form[action=?]", session_path

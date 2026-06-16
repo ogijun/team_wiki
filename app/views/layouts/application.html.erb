@@ -43,7 +43,7 @@
         <input type="search" name="q" placeholder="検索…" aria-label="検索">
       </form>
       <% if Current.user %>
-        <details class="topbar__user-menu">
+        <details class="topbar__user-menu" data-controller="menu">
           <summary aria-label="ユーザーメニューを開く">
             <%= avatar_tag(Current.user, size: 32) %>
           </summary>
