@@ -12,15 +12,17 @@ export default class extends Controller {
     this.onBeforeVisit = () => this.close()
     document.addEventListener("turbo:before-visit", this.onBeforeVisit)
     // メニュー内リンクのクリックでも閉じる（遷移しない anchor の場合の保険）。
-    this.element.addEventListener("click", this.onItemClick = (e) => {
+    this.onItemClick = (e) => {
       if (e.target.closest("a, button") && e.target.closest("summary") === null) this.close()
-    })
+    }
+    this.element.addEventListener("click", this.onItemClick)
   }
 
   disconnect() {
     document.removeEventListener("click", this.onDocClick)
     document.removeEventListener("keydown", this.onKeydown)
     document.removeEventListener("turbo:before-visit", this.onBeforeVisit)
+    this.element.removeEventListener("click", this.onItemClick)
   }
 
   close() {

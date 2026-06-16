@@ -23,9 +23,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /ダッシュ記事/
   end
 
-  test "layout includes the right-sidebar scaffold (shown via CSS only on wide screens)" do
+  test "pages without content_for(:aside) do not render an empty right-sidebar landmark" do
     get root_url
-    assert_select "aside.sidebar-right"
+    assert_select "aside.sidebar-right", count: 0
   end
 
   test "新規作成 is a dropdown offering both article and material creation" do

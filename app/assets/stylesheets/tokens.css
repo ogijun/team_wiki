@@ -6,8 +6,7 @@
 
 :root {
   /* Palette */
-  --bg:         #edece5;   /* gridded outer ground */
-  --panel:      #fdfdfb;   /* content panel */
+  --panel:      #fdfdfb;   /* content panel & outer ground (flat, seamless) */
   --surface:    #ffffff;   /* cards */
   --ink:        #2b2b2b;
   --ink-soft:   #5c5c57;
@@ -18,7 +17,6 @@
   --danger:     #b3261e;   /* 削除など破壊的操作 */
   --danger-weak:#f7eceb;
   --hairline:   #e7e6e0;
-  --grid:       #dcdacd;
   --code-bg:    #f5f5f1;
   --border:     #e7e6e0;
   --page:       62rem;     /* shared width: header inner === content panel */

@@ -50,7 +50,6 @@ body > header.topbar {
 }
 .topbar__toggle { display: none; align-self: stretch; background: none; border: 0; line-height: 1; padding: 0 0.9rem; margin: 0; cursor: pointer; color: var(--ink); width: auto; }
 .topbar__toggle:hover, .topbar__toggle:focus { color: var(--accent); background: var(--accent-weak); }
-.topbar__spacer { flex: 1; }
 .topbar__user-menu { position: relative; align-self: stretch; display: flex; align-items: center; height: 100%; margin: 0; padding: 0; }
 .topbar__user-menu[open] { margin: 0; padding: 0; }
 .topbar__user-menu > summary {
@@ -84,7 +83,7 @@ body > header.topbar {
 }
 .topbar__menu a:hover, .topbar__logout:hover { background: var(--accent-weak); color: var(--accent); }
 .topbar__menu form.button_to { display: block; margin: 0; }
-.topbar__search { flex: 0 1 16rem; margin: 0; }
+.topbar__search { flex: 0 1 16rem; margin: 0 0 0 auto; } /* margin-left:auto で検索以降を右寄せ（spacer div の代替） */
 .topbar__search input {
   width: 100%; margin: 0; padding: 0.24rem 0.65rem; line-height: 1.35;
   font-size: 0.85rem; background: var(--surface);

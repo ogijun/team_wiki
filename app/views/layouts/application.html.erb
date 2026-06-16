@@ -37,8 +37,7 @@
   <body data-controller="sidebar">
     <header class="topbar">
       <button type="button" class="topbar__toggle" data-action="sidebar#toggle" aria-label="メニューを開閉"><%= icon("menu") %></button>
-      <strong class="brand"><%= link_to brand_display, root_path %></strong>
-      <div class="topbar__spacer"></div>
+      <span class="brand"><%= link_to brand_display, root_path %></span>
       <form class="topbar__search" action="<%= search_path %>" method="get" role="search">
         <input type="search" name="q" placeholder="検索…" aria-label="検索">
       </form>
@@ -47,10 +46,10 @@
           <summary aria-label="ユーザーメニューを開く">
             <%= avatar_tag(Current.user, size: 32) %>
           </summary>
-          <div class="topbar__menu" role="menu">
-            <%= link_to Current.user, role: "menuitem" do %><%= icon("user") %> <strong><%= display_name(Current.user) %></strong><% end %>
-            <%= link_to edit_account_path, role: "menuitem" do %><%= icon("settings") %> 設定<% end %>
-            <%= button_to session_path, method: :delete, class: "topbar__logout", role: "menuitem" do %><%= icon("log-out") %> ログアウト<% end %>
+          <div class="topbar__menu">
+            <%= link_to Current.user do %><%= icon("user") %> <strong><%= display_name(Current.user) %></strong><% end %>
+            <%= link_to edit_account_path do %><%= icon("settings") %> 設定<% end %>
+            <%= button_to session_path, method: :delete, class: "topbar__logout" do %><%= icon("log-out") %> ログアウト<% end %>
           </div>
         </details>
       <% end %>
@@ -80,8 +79,11 @@
 
     <div class="backdrop" data-action="click->sidebar#close"></div>
 
-    <%# 右サイドバー: 用途未定の足場。十分広い画面でのみCSSで表示。各ページから content_for :aside で中身を差せる %>
-    <aside class="sidebar-right"><%= yield :aside %></aside>
+    <%# 右サイドバー: 用途未定の足場。各ページが content_for :aside で中身を入れたときだけ出す
+        （空の landmark を出さない）。表示は十分広い画面のみ（base.css の .sidebar-right）。 %>
+    <% if content_for?(:aside) %>
+      <aside class="sidebar-right"><%= yield :aside %></aside>
+    <% end %>
 
     <main>
       <% flash.each do |type, message| %>
