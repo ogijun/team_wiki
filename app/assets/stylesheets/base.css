@@ -19,7 +19,7 @@ body > main {
   max-width: var(--page);
   margin: 0 auto;
   box-sizing: border-box;
-  padding: 2.6rem 2.2rem 5rem;
+  padding: 1.6rem 2.2rem 5rem;
   background: var(--panel);
   min-height: calc(100vh - var(--topbar-height));
 }
