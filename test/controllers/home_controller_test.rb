@@ -36,6 +36,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".home-hero__cta a[href=?]", transcriptions_path, text: /文字起こし/
   end
 
+  test "hero frames transcription as the fallback path with a connector phrase" do
+    # 「記事を書く/資料を追加 → どちらもなければ文字起こし」という導線の意味づけ。
+    get root_url
+    assert_select ".home-hero__cta-or", text: "どちらもなければ"
+  end
+
   test "hero headline shows the brand" do
     get root_url
     assert_select "h1.home-hero__brand"

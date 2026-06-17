@@ -7,6 +7,7 @@
   <div class="home-hero__cta">
     <%= link_to new_article_path, class: "btn-hero" do %><%= icon("pencil-line") %> 記事を書く<% end %>
     <%= link_to new_material_path, class: "btn-hero btn-hero--ghost" do %><%= icon("library-big") %> 資料を追加<% end %>
+    <span class="home-hero__cta-or">どちらもなければ</span>
     <%= link_to transcriptions_path, class: "btn-hero btn-hero--ghost" do %><%= icon("pen-line") %> 文字起こしをする<% end %>
   </div>
 

@@ -95,7 +95,8 @@ button.tag-chip:hover, button.tag-chip:focus {
 .home-hero__brand { font-size: 2.2rem; line-height: 1.15; margin: 0; }
 .home-hero__brand .brand-logo { height: 3rem; width: auto; vertical-align: middle; }
 .home-hero__tagline { max-width: 42rem; margin: 0.7rem auto 0; color: var(--muted); font-size: 1.05rem; }
-.home-hero__cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin: 1.5rem 0 0; }
+.home-hero__cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.6rem; margin: 1.5rem 0 0; }
+.home-hero__cta-or { color: var(--muted); font-size: 0.9rem; }
 .btn-hero {
   display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.6rem 1.15rem;
   border: 1px solid var(--accent); border-radius: 8px; font-weight: 600;
