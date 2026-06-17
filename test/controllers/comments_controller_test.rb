@@ -25,10 +25,13 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, @material.reload.comments_count
   end
 
-  test "flash notice is visible on the page after posting" do
+  test "flash notice is visible as an auto-dismissing toast after posting" do
     post material_comments_url(@material), params: { comment: { body: "見えるか" } }
     follow_redirect!
-    assert_select ".flash--notice", text: "コメントを投稿しました。"
+    # 右下トーストスタック内に notice。メッセージは .flash__msg、× は手動クローズ。
+    assert_select ".toast-stack[data-controller=toast] .flash--notice[data-auto=true]"
+    assert_select ".flash--notice .flash__msg", text: "コメントを投稿しました。"
+    assert_select ".flash--notice .flash__close"
   end
 
   test "blank comment is rejected" do

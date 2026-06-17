@@ -33,6 +33,8 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     article = Article.find_by(title: "新記事")
     assert_equal "本文 [[他]]", article.current_revision.body
     assert_redirected_to article_url(article)
+    follow_redirect!
+    assert_select ".toast-stack .flash--notice .flash__msg", text: "記事を作成しました。"
   end
 
   test "show renders current revision body" do

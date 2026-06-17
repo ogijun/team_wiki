@@ -19,7 +19,7 @@ class RevisionsController < ApplicationController
     old = @article.revisions.find(params[:id])
     @article.restore_revision!(old, author: Current.user)
     Activity.record(actor: Current.user, action: "article.edited", subject: @article)
-    redirect_to @article
+    redirect_to @article, notice: "リビジョン##{old.id} を復元しました。"
   end
 
   private

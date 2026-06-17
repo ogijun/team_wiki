@@ -159,10 +159,36 @@ button.tag-chip:hover, button.tag-chip:focus {
 .field-badge--req { color: var(--danger); background: var(--danger-weak); }
 .field-badge--opt { color: var(--muted); background: var(--code-bg); }
 
-/* Flash messages (rendered once in the layout) */
-.flash { margin: 0 0 1.1rem; padding: 0.55rem 0.9rem; border-radius: 6px; font-size: 0.9rem; }
+/* Flash messages（トースト化: layout で右下に積み上げ） */
+.flash { padding: 0.7rem 1rem; border-radius: 8px; font-size: 0.9rem; }
 .flash--notice { background: var(--accent-weak); color: var(--accent-dark); }
 .flash--alert { background: var(--danger-weak); color: var(--danger); }
+
+/* 右下スタック。各 flash はカード状トースト。notice は自動・alert は手動(toast_controller)。 */
+.toast-stack {
+  position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 60;
+  display: flex; flex-direction: column; gap: 0.6rem;
+  width: min(92vw, 22rem);
+}
+/* 登場: 下からせり上がりながらフェードイン。退場(.toast--leaving)は下へ沈んでフェードアウト。 */
+@keyframes toast-rise {
+  from { opacity: 0; transform: translateY(1.5rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.toast-stack .flash {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  box-shadow: 0 8px 24px rgba(20, 17, 15, 0.18); border: 1px solid var(--hairline);
+  opacity: 1; transform: translateY(0);
+  animation: toast-rise 0.32s ease-out;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.toast-stack .flash.toast--leaving { opacity: 0; transform: translateY(1rem); }
+.flash__msg { flex: 1; }
+.flash__close {
+  background: none; border: 0; font-size: 1.15rem; line-height: 1; padding: 0 0.1rem; margin: 0;
+  cursor: pointer; color: inherit; opacity: 0.55;
+}
+.flash__close:hover, .flash__close:focus { opacity: 1; }
 
 /* Chronicle date inputs */
 .date-clear {

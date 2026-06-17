@@ -8,7 +8,7 @@ class TagsController < ApplicationController
     @tag = Tag.new(tag_params)
     if @tag.save
       Activity.record(actor: Current.user, action: "tag.created", subject: @tag)
-      redirect_to tags_url
+      redirect_to tags_url, notice: "タグ「#{@tag.name}」を作成しました。"
     else
       @tags = Tag.with_usage_count
       render :index, status: :unprocessable_entity
@@ -26,8 +26,10 @@ class TagsController < ApplicationController
       label = tag.name
       tag.destroy
       Activity.record(actor: Current.user, action: "tag.deleted", subject_label: label)
+      redirect_to tags_url, notice: "タグ「#{label}」を削除しました。"
+    else
+      redirect_to tags_url, alert: "使用中のタグは削除できません。"
     end
-    redirect_to tags_url
   end
 
   private

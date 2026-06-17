@@ -31,7 +31,7 @@ class ArticlesController < ApplicationController
     @article.revise!(body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary])
     Activity.record(actor: Current.user, action: "article.created", subject: @article)
     add_first_comment(@article, params[:first_comment])
-    redirect_to @article
+    redirect_to @article, notice: "記事を作成しました。"
   rescue ActiveRecord::RecordInvalid
     render :new, status: :unprocessable_entity
   end
@@ -49,7 +49,7 @@ class ArticlesController < ApplicationController
     end
     @article.revise!(body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary])
     Activity.record(actor: Current.user, action: "article.edited", subject: @article)
-    redirect_to @article
+    redirect_to @article, notice: "記事を保存しました。"
   rescue ActiveRecord::RecordInvalid
     rerender_edit
   end
@@ -58,7 +58,7 @@ class ArticlesController < ApplicationController
     label = @article.title
     @article.destroy
     Activity.record(actor: Current.user, action: "article.deleted", subject_label: label)
-    redirect_to articles_url
+    redirect_to articles_url, notice: "記事を削除しました。"
   end
 
   private

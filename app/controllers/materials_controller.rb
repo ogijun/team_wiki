@@ -43,7 +43,7 @@ class MaterialsController < ApplicationController
       # 外部 I/O を含むのでリクエストから外して非同期で行う。
       MaterialPostProcessJob.perform_later(@material)
       Activity.record(actor: Current.user, action: "material.added", subject: @material)
-      redirect_to @material
+      redirect_to @material, notice: "資料を追加しました。"
     else
       render :new, status: :unprocessable_entity
     end
@@ -54,7 +54,7 @@ class MaterialsController < ApplicationController
 
   def update
     if @material.update(material_params)
-      redirect_to @material
+      redirect_to @material, notice: "資料を保存しました。"
     else
       render :edit, status: :unprocessable_entity
     end
@@ -64,7 +64,7 @@ class MaterialsController < ApplicationController
     label = @material.title
     @material.destroy
     Activity.record(actor: Current.user, action: "material.deleted", subject_label: label)
-    redirect_to materials_url
+    redirect_to materials_url, notice: "資料を削除しました。"
   end
 
   private

@@ -85,10 +85,20 @@
       <aside class="sidebar-right"><%= yield :aside %></aside>
     <% end %>
 
+    <%# flash はトースト化（右下に積み上げ）。notice は自動消去、alert は手動（× で閉じる）。
+        クラス .flash/.flash--type は維持（既存アサーション互換）。 %>
+    <% if flash.any? %>
+      <div class="toast-stack" data-controller="toast">
+        <% flash.each do |type, message| %>
+          <div class="flash flash--<%= type %>" data-toast-target="toast" data-auto="<%= type.to_s == "notice" %>">
+            <span class="flash__msg"><%= message %></span>
+            <button type="button" class="flash__close" data-action="toast#dismiss" aria-label="閉じる">×</button>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <main>
-      <% flash.each do |type, message| %>
-        <div class="flash flash--<%= type %>"><%= message %></div>
-      <% end %>
       <%= yield %>
       <% if (footer = render_site_markdown(site_setting.footer)) %>
         <footer class="site-footer"><%= footer.html %></footer>

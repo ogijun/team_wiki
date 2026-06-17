@@ -505,6 +505,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "quotable", m.rights
   end
 
+  test "update flashes a toast notice" do
+    m = Material.create!(user: @user, url: "https://x.test/u", title: "更新前")
+    patch material_url(m), params: { material: { title: "更新後" } }
+    follow_redirect!
+    assert_select ".toast-stack .flash--notice .flash__msg", text: "資料を保存しました。"
+  end
+
   test "create persists ownership; any member can set it (no admin gate) and show badges it" do
     post materials_url, params: { material: { url: "https://x.test/own", title: "所持資料", ownership: "partial" } }
     m = Material.find_by!(title: "所持資料")
