@@ -28,6 +28,8 @@ class Material < ApplicationRecord
   THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
   CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "unconfirmed" => "未確認" }.freeze
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
+  # 実物の所持状況（nil=未設定）。出典検証の confidence と違い、所持は事実なので編集は誰でも可。
+  OWNERSHIP_STATUSES = { "original" => "原本所有", "partial" => "部分所有", "none" => "未所持（データのみ）" }.freeze
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
@@ -42,6 +44,8 @@ class Material < ApplicationRecord
   # フォームの「未設定」(include_blank) は "" を送る。空文字は nil 扱いにして allow_nil を効かせる。
   normalizes :rights, with: ->(v) { v.presence }
   validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
+  normalizes :ownership, with: ->(v) { v.presence }
+  validates :ownership, inclusion: { in: OWNERSHIP_STATUSES.keys }, allow_nil: true
 
   # 書誌の詳細（すべて任意・自由記述）。空文字は nil に揃える。
   normalizes :isbn, :pages, :publisher, :volume, with: ->(v) { v.presence }
@@ -154,6 +158,7 @@ class Material < ApplicationRecord
 
   def confidence_label = CONFIDENCE_LEVELS[confidence]
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
+  def ownership_label = ownership ? OWNERSHIP_STATUSES[ownership] : nil
 
   # ── 認可述語（自作。モデルに `*_able_by?(user)` を置く方針。規則が増えたら Pundit へ。詳細は
   #    [[project-authorization-approach]]）。Comment#deletable_by? と同じ書き味で揃える。──

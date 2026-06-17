@@ -505,6 +505,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "quotable", m.rights
   end
 
+  test "create persists ownership; any member can set it (no admin gate) and show badges it" do
+    post materials_url, params: { material: { url: "https://x.test/own", title: "所持資料", ownership: "partial" } }
+    m = Material.find_by!(title: "所持資料")
+    assert_equal "partial", m.ownership   # 非adminでも設定できる
+    get material_url(m)
+    assert_select ".badge", text: /部分所有/
+  end
+
   test "index sorts by type (link/file grouping) without error" do
     Material.create!(user: @user, url: "https://example.com/a", title: "L")
     img = Material.new(user: @user)

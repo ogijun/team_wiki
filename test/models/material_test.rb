@@ -5,6 +5,21 @@ class MaterialTest < ActiveSupport::TestCase
     @user = User.create!(email_address: "mat@example.com", password: "password123", name: "Mat")
   end
 
+  test "ownership: blank normalizes to nil, inclusion validated, label maps" do
+    m = Material.new(user: @user, url: "https://x.test/o", ownership: "")
+    assert_predicate m, :valid?, m.errors.full_messages.join(", ")
+    assert_nil m.ownership                          # 空文字→nil（未設定）
+    m.ownership = "original"
+    assert_predicate m, :valid?
+    assert_equal "原本所有", m.ownership_label
+    m.ownership = "bogus"
+    assert_not_predicate m, :valid?                 # 不正値は弾く
+  end
+
+  test "ownership_label is nil when unset" do
+    assert_nil Material.new(user: @user, url: "https://x.test/o2").ownership_label
+  end
+
   test "authorization predicates: editable/deletable by any member, confidence admin-only" do
     admin = User.create!(email_address: "adm@example.com", password: "password123", name: "Adm", role: "admin")
     m = Material.create!(user: @user, url: "https://x.test/authz", title: "認可")
