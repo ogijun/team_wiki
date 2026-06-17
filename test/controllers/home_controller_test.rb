@@ -42,9 +42,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".home-hero__cta-or", text: "どちらもなければ"
   end
 
-  test "hero headline shows the brand" do
+  test "home page has a heading for document structure but does not repeat the brand visibly" do
+    # ブランド名はトップバーに出ているのでヒーローでは繰り返さない。
+    # 文書構造のため h1 は残すが視覚的には隠す（.sr-only）。
     get root_url
-    assert_select "h1.home-hero__brand"
+    assert_select "h1.sr-only"
+    assert_select "h1.home-hero__brand", count: 0
   end
 
   test "hero shows the site tagline when set" do

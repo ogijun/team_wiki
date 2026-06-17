@@ -1,12 +1,14 @@
 <section class="home-hero">
-  <h1 class="home-hero__brand"><%= brand_display %></h1>
+  <%# ブランド名はトップバーに出ているので、ここでは視覚的に重複させない。
+      文書構造のため h1 は残し、視覚的にのみ隠す（スクリーンリーダーには読み上げられる）。 %>
+  <h1 class="sr-only">ホーム</h1>
   <% if site_setting.tagline.present? %>
     <p class="home-hero__tagline"><%= site_setting.tagline %></p>
   <% end %>
 
   <div class="home-hero__cta">
     <%= link_to new_article_path, class: "btn-hero" do %><%= icon("pencil-line") %> 記事を書く<% end %>
-    <%= link_to new_material_path, class: "btn-hero" do %><%= icon("library-big") %> 資料を追加<% end %>
+    <%= link_to new_material_path, class: "btn-hero" do %><%= icon("library-big") %> 資料を追加する<% end %>
     <span class="home-hero__cta-or">どちらもなければ</span>
     <%= link_to transcriptions_path, class: "btn-hero" do %><%= icon("pen-line") %> 文字起こしをする<% end %>
   </div>

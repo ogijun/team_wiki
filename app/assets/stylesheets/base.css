@@ -28,6 +28,12 @@ body > main {
 
 main a { color: var(--accent); }
 
+/* スクリーンリーダーには残すが視覚的には隠す（文書構造用の見出しなどに使う）。 */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
 /* `main` itself is the page panel, so a semantic <article> inside it must not
    render as a second Pico card. Strip Pico's card visuals — keep it a plain block
    so `main > article` pages and `main`-only pages share the same layout. */
