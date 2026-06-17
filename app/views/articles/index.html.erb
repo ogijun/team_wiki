@@ -2,6 +2,7 @@
   <h1>記事一覧</h1>
   <%= link_to "新規作成", new_article_path, role: "button" %>
 </div>
+<p class="page-lead">ナレッジの記事 <%= @articles.size %> 本。赤いリンクは未作成＝作れば埋まります。</p>
 <p class="filters">
   種別:
   <%= link_to "すべて", articles_path %>
