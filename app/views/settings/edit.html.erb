@@ -9,6 +9,12 @@
   </div>
 
   <div class="field">
+    <%= f.label :tagline, "タグライン（ホーム上部のミッション一言）" %><%= optional_badge %>
+    <small class="field__hint">トップページのブランド名直下に表示されます。このサイトが何のための場所かを一言で。</small>
+    <%= f.text_field :tagline, placeholder: "例: 一次資料を集め、整理し、後世に活用する。" %>
+  </div>
+
+  <div class="field">
     <%= f.label :logo, "ロゴ画像（あれば名称より優先）" %><%= optional_badge %>
     <small class="field__hint">サイドバーに高さ28pxで表示されます。横長のロゴ向け。背景透過のPNG/WebP・高さ56px程度（横幅は自由）が目安です。</small>
     <% if @setting.logo.attached? %>

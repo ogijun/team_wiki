@@ -33,6 +33,12 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "© 2026", SiteSetting.instance.footer
   end
 
+  test "admin updates tagline" do
+    @user.update!(role: "admin")
+    patch settings_url, params: { site_setting: { brand_name: "x", tagline: "一次資料を集め、整理し、後世に活用する。" } }
+    assert_equal "一次資料を集め、整理し、後世に活用する。", SiteSetting.instance.tagline
+  end
+
   test "admin can remove logo (falls back to text)" do
     @user.update!(role: "admin")
     s = SiteSetting.instance

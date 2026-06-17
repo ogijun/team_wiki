@@ -19,6 +19,6 @@ class SettingsController < ApplicationController
   private
 
   def setting_params
-    params.require(:site_setting).permit(:brand_name, :logo, :icon, :about, :footer)
+    params.require(:site_setting).permit(:brand_name, :tagline, :logo, :icon, :about, :footer)
   end
 end
