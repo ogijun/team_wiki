@@ -6,6 +6,8 @@ class SiteSetting < ApplicationRecord
 
   has_one_attached :logo
   has_one_attached :icon # 正方形画像。favicon / apple-touch-icon を variant 生成する元。
+  # 空欄送信は nil に寄せる（ホームのヒーローは present? で出し分けるため、空白だけの値で出さない）。
+  normalizes :tagline, with: ->(v) { v.presence }
   validate :acceptable_logo, if: -> { logo.attached? }
   validate :acceptable_icon, if: -> { icon.attached? }
 

@@ -33,4 +33,10 @@ class SiteSettingTest < ActiveSupport::TestCase
     s.icon.attach(io: StringIO.new("x"), filename: "icon.png", content_type: "image/png")
     assert_predicate s, :valid?, s.errors.full_messages.join(", ")
   end
+
+  test "blank tagline normalizes to nil (so the hero omits it)" do
+    s = SiteSetting.instance
+    s.update!(tagline: "   ")
+    assert_nil s.reload.tagline
+  end
 end
