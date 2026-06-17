@@ -100,12 +100,10 @@ button.tag-chip:hover, button.tag-chip:focus {
 .btn-hero {
   display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.6rem 1.15rem;
   border: 1px solid var(--accent); border-radius: 8px; font-weight: 600;
-  background: var(--accent); color: #fff; text-decoration: none;
+  background: transparent; color: var(--accent); text-decoration: none;
 }
-.btn-hero:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.btn-hero:hover { background: var(--accent-weak); }
 .btn-hero:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn-hero--ghost { background: transparent; color: var(--accent); }
-.btn-hero--ghost:hover { background: var(--accent-weak); border-color: var(--accent); }
 .home-hero__sum { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem; margin: 1.5rem 0 0; color: var(--ink-soft); font-size: 0.9rem; }
 .home-hero__sum strong { font-size: 1.15rem; color: var(--ink); }
 .home-hero__sum a { display: inline-flex; align-items: center; }
