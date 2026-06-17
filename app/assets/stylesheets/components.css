@@ -94,6 +94,9 @@ button.tag-chip:hover, button.tag-chip:focus {
    出ているので見出しでは繰り返さない（h1 は sr-only）。縦間隔は gap に集約し、
    タグライン有無で破綻しないようにする。上の余白は main の padding に任せる。 */
 .home-hero { text-align: left; margin: 0 0 1.8rem; display: flex; flex-direction: column; gap: 1.4rem; }
+.home-hero__heading { font-size: 2.2rem; line-height: 1.15; margin: 0; }
+/* 見出し直下にタグラインが続くときは間隔を詰める（gap の 1.4rem だと離れすぎる）。 */
+.home-hero__heading + .home-hero__tagline { margin-top: -1rem; }
 .home-hero__tagline { max-width: 42rem; margin: 0; color: var(--muted); font-size: 1.05rem; }
 .home-hero__cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 0.6rem; margin: 0; }
 .home-hero__cta-or { color: var(--muted); font-size: 0.9rem; }

@@ -42,11 +42,20 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".home-hero__cta-or", text: "どちらもなければ"
   end
 
-  test "home page has a heading for document structure but does not repeat the brand visibly" do
+  test "home shows the configured heading as a visible h1" do
+    SiteSetting.instance.update!(home_heading: "アーカイブ計画")
+    get root_url
+    assert_select "h1.home-hero__heading", text: "アーカイブ計画"
+    assert_select "h1.sr-only", count: 0
+  end
+
+  test "home falls back to a visually-hidden heading when home_heading is unset" do
+    # 見出し未設定でも文書構造のため h1 は残し、視覚的には隠す（.sr-only）。
     # ブランド名はトップバーに出ているのでヒーローでは繰り返さない。
-    # 文書構造のため h1 は残すが視覚的には隠す（.sr-only）。
+    SiteSetting.instance.update!(home_heading: nil)
     get root_url
     assert_select "h1.sr-only"
+    assert_select "h1.home-hero__heading", count: 0
     assert_select "h1.home-hero__brand", count: 0
   end
 

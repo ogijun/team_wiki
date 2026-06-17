@@ -1,7 +1,11 @@
 <section class="home-hero">
-  <%# ブランド名はトップバーに出ているので、ここでは視覚的に重複させない。
-      文書構造のため h1 は残し、視覚的にのみ隠す（スクリーンリーダーには読み上げられる）。 %>
-  <h1 class="sr-only">ホーム</h1>
+  <%# 見出しは設定（home_heading）から注入する。未設定ならブランド名を繰り返さず、
+      文書構造のための h1 を視覚的にのみ隠す（スクリーンリーダーには読み上げられる）。 %>
+  <% if site_setting.home_heading.present? %>
+    <h1 class="home-hero__heading"><%= site_setting.home_heading %></h1>
+  <% else %>
+    <h1 class="sr-only">ホーム</h1>
+  <% end %>
   <% if site_setting.tagline.present? %>
     <p class="home-hero__tagline"><%= site_setting.tagline %></p>
   <% end %>
