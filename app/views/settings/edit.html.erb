@@ -11,7 +11,7 @@
   <div class="field">
     <%= f.label :tagline, "タグライン（ホーム上部のミッション一言）" %><%= optional_badge %>
     <small class="field__hint">トップページのブランド名直下に表示されます。このサイトが何のための場所かを一言で。</small>
-    <%= f.text_field :tagline, placeholder: "例: 一次資料を集め、整理し、後世に活用する。" %>
+    <%= f.text_field :tagline, maxlength: 120, placeholder: "例: 一次資料を集め、整理し、後世に活用する。" %>
   </div>
 
   <div class="field">

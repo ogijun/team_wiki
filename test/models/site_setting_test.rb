@@ -39,4 +39,11 @@ class SiteSettingTest < ActiveSupport::TestCase
     s.update!(tagline: "   ")
     assert_nil s.reload.tagline
   end
+
+  test "rejects an overlong tagline (it's a one-line mission, not prose)" do
+    s = SiteSetting.instance
+    s.tagline = "あ" * 121
+    assert_not s.valid?
+    assert_predicate s.errors[:tagline], :any?
+  end
 end
