@@ -1,20 +1,22 @@
-<div class="page-header">
-  <h1>ホーム</h1>
-  <details class="create-menu" data-controller="menu">
-    <summary role="button">新規作成</summary>
-    <ul>
-      <li><%= link_to new_article_path do %><%= icon("pencil-line") %> 記事を作成<% end %></li>
-      <li><%= link_to new_material_path do %><%= icon("library-big") %> 資料を追加<% end %></li>
-    </ul>
-  </details>
-</div>
+<section class="home-hero">
+  <h1 class="home-hero__brand"><%= brand_display %></h1>
+  <% if site_setting.tagline.present? %>
+    <p class="home-hero__tagline"><%= site_setting.tagline %></p>
+  <% end %>
 
-<section class="dashboard-stats">
-  <span><%= icon("pencil-line") %> <strong><%= @stats[:articles_count] %></strong> 記事</span>
-  <span><%= icon("library-big") %> <strong><%= @stats[:materials_count] %></strong> 資料</span>
-  <span><%= icon("search") %> <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
-  <span><%= icon("pen-line") %> <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
-  <span><%= icon_link "trending-up", stats_path, label: "統計の推移" %></span>
+  <div class="home-hero__cta">
+    <%= link_to new_article_path, class: "btn-hero" do %><%= icon("pencil-line") %> 記事を書く<% end %>
+    <%= link_to new_material_path, class: "btn-hero btn-hero--ghost" do %><%= icon("library-big") %> 資料を追加<% end %>
+    <%= link_to transcriptions_path, class: "btn-hero btn-hero--ghost" do %><%= icon("pen-line") %> 文字起こしをする<% end %>
+  </div>
+
+  <div class="home-hero__sum">
+    <span><%= icon("pencil-line") %> <strong><%= @stats[:articles_count] %></strong> 記事</span>
+    <span><%= icon("library-big") %> <strong><%= @stats[:materials_count] %></strong> 資料</span>
+    <span><%= icon("search") %> <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
+    <span><%= icon("pen-line") %> <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
+    <span><%= icon_link "trending-up", stats_path, label: "統計の推移" %></span>
+  </div>
 </section>
 
 <% if @my_stats[:active_days].positive? %>
