@@ -46,4 +46,17 @@ class SiteSettingTest < ActiveSupport::TestCase
     assert_not s.valid?
     assert_predicate s.errors[:tagline], :any?
   end
+
+  test "blank home_heading normalizes to nil (so the hero falls back to sr-only)" do
+    s = SiteSetting.instance
+    s.update!(home_heading: "   ")
+    assert_nil s.reload.home_heading
+  end
+
+  test "rejects an overlong home_heading (it's a heading, not prose)" do
+    s = SiteSetting.instance
+    s.home_heading = "あ" * 61
+    assert_not s.valid?
+    assert_predicate s.errors[:home_heading], :any?
+  end
 end
