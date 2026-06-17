@@ -39,6 +39,12 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "一次資料を集め、整理し、後世に活用する。", SiteSetting.instance.tagline
   end
 
+  test "admin updates home heading" do
+    @user.update!(role: "admin")
+    patch settings_url, params: { site_setting: { brand_name: "x", home_heading: "アーカイブ" } }
+    assert_equal "アーカイブ", SiteSetting.instance.home_heading
+  end
+
   test "admin can remove logo (falls back to text)" do
     @user.update!(role: "admin")
     s = SiteSetting.instance
