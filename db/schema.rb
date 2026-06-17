@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_15_150937) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_16_235749) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -117,6 +117,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_150937) do
     t.text "description"
     t.datetime "file_created_at"
     t.string "isbn"
+    t.string "ownership"
     t.integer "page_count"
     t.string "pages"
     t.datetime "published_at"
@@ -131,6 +132,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_150937) do
     t.integer "user_id", null: false
     t.string "volume"
     t.index ["confidence"], name: "index_materials_on_confidence"
+    t.index ["ownership"], name: "index_materials_on_ownership"
     t.index ["published_at"], name: "index_materials_on_published_at"
     t.index ["rights"], name: "index_materials_on_rights"
     t.index ["slug"], name: "index_materials_on_slug", unique: true

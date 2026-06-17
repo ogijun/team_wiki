@@ -93,7 +93,7 @@ class MaterialsController < ApplicationController
 
   def material_params
     permitted = [ :title, :description,
-                 :source, :author, :rights, :tag_names,
+                 :source, :author, :rights, :ownership, :tag_names,
                  :isbn, :pages, :page_count, :publisher, :volume,
                  :published_year, :published_month, :published_day ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。

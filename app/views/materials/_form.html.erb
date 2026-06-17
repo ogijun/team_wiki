@@ -67,6 +67,11 @@
       <small class="field__hint">引用していいか迷うものは「要注意」、判断がつかなければ未設定のままでOK。</small>
       <%= f.select :rights, Material::RIGHTS_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>
     </div>
+    <div class="field">
+      <%= f.label :ownership, "所持状況" %><%= optional_badge %>
+      <small class="field__hint">この資料の実物を持っているか。原本所有／部分所有（切り抜きなど）／未所持（データのみ）。</small>
+      <%= f.select :ownership, Material::OWNERSHIP_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>
+    </div>
   </fieldset>
 
   <% if material.new_record? %>
