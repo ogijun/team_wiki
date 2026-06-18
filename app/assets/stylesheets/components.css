@@ -50,8 +50,10 @@
 .timeline li .avatar { flex: 0 0 auto; }
 .timeline__body { flex: 1; min-width: 0; } /* テキストはアバターの右から始まり、折り返しても潜り込まない */
 .timeline__icon { color: var(--muted); margin-right: 0.35rem; }
-/* 「ほかN件」はアバター幅(28px)＋gap ぶん右に寄せて本文と揃える */
-.timeline__overflow { font-size: 0.85rem; padding-left: calc(28px + 0.45rem); }
+/* 「ほかN件」はアバター幅(32px)＋gap ぶん右に寄せて本文と揃える */
+.timeline__overflow { font-size: 0.85rem; padding-left: calc(32px + 0.45rem); }
+/* .dashboard-card ul の左パディング(1.1rem)が timeline にも効いて左スキマになるのを打ち消す。 */
+.dashboard-card .timeline { padding-left: 0; }
 
 /* 改行を保持して表示（文字起こし本文など） */
 .prewrap { white-space: pre-wrap; }
