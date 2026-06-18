@@ -369,8 +369,16 @@ button.tag-chip:hover, button.tag-chip:focus {
 .pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.1rem; flex: 0 0 auto; }
 .pdf-viewer__nav--rtl { flex-direction: row-reverse; }
 .pdf-viewer__page { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0 0.3rem; font-size: 0.85rem; color: var(--ink-soft); }
-/* 入力は行の中で縦中央に。height と一致する line-height で数字を箱の中央に置く。 */
-.pdf-viewer__pageinput { width: 3rem; height: 1.7rem; line-height: 1.7rem; text-align: right; padding: 0 0.4rem; margin: 0; font-size: 0.85rem; background: rgba(255, 255, 255, 0.55); border-color: rgba(255, 255, 255, 0.6); }
+/* 周りの要素と高さを揃えてコンパクトに。height と一致する line-height で数字を箱の中央に置き、
+   数値スピナー（▲▼）は隠して箱を小さく保つ。 */
+.pdf-viewer__pageinput {
+  width: 2.6rem; height: 1.5rem; line-height: 1.5rem; box-sizing: border-box;
+  text-align: center; padding: 0 0.3rem; margin: 0; font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.55); border-color: rgba(255, 255, 255, 0.6);
+  appearance: textfield; -webkit-appearance: textfield;
+}
+.pdf-viewer__pageinput::-webkit-inner-spin-button,
+.pdf-viewer__pageinput::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .pdf-viewer__pagesep { color: var(--muted); }
 .pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.1rem; }
 /* % 表示はクリックで等倍に戻すボタン。見た目は控えめなテキスト、ホバーで操作可能と示す。 */
