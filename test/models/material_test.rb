@@ -376,4 +376,21 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal 1, counts[:in_progress]
     assert_equal 1, counts[:unassigned]
   end
+
+  test "transcription_incomplete returns materials whose transcription is not done (todo or drafting)" do
+    u = User.create!(email_address: "inc@example.com", name: "Inc", provider: "discord", uid: "inc")
+    todo = Material.new(user: u, title: "未着手音声")
+    todo.file.attach(io: StringIO.new("x"), filename: "t.mp3", content_type: "audio/mpeg"); todo.save!
+    drafting = Material.new(user: u, title: "途中音声")
+    drafting.file.attach(io: StringIO.new("x"), filename: "d.mp3", content_type: "audio/mpeg"); drafting.save!
+    drafting.transcriptions.create!(author: u, body: "a", position: 1, status: "drafting")
+    done = Material.new(user: u, title: "完了音声")
+    done.file.attach(io: StringIO.new("x"), filename: "o.mp3", content_type: "audio/mpeg"); done.save!
+    done.transcriptions.create!(author: u, body: "b", position: 1, status: "done")
+
+    ids = Material.transcription_incomplete.pluck(:id)
+    assert_includes ids, todo.id
+    assert_includes ids, drafting.id
+    assert_not_includes ids, done.id
+  end
 end
