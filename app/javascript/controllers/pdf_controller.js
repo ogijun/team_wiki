@@ -45,7 +45,11 @@ export default class extends Controller {
 
   applyDirection() {
     this.navTarget.classList.toggle("pdf-viewer__nav--rtl", this.rtl)
-    this.dirTarget.textContent = this.rtl ? "右開き" : "左開き"
+    // アイコンボタン化したので、現在の綴じ方向は title/aria-label と本(アイコン)の左右反転で示す。
+    const label = this.rtl ? "綴じ方向: 右開き（クリックで左開き）" : "綴じ方向: 左開き（クリックで右開き）"
+    this.dirTarget.title = label
+    this.dirTarget.setAttribute("aria-label", label)
+    this.dirTarget.classList.toggle("is-rtl", this.rtl)
   }
 
   // ←→ キーでのページ送り。左開きは →=次, 右開きは ←=次（読み進み方向に一致）。

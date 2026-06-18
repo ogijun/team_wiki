@@ -341,15 +341,34 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* PDF ビューア（PDF.js・ページ単位の部分読み込み）。
    ダイアログは中身ぴったりに縮み、ページは本来のアスペクト比でビューポート最大まで表示する。 */
 .pdf-viewer { padding: 0.7rem 0.8rem; display: flex; flex-direction: column; max-height: 94vh; }
-.pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+.pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
+/* 関連する操作を角丸の薄いセグメントでまとめて整える。 */
+.pdf-viewer__group { display: inline-flex; align-items: center; gap: 0.1rem; padding: 0.15rem; background: var(--code-bg); border-radius: 9px; }
+/* アイコンのみの操作ボタン（全ツールバー共通）。十分なヒット領域・ホバー・キーボードフォーカス。 */
+.pdf-viewer__btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.95rem; height: 1.95rem; padding: 0; margin: 0;
+  background: none; border: 0; border-radius: 7px; cursor: pointer; color: var(--ink-soft);
+}
+.pdf-viewer__btn:hover { background: var(--surface); color: var(--accent); }
+.pdf-viewer__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pdf-viewer__btn .icon { width: 1.15rem; height: 1.15rem; }
+/* 綴じ方向: 右開きのときは本アイコンを左右反転して状態を示す。 */
+.pdf-viewer__btn.is-rtl .icon { transform: scaleX(-1); }
 /* 前/次ナビ。右開きのときは並びを反転して「次へ」を左に置く（読み進み方向に一致）。 */
-.pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.5rem; }
+.pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.1rem; }
 .pdf-viewer__nav--rtl { flex-direction: row-reverse; }
-.pdf-viewer__page { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.85rem; color: var(--ink-soft); }
-.pdf-viewer__pageinput { width: 3.2rem; text-align: right; padding: 0.1rem 0.3rem; margin: 0; font-size: 0.85rem; }
+.pdf-viewer__page { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0 0.3rem; font-size: 0.85rem; color: var(--ink-soft); }
+.pdf-viewer__pageinput { width: 3rem; text-align: right; padding: 0.1rem 0.3rem; margin: 0; font-size: 0.85rem; background: var(--surface); }
 .pdf-viewer__pagesep { color: var(--muted); }
-.pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.6rem; }
-.pdf-viewer__pct { font-size: 0.8rem; color: var(--ink-soft); min-width: 3.4rem; text-align: center; }
+.pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.1rem; }
+/* % 表示はクリックで等倍に戻すボタン。見た目は控えめなテキスト、ホバーで操作可能と示す。 */
+.pdf-viewer__pct {
+  min-width: 3.4rem; padding: 0.2rem 0.3rem; margin: 0; border: 0; border-radius: 7px;
+  background: none; cursor: pointer; font-size: 0.8rem; color: var(--ink-soft); text-align: center;
+}
+.pdf-viewer__pct:hover { background: var(--surface); color: var(--accent); }
+.pdf-viewer__pct:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .pdf-viewer__close { margin-left: auto; }
 /* ステージ: JS が「フィット時のページ寸法」に固定する枠。ツールバーはこの枠の外＝固定。
    ズーム時は枠内で canvas だけが拡大縮小し、はみ出たらこの枠の中だけスクロールする。

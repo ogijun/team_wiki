@@ -54,25 +54,24 @@
         <dialog class="lightbox lightbox--pdf" data-pdf-target="dialog" data-action="click->pdf#backdropClose keydown->pdf#key">
           <div class="pdf-viewer">
             <div class="pdf-viewer__bar">
-              <span class="pdf-viewer__nav" data-pdf-target="nav">
-                <button type="button" class="btn-sm secondary outline" data-action="pdf#prev">前のページ</button>
+              <span class="pdf-viewer__group pdf-viewer__nav" data-pdf-target="nav">
+                <button type="button" class="pdf-viewer__btn" data-action="pdf#prev" title="前のページ" aria-label="前のページ"><%= icon("chevron-left") %></button>
                 <span class="pdf-viewer__page">
                   <input type="number" min="1" class="pdf-viewer__pageinput" data-pdf-target="pageInput"
                          data-action="change->pdf#jump" aria-label="ページ番号へ移動">
                   <span class="pdf-viewer__pagesep">/</span>
                   <span data-pdf-target="pageTotal">…</span>
                 </span>
-                <button type="button" class="btn-sm secondary outline" data-action="pdf#next">次のページ</button>
+                <button type="button" class="pdf-viewer__btn" data-action="pdf#next" title="次のページ" aria-label="次のページ"><%= icon("chevron-right") %></button>
               </span>
-              <button type="button" class="btn-sm secondary outline" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え">左開き</button>
-              <span class="pdf-viewer__zoom">
-                <button type="button" class="btn-sm secondary outline" data-action="pdf#zoomOut" aria-label="縮小">−</button>
-                <span class="pdf-viewer__pct" data-pdf-target="pct">…</span>
-                <button type="button" class="btn-sm secondary outline" data-action="pdf#zoomIn" aria-label="拡大">＋</button>
-                <button type="button" class="btn-sm secondary outline" data-action="pdf#actualSize">等倍</button>
-                <button type="button" class="btn-sm secondary outline" data-action="pdf#fit">フィット</button>
+              <button type="button" class="pdf-viewer__btn" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え" aria-label="綴じ方向を切り替え"><%= icon("book-open") %></button>
+              <span class="pdf-viewer__group pdf-viewer__zoom">
+                <button type="button" class="pdf-viewer__btn" data-action="pdf#zoomOut" title="縮小" aria-label="縮小"><%= icon("zoom-out") %></button>
+                <button type="button" class="pdf-viewer__pct" data-pdf-target="pct" data-action="pdf#actualSize" title="クリックで等倍（100%）" aria-label="等倍（100%）にする">…</button>
+                <button type="button" class="pdf-viewer__btn" data-action="pdf#zoomIn" title="拡大" aria-label="拡大"><%= icon("zoom-in") %></button>
+                <button type="button" class="pdf-viewer__btn" data-action="pdf#fit" title="全体を表示（フィット）" aria-label="全体を表示（フィット）"><%= icon("maximize") %></button>
               </span>
-              <button type="button" class="btn-sm secondary outline pdf-viewer__close" data-action="pdf#close" aria-label="閉じる">×</button>
+              <button type="button" class="pdf-viewer__btn pdf-viewer__close" data-action="pdf#close" title="閉じる" aria-label="閉じる"><%= icon("x") %></button>
             </div>
             <div class="pdf-viewer__stage" data-pdf-target="stage">
               <canvas data-pdf-target="canvas"></canvas>
