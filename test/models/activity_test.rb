@@ -47,7 +47,7 @@ class ActivityTest < ActiveSupport::TestCase
 
   test "transcription.assigned is an allowed action" do
     a = Activity.record(actor: @user, action: "transcription.assigned", subject_label: "音声X")
-    assert a.persisted?
+    assert_predicate a, :persisted?
     assert_equal "transcription.assigned", a.action
   end
 end
