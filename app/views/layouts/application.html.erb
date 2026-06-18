@@ -38,9 +38,20 @@
     <header class="topbar">
       <button type="button" class="topbar__toggle" data-action="sidebar#toggle" aria-label="メニューを開閉"><%= icon("menu") %></button>
       <span class="brand"><%= link_to brand_display, root_path %></span>
-      <form class="topbar__search" action="<%= search_path %>" method="get" role="search">
-        <input type="search" name="q" placeholder="検索…" aria-label="検索">
-      </form>
+      <%# 検索: アイコンだけ出し、押すとトップバーを覆うオーバーレイで検索窓を出す（全画面共通）。 %>
+      <div class="topbar__search" data-controller="search">
+        <button type="button" class="topbar__search-toggle" data-action="search#open"
+                data-search-target="toggle" aria-label="検索を開く" aria-expanded="false"
+                aria-controls="search-overlay"><%= icon("search") %></button>
+        <div class="topbar__search-overlay" id="search-overlay" data-search-target="overlay" hidden>
+          <form action="<%= search_path %>" method="get" role="search">
+            <%# 虫めがねは Pico が input[type=search] に付ける native 装飾を使う（自前アイコンは置かない）。 %>
+            <input type="search" name="q" placeholder="検索…" aria-label="検索" data-search-target="input">
+          </form>
+          <button type="button" class="topbar__search-close" data-action="search#close"
+                  data-search-target="close" aria-label="検索を閉じる">×</button>
+        </div>
+      </div>
       <% if Current.user %>
         <details class="topbar__user-menu" data-controller="menu">
           <summary aria-label="ユーザーメニューを開く">
