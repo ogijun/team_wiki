@@ -83,11 +83,33 @@ body > header.topbar {
 }
 .topbar__menu a:hover, .topbar__logout:hover { background: var(--accent-weak); color: var(--accent); }
 .topbar__menu form.button_to { display: block; margin: 0; }
-.topbar__search { flex: 0 1 16rem; margin: 0 0 0 auto; } /* margin-left:auto で検索以降を右寄せ（spacer div の代替） */
-.topbar__search input {
-  width: 100%; margin: 0; padding: 0.24rem 0.65rem; line-height: 1.35;
-  font-size: 0.85rem; background: var(--surface);
+/* 検索: アイコンのトグル＋トップバーを覆うオーバーレイ（全画面共通の挙動）。 */
+.topbar__search { margin-left: auto; } /* margin-left:auto で検索以降を右寄せ（spacer div の代替） */
+.topbar__search-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  align-self: stretch; height: 100%; width: auto; padding: 0 0.9rem; margin: 0;
+  background: none; border: 0; cursor: pointer; color: var(--ink);
 }
+.topbar__search-toggle:hover, .topbar__search-toggle:focus-visible { color: var(--accent); background: var(--accent-weak); }
+.topbar__search-overlay {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-height); z-index: 60;
+  display: flex; align-items: center; gap: 0.5rem; padding: 0 0.75rem;
+  background: var(--surface); border-bottom: 1px solid var(--hairline);
+}
+.topbar__search-overlay[hidden] { display: none; } /* display:flex が hidden 既定を上書きするので明示 */
+.topbar__search-overlay form { flex: 1; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+.topbar__search-overlay-icon { display: inline-flex; color: var(--muted); }
+.topbar__search-overlay input {
+  flex: 1; width: 100%; margin: 0; padding: 0.35rem 0.4rem; line-height: 1.4;
+  font-size: 1rem; background: transparent; border: 0;
+}
+.topbar__search-overlay input:focus { outline: none; box-shadow: none; }
+.topbar__search-close {
+  flex: 0 0 auto; width: auto; padding: 0 0.5rem; margin: 0;
+  background: none; border: 0; cursor: pointer; color: var(--muted);
+  font-size: 1.5rem; line-height: 1;
+}
+.topbar__search-close:hover, .topbar__search-close:focus-visible { color: var(--ink); }
 
 .sidebar {
   position: fixed; top: var(--topbar-height); left: 0; bottom: 0; width: var(--sidebar-width); z-index: 30;
@@ -135,14 +157,9 @@ body > header.topbar {
 @media (max-width: 880px) {
   body { padding-left: 0; }
   .topbar__toggle { display: inline-flex; align-items: center; justify-content: center; }
-  .topbar__search { flex-basis: 12rem; }
   .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: 0 0 40px rgba(43, 43, 43, 0.18); }
   body.sidebar-open .sidebar { transform: translateX(0); }
   body.sidebar-open .backdrop { display: block; position: fixed; inset: 0; z-index: 20; background: rgba(20, 17, 15, 0.35); }
-}
-
-@media (max-width: 560px) {
-  .topbar__search { flex-basis: 8.5rem; }
 }
 
 .brand { font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; }
