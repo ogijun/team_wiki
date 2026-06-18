@@ -347,15 +347,16 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* ツールバーは「つかんで動かす」ハンドルも兼ねる（ボタン/入力の上ではドラッグしない）。 */
 .pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; cursor: move; touch-action: none; }
 .pdf-viewer__bar.is-dragging { cursor: grabbing; }
-/* 関連する操作を角丸の薄いセグメントでまとめて整える。 */
-.pdf-viewer__group { display: inline-flex; align-items: center; gap: 0.1rem; padding: 0.15rem; background: var(--code-bg); border-radius: 9px; }
+/* 関連する操作を角丸の薄いセグメントでまとめて整える。半透明グレーの地に馴染むよう
+   不透明色ではなく薄い白のフロストにする。 */
+.pdf-viewer__group { display: inline-flex; align-items: center; gap: 0.1rem; padding: 0.15rem; background: rgba(255, 255, 255, 0.22); border-radius: 9px; }
 /* アイコンのみの操作ボタン（全ツールバー共通）。十分なヒット領域・ホバー・キーボードフォーカス。 */
 .pdf-viewer__btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 1.95rem; height: 1.95rem; padding: 0; margin: 0;
   background: none; border: 0; border-radius: 7px; cursor: pointer; color: var(--ink-soft);
 }
-.pdf-viewer__btn:hover { background: var(--surface); color: var(--accent); }
+.pdf-viewer__btn:hover { background: rgba(255, 255, 255, 0.5); color: var(--accent); }
 .pdf-viewer__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .pdf-viewer__btn .icon { width: 1.15rem; height: 1.15rem; }
 /* 綴じ方向: 右開きのときは本アイコンを左右反転して状態を示す。 */
@@ -364,7 +365,7 @@ button.tag-chip:hover, button.tag-chip:focus {
 .pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.1rem; }
 .pdf-viewer__nav--rtl { flex-direction: row-reverse; }
 .pdf-viewer__page { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0 0.3rem; font-size: 0.85rem; color: var(--ink-soft); }
-.pdf-viewer__pageinput { width: 3rem; text-align: right; padding: 0.1rem 0.3rem; margin: 0; font-size: 0.85rem; background: var(--surface); }
+.pdf-viewer__pageinput { width: 3rem; text-align: right; padding: 0.1rem 0.3rem; margin: 0; font-size: 0.85rem; background: rgba(255, 255, 255, 0.55); border-color: rgba(255, 255, 255, 0.6); }
 .pdf-viewer__pagesep { color: var(--muted); }
 .pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.1rem; }
 /* % 表示はクリックで等倍に戻すボタン。見た目は控えめなテキスト、ホバーで操作可能と示す。 */
@@ -372,7 +373,7 @@ button.tag-chip:hover, button.tag-chip:focus {
   min-width: 3.4rem; padding: 0.2rem 0.3rem; margin: 0; border: 0; border-radius: 7px;
   background: none; cursor: pointer; font-size: 0.8rem; color: var(--ink-soft); text-align: center;
 }
-.pdf-viewer__pct:hover { background: var(--surface); color: var(--accent); }
+.pdf-viewer__pct:hover { background: rgba(255, 255, 255, 0.5); color: var(--accent); }
 .pdf-viewer__pct:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .pdf-viewer__close { margin-left: auto; }
 /* ステージ: JS が「フィット時のページ寸法」に固定する枠。ツールバーはこの枠の外＝固定。
@@ -382,7 +383,9 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* ステージをラップして、はっきり見えるカスタムのリサイズグリップを右下角に重ねる
    （native の resize ハンドルは視認しづらいので使わない）。 */
 .pdf-viewer__stagewrap { position: relative; align-self: center; max-width: 100%; }
-.pdf-viewer__stage { overflow: auto; min-width: 14rem; min-height: 10rem; max-width: 92vw; max-height: 82vh; text-align: center; background: var(--surface); border-radius: 4px; }
+/* 背景は透明にして、ページのアスペクト比でできるレターボックスの隙間を
+   ビューアの半透明グレー（フロスト地）に馴染ませる。ページ自体の白は canvas 側で出す。 */
+.pdf-viewer__stage { overflow: auto; min-width: 14rem; min-height: 10rem; max-width: 92vw; max-height: 82vh; text-align: center; background: transparent; border-radius: 4px; }
 /* 右下のリサイズグリップ: 斜めストライプを三角マスクで切り出した定番の掴み。 */
 .pdf-viewer__resizer {
   position: absolute; right: 0; bottom: 0; width: 18px; height: 18px; z-index: 2;
