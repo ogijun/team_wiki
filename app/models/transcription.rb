@@ -42,6 +42,9 @@ class Transcription < ApplicationRecord
   # 将来は割り当てワークフロー（assignee 中心＋admin）に絞る想定＝ここを変える唯一の窓口。
   def editable_by?(user) = user.present?
 
+  # 担当(assignee)の設定/変更/解除は誰でも自由（GitHub の assignee と同じ。編集ゲートにはしない）。
+  def assignable_by?(user) = user.present?
+
   def ai? = AI_METHODS.include?(creation_method)
 
   # 版の author を初参加順（最初に貢献した順）で重複除去して返す（Article#contributors と同形）。

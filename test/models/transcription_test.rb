@@ -134,4 +134,10 @@ class TranscriptionTest < ActiveSupport::TestCase
     assert_equal :done, t.assignment_state
     assert_equal "完了", t.assignment_state_label
   end
+
+  test "assignable_by? is true for any logged-in user, false for nil" do
+    t = build_part
+    assert t.assignable_by?(@user)
+    assert_not t.assignable_by?(nil)
+  end
 end
