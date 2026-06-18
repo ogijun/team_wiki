@@ -44,11 +44,14 @@
 /* タイムライン: 黒点マーカーの代わりにアクション種別アイコンを行頭に出す
    （Pico は li 側にもマーカーを当てるので両方で無効化する） */
 .timeline { list-style: none; padding-left: 0; margin: 0; }
-.timeline li { list-style: none; margin-bottom: 0.45rem; }
+/* 左=アバター / 右=本文。マーカー分のインデントは付けない（padding-left:0）。 */
+.timeline li { display: flex; align-items: flex-start; gap: 0.45rem; list-style: none; margin-bottom: 0.5rem; }
 .timeline li::marker { content: none; }
-.timeline li .avatar { margin-right: 0.3rem; }
+.timeline li .avatar { flex: 0 0 auto; }
+.timeline__body { flex: 1; min-width: 0; } /* テキストはアバターの右から始まり、折り返しても潜り込まない */
 .timeline__icon { color: var(--muted); margin-right: 0.35rem; }
-.timeline__overflow { font-size: 0.85rem; padding-left: 1.6rem; }
+/* 「ほかN件」はアバター幅(28px)＋gap ぶん右に寄せて本文と揃える */
+.timeline__overflow { font-size: 0.85rem; padding-left: calc(28px + 0.45rem); }
 
 /* 改行を保持して表示（文字起こし本文など） */
 .prewrap { white-space: pre-wrap; }
