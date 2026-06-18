@@ -173,4 +173,26 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal "執筆中", a.status_label
     assert_equal "未分類", Article.new(title: "x", created_by: @user, kind: nil).kind_label
   end
+
+  test "untouched_auto_stubs selects only never-touched auto-created stubs" do
+    auto_stub = ->(title) {
+      Article.create_with_revision!({ title: title, status: "stub", created_by: @user },
+                                    body: "案内\n\n[[ref:x]]\n", author: @user, edit_summary: "資料から自動作成")
+    }
+    untouched = auto_stub.call("手付かず")
+    edited    = auto_stub.call("本文編集済"); edited.revise!(body: "加筆した本文", author: @user)
+    promoted  = auto_stub.call("昇格済"); promoted.update!(status: "writing")
+    tagged    = auto_stub.call("タグ付き"); tagged.update!(tag_names: "メモ")
+    commented = auto_stub.call("コメント付き"); commented.comments.create!(author: @user, body: "コメント")
+    manual    = Article.create_with_revision!({ title: "手動記事", status: "stub", created_by: @user },
+                                              body: "手動", author: @user) # マーカー無し
+
+    ids = Article.untouched_auto_stubs.map(&:id)
+    assert_equal [ untouched.id ], ids
+    assert_not_includes ids, edited.id
+    assert_not_includes ids, promoted.id
+    assert_not_includes ids, tagged.id
+    assert_not_includes ids, commented.id
+    assert_not_includes ids, manual.id
+  end
 end
