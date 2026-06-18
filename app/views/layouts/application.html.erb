@@ -71,11 +71,12 @@
         <%= link_to root_path do %><%= icon("house") %> ホーム<% end %>
         <div class="nav-group">
           <span class="nav-group__label">コンテンツ</span>
-          <%= link_to articles_path do %><%= icon("newspaper") %> 記事一覧<% end %>
-          <%= link_to chronicle_path do %><%= icon("calendar-days") %> 年表 <small class="wip">(検討中)</small><% end %>
-          <%= link_to tags_path do %><%= icon("tags") %> タグ<% end %>
           <%= link_to materials_path do %><%= icon("landmark") %> 資料<% end %>
           <%= link_to transcriptions_path do %><%= icon("audio-lines") %> 文字起こし<% end %>
+          <%= link_to tags_path do %><%= icon("tags") %> タグ<% end %>
+          <%= link_to chronicle_path do %><%= icon("calendar-days") %> 年表 <small class="wip">(検討中)</small><% end %>
+          <hr class="nav-sep">
+          <%= link_to articles_path do %><%= icon("newspaper") %> 記事 <small class="wip">(見直し中)</small><% end %>
         </div>
         <% if Current.user&.admin? %>
           <div class="nav-group">

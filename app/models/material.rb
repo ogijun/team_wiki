@@ -168,6 +168,13 @@ class Material < ApplicationRecord
   # 信頼度（原本検証の確定）は admin のみ。インスタンス状態に依存しない役割判定。
   def confidence_editable_by?(user) = user&.admin? || false
 
+  # 「未完成資料」の単一の出所: 文字起こしが done でない資料（未着手＝パート0、または途中＝非done パートあり）。
+  # transcription_status が done 以外、と同義。将来「主要項目が未確認」等へ広げるならここを広げる。
+  scope :transcription_incomplete, -> {
+    where("NOT EXISTS (SELECT 1 FROM transcriptions WHERE transcriptions.material_id = materials.id) " \
+          "OR EXISTS (SELECT 1 FROM transcriptions WHERE transcriptions.material_id = materials.id AND transcriptions.status != 'done')")
+  }
+
   # パート集約: 0件=todo / 全完了=done / それ以外=drafting。
   def transcription_status
     parts = transcriptions.to_a

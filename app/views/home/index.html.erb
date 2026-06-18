@@ -1,6 +1,5 @@
 <section class="home-hero">
-  <%# 見出しは設定（home_heading）から注入する。未設定ならブランド名を繰り返さず、
-      文書構造のための h1 を視覚的にのみ隠す（スクリーンリーダーには読み上げられる）。 %>
+  <%# 見出しは設定(home_heading)から注入。未設定はブランド名を繰り返さず sr-only 見出し。 %>
   <% if site_setting.home_heading.present? %>
     <h1 class="home-hero__heading"><%= site_setting.home_heading %></h1>
   <% else %>
@@ -10,67 +9,52 @@
     <p class="home-hero__tagline"><%= site_setting.tagline %></p>
   <% end %>
 
+  <%# 資料主役の CTA（記事を書くは外す＝記事は降格） %>
   <div class="home-hero__cta">
-    <%= link_to new_article_path, class: "btn-hero" do %><%= icon("pencil-line") %> 記事を書く<% end %>
     <%= link_to new_material_path, class: "btn-hero" do %><%= icon("library-big") %> 資料を追加する<% end %>
-    <span class="home-hero__cta-or">どちらもなければ</span>
     <%= link_to transcriptions_path, class: "btn-hero" do %><%= icon("pen-line") %> 文字起こしをする<% end %>
   </div>
 
   <div class="home-hero__sum">
-    <span><%= icon("pencil-line") %> <strong><%= @stats[:articles_count] %></strong> 記事</span>
     <span><%= icon("library-big") %> <strong><%= @stats[:materials_count] %></strong> 資料</span>
-    <span><%= icon("search") %> <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
     <span><%= icon("pen-line") %> <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
+    <span><%= icon("audio-lines") %> <strong><%= @incomplete_count %></strong> 未完成資料</span>
     <span><%= icon_link "trending-up", stats_path, label: "統計の推移" %></span>
   </div>
 </section>
 
+<%# 実績ストリップ（将来）はここに入る。今は非描画。 %>
+
 <div class="dashboard-grid">
   <section class="dashboard-card">
-    <h2><%= icon("newspaper") %> 最近更新された記事</h2>
-    <% if @recent_articles.any? %>
-      <ul>
-        <% @recent_articles.each do |article| %>
-          <li>
-            <%= link_to article.title, article %>
-            <small><%= local_time_ago(article.updated_at) %></small>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p class="muted">まだ記事がありません。「新規作成」から最初の1本をどうぞ。完璧でなくて大丈夫です。</p>
-    <% end %>
-    <p><%= link_to "記事一覧へ", articles_path %></p>
+    <h2><%= icon("activity") %> 報告します！</h2>
+    <%# 連続同一ユーザを畳んでから 10 行に頭打ち（cap 後に畳むと行数が減るため、ホームのみ） %>
+    <%= render "activities/timeline", groups: collapse_consecutive_actors(@recent_activity_groups).first(10) %>
+    <p><%= link_to "すべての動きを見る", activities_path %></p>
   </section>
 
   <section class="dashboard-card">
-    <h2><%= icon("pencil-line") %> 加筆を求む</h2>
-    <% if @stub_articles.any? %>
+    <h2><%= icon("audio-lines") %> この続き、誰かお願い！</h2>
+    <% if @incomplete_materials.any? %>
+      <p class="muted">文字起こしが必要な資料です。</p>
       <ul>
-        <% @stub_articles.each do |article| %>
+        <% @incomplete_materials.each do |m| %>
+          <% done, total = m.transcription_progress %>
           <li>
-            <%= link_to article.title, article %>
-            <small><%= article.status_label %></small>
+            <%= link_to m.title, m %>
+            <small><%= total.zero? ? "未着手" : "途中 (#{done}/#{total})" %></small>
           </li>
         <% end %>
       </ul>
+      <p><%= link_to "すべての未完成資料を表示", transcriptions_path %></p>
     <% else %>
-      <p class="muted">スタブ/執筆中の記事はありません。</p>
+      <p class="muted">未完成の資料はありません。よく整っています。</p>
     <% end %>
   </section>
 </div>
-
-<section class="dashboard-card recent-activity">
-  <h2><%= icon("activity") %> 最近の動き</h2>
-  <%# 連続同一ユーザを畳んでから 10 行に頭打ち（cap 後に畳むと行数が減るため、ホームのみ） %>
-  <%= render "activities/timeline", groups: collapse_consecutive_actors(@recent_activity_groups).first(10) %>
-  <p><%= link_to "すべて見る", activities_path %></p>
-</section>
 
 <section class="activity-block">
   <h2><%= icon("activity") %> サイトの動き</h2>
   <%= render "shared/activity_overview", daily: @daily[:total], hourly: @hourly[:total] %>
   <p><%= link_to "統計をくわしく見る", stats_path %></p>
 </section>
-
