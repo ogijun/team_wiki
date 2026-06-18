@@ -33,4 +33,30 @@ class SiteSettingTest < ActiveSupport::TestCase
     s.icon.attach(io: StringIO.new("x"), filename: "icon.png", content_type: "image/png")
     assert_predicate s, :valid?, s.errors.full_messages.join(", ")
   end
+
+  test "blank tagline normalizes to nil (so the hero omits it)" do
+    s = SiteSetting.instance
+    s.update!(tagline: "   ")
+    assert_nil s.reload.tagline
+  end
+
+  test "rejects an overlong tagline (it's a one-line mission, not prose)" do
+    s = SiteSetting.instance
+    s.tagline = "あ" * 121
+    assert_not s.valid?
+    assert_predicate s.errors[:tagline], :any?
+  end
+
+  test "blank home_heading normalizes to nil (so the hero falls back to sr-only)" do
+    s = SiteSetting.instance
+    s.update!(home_heading: "   ")
+    assert_nil s.reload.home_heading
+  end
+
+  test "rejects an overlong home_heading (it's a heading, not prose)" do
+    s = SiteSetting.instance
+    s.home_heading = "あ" * 61
+    assert_not s.valid?
+    assert_predicate s.errors[:home_heading], :any?
+  end
 end

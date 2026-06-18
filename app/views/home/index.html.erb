@@ -1,29 +1,30 @@
-<div class="page-header">
-  <h1>ホーム</h1>
-  <details class="create-menu" data-controller="menu">
-    <summary role="button">新規作成</summary>
-    <ul>
-      <li><%= link_to new_article_path do %><%= icon("pencil-line") %> 記事を作成<% end %></li>
-      <li><%= link_to new_material_path do %><%= icon("library-big") %> 資料を追加<% end %></li>
-    </ul>
-  </details>
-</div>
+<section class="home-hero">
+  <%# 見出しは設定（home_heading）から注入する。未設定ならブランド名を繰り返さず、
+      文書構造のための h1 を視覚的にのみ隠す（スクリーンリーダーには読み上げられる）。 %>
+  <% if site_setting.home_heading.present? %>
+    <h1 class="home-hero__heading"><%= site_setting.home_heading %></h1>
+  <% else %>
+    <h1 class="sr-only">ホーム</h1>
+  <% end %>
+  <% if site_setting.tagline.present? %>
+    <p class="home-hero__tagline"><%= site_setting.tagline %></p>
+  <% end %>
 
-<section class="dashboard-stats">
-  <span><%= icon("pencil-line") %> <strong><%= @stats[:articles_count] %></strong> 記事</span>
-  <span><%= icon("library-big") %> <strong><%= @stats[:materials_count] %></strong> 資料</span>
-  <span><%= icon("search") %> <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
-  <span><%= icon("pen-line") %> <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
-  <span><%= icon_link "trending-up", stats_path, label: "統計の推移" %></span>
+  <div class="home-hero__cta">
+    <%= link_to new_article_path, class: "btn-hero" do %><%= icon("pencil-line") %> 記事を書く<% end %>
+    <%= link_to new_material_path, class: "btn-hero" do %><%= icon("library-big") %> 資料を追加する<% end %>
+    <span class="home-hero__cta-or">どちらもなければ</span>
+    <%= link_to transcriptions_path, class: "btn-hero" do %><%= icon("pen-line") %> 文字起こしをする<% end %>
+  </div>
+
+  <div class="home-hero__sum">
+    <span><%= icon("pencil-line") %> <strong><%= @stats[:articles_count] %></strong> 記事</span>
+    <span><%= icon("library-big") %> <strong><%= @stats[:materials_count] %></strong> 資料</span>
+    <span><%= icon("search") %> <strong><%= @stats[:unconfirmed_materials_count] %></strong> 未確認資料</span>
+    <span><%= icon("pen-line") %> <strong><%= number_with_delimiter(@stats[:transcribed_chars]) %></strong> 文字起こし済</span>
+    <span><%= icon_link "trending-up", stats_path, label: "統計の推移" %></span>
+  </div>
 </section>
-
-<% if @my_stats[:active_days].positive? %>
-  <p class="my-streak muted">
-    <%= avatar_tag(Current.user, size: 18) %> あなた:
-    <% if @my_stats[:current_streak].positive? %><%= icon("flame") %> <strong><%= @my_stats[:current_streak] %></strong>日連続活動中 ・<% end %>
-    最長 <strong><%= @my_stats[:longest_streak] %></strong>日 ・ 累計 <strong><%= @my_stats[:active_days] %></strong>日活動
-  </p>
-<% end %>
 
 <div class="dashboard-grid">
   <section class="dashboard-card">

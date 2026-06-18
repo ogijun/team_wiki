@@ -9,6 +9,18 @@
   </div>
 
   <div class="field">
+    <%= f.label :home_heading, "ホーム見出し（トップページの大見出し）" %><%= optional_badge %>
+    <small class="field__hint">トップページの一番上に大きく表示される見出しです。未設定なら見出しは表示されません（ブランド名はトップバーに出ています）。</small>
+    <%= f.text_field :home_heading, maxlength: 60, placeholder: "例: 〇〇アーカイブ" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :tagline, "タグライン（見出し下のミッション一言）" %><%= optional_badge %>
+    <small class="field__hint">ホーム見出しの直下に小さく表示されます。このサイトが何のための場所かを一言で。</small>
+    <%= f.text_field :tagline, maxlength: 120, placeholder: "例: 一次資料を集め、整理し、後世に活用する。" %>
+  </div>
+
+  <div class="field">
     <%= f.label :logo, "ロゴ画像（あれば名称より優先）" %><%= optional_badge %>
     <small class="field__hint">サイドバーに高さ28pxで表示されます。横長のロゴ向け。背景透過のPNG/WebP・高さ56px程度（横幅は自由）が目安です。</small>
     <% if @setting.logo.attached? %>

@@ -19,7 +19,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", text: /最近更新された記事/
     assert_select "h2", text: /加筆を求む/
     assert_select "h2", text: /最近の動き/
-    assert_select ".dashboard-stats"
+    assert_select ".home-hero__sum"
     assert_select "a", text: /ダッシュ記事/
   end
 
@@ -28,12 +28,47 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "aside.sidebar-right", count: 0
   end
 
-  test "新規作成 is a dropdown offering both article and material creation" do
+  test "hero offers the primary create/transcribe actions as buttons" do
     get root_url
     assert_response :success
-    assert_select "details.create-menu summary", text: "新規作成"
-    assert_select "details.create-menu a[href=?]", new_article_path, text: /記事/
-    assert_select "details.create-menu a[href=?]", new_material_path, text: /資料/
+    assert_select ".home-hero__cta a[href=?]", new_article_path, text: /記事を書く/
+    assert_select ".home-hero__cta a[href=?]", new_material_path, text: /資料を追加/
+    assert_select ".home-hero__cta a[href=?]", transcriptions_path, text: /文字起こし/
+  end
+
+  test "hero frames transcription as the fallback path with a connector phrase" do
+    # 「記事を書く/資料を追加 → どちらもなければ文字起こし」という導線の意味づけ。
+    get root_url
+    assert_select ".home-hero__cta-or", text: "どちらもなければ"
+  end
+
+  test "home shows the configured heading as a visible h1" do
+    SiteSetting.instance.update!(home_heading: "アーカイブ計画")
+    get root_url
+    assert_select "h1.home-hero__heading", text: "アーカイブ計画"
+    assert_select "h1.sr-only", count: 0
+  end
+
+  test "home falls back to a visually-hidden heading when home_heading is unset" do
+    # 見出し未設定でも文書構造のため h1 は残し、視覚的には隠す（.sr-only）。
+    # ブランド名はトップバーに出ているのでヒーローでは繰り返さない。
+    SiteSetting.instance.update!(home_heading: nil)
+    get root_url
+    assert_select "h1.sr-only"
+    assert_select "h1.home-hero__heading", count: 0
+    assert_select "h1.home-hero__brand", count: 0
+  end
+
+  test "hero shows the site tagline when set" do
+    SiteSetting.instance.update!(tagline: "一次資料を集め、整理し、後世に活用する。")
+    get root_url
+    assert_select ".home-hero__tagline", text: "一次資料を集め、整理し、後世に活用する。"
+  end
+
+  test "hero omits the tagline element when unset" do
+    SiteSetting.instance.update!(tagline: nil)
+    get root_url
+    assert_select ".home-hero__tagline", count: 0
   end
 
   test "home collapses a long same-user activity run into a +N summary and fills the feed with others" do
@@ -62,8 +97,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "stats trends link is an accessible icon-only link" do
     get root_url
     # アイコンのみ＝可視テキストは無いが、リンク名は aria-label で読み上げ可能
-    assert_select ".dashboard-stats a[href=?][aria-label=?]", stats_path, "統計の推移"
-    assert_select ".dashboard-stats a[href=?] svg", stats_path
+    assert_select ".home-hero__sum a[href=?][aria-label=?]", stats_path, "統計の推移"
+    assert_select ".home-hero__sum a[href=?] svg", stats_path
   end
 
   test "stats include the total transcribed characters" do
@@ -72,13 +107,13 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     m.save!
     Transcription.create!(material: m, author: @user, body: "あ" * 1234, status: "drafting")
     get root_url
-    assert_select ".dashboard-stats", text: /1,234.*文字起こし済/m
+    assert_select ".home-hero__sum", text: /1,234.*文字起こし済/m
   end
 
-  test "shows my personal streak line when I have activity" do
+  test "does not show a personal streak line on the home page" do
     Activity.record(actor: @user, action: "tag.created", subject_label: "今日の活動")
     get root_url
-    assert_select ".my-streak", text: /1.*日連続活動中.*最長.*1.*累計.*1/m
+    assert_select ".my-streak", count: 0
   end
 
   test "renders relative timestamps as auto-updating local-time elements" do

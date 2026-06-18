@@ -19,7 +19,7 @@ body > main {
   max-width: var(--page);
   margin: 0 auto;
   box-sizing: border-box;
-  padding: 2.6rem 2.2rem 5rem;
+  padding: 1.6rem 2.2rem 5rem;
   background: var(--panel);
   min-height: calc(100vh - var(--topbar-height));
 }
@@ -27,6 +27,12 @@ body > main {
 @media (max-width: 640px) { body > main { padding: 1.6rem 1.1rem 3rem; border: none; box-shadow: none; } }
 
 main a { color: var(--accent); }
+
+/* スクリーンリーダーには残すが視覚的には隠す（文書構造用の見出しなどに使う）。 */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 
 /* `main` itself is the page panel, so a semantic <article> inside it must not
    render as a second Pico card. Strip Pico's card visuals — keep it a plain block
