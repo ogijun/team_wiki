@@ -369,9 +369,10 @@ button.tag-chip:hover, button.tag-chip:focus {
 .pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.1rem; flex: 0 0 auto; }
 .pdf-viewer__nav--rtl { flex-direction: row-reverse; }
 .pdf-viewer__page { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0 0.3rem; font-size: 0.85rem; color: var(--ink-soft); }
-/* 周りの要素と高さを揃えてコンパクトに。height と一致する line-height で数字を箱の中央に置き、
-   数値スピナー（▲▼）は隠して箱を小さく保つ。 */
-.pdf-viewer__pageinput {
+/* 周りの要素と高さを揃えてコンパクトに。Pico の input 既定（縦 padding・margin-bottom・height）が
+   クラス1個では勝てない（input:not(...) の方が特異性が高い）ので、.pdf-viewer を前置して上書きする。
+   height と一致する line-height で数字を箱の中央に置き、数値スピナー（▲▼）は隠す。 */
+.pdf-viewer .pdf-viewer__pageinput {
   width: 2.6rem; height: 1.5rem; line-height: 1.5rem; box-sizing: border-box;
   text-align: center; padding: 0 0.3rem; margin: 0; font-size: 0.85rem;
   background: rgba(255, 255, 255, 0.55); border-color: rgba(255, 255, 255, 0.6);
