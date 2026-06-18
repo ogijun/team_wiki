@@ -587,4 +587,16 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_not defined?(StubArticleForMaterial), "StubArticleForMaterial は削除されているはず"
   end
+
+  test "published_at can be entered down to the minute" do
+    post materials_url, params: { material: {
+      title: "時刻あり資料", url: "https://x.test/time",
+      published_year: "1982", published_month: "3", published_day: "1",
+      published_hour: "14", published_minute: "30"
+    } }
+    m = Material.find_by!(title: "時刻あり資料")
+    assert_equal "time", m.published_precision      # 時刻まで入れたら time 精度（FuzzyDate）
+    assert_equal 14, m.published_at.hour
+    assert_equal 30, m.published_at.min
+  end
 end

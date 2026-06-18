@@ -95,7 +95,7 @@ class MaterialsController < ApplicationController
     permitted = [ :title, :description,
                  :source, :author, :rights, :ownership, :tag_names,
                  :isbn, :pages, :page_count, :publisher, :volume,
-                 :published_year, :published_month, :published_day ]
+                 :published_year, :published_month, :published_day, :published_hour, :published_minute ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。
     permitted += [ :file, :url ] unless @material&.persisted?
     # 信頼度の権限は Material の述語に集約（create 時は @material 未設定なので新規インスタンスで判定）。
