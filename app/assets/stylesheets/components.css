@@ -343,7 +343,7 @@ button.tag-chip:hover, button.tag-chip:focus {
 
 /* PDF ビューア（PDF.js・ページ単位の部分読み込み）。
    ダイアログは中身ぴったりに縮み、ページは本来のアスペクト比でビューポート最大まで表示する。 */
-.pdf-viewer { padding: 0.7rem 0.8rem; display: flex; flex-direction: column; max-height: 94vh; }
+.pdf-viewer { position: relative; padding: 0.7rem 0.8rem; display: flex; flex-direction: column; max-height: 94vh; }
 /* ツールバーは「つかんで動かす」ハンドルも兼ねる（ボタン/入力の上ではドラッグしない）。
    左右ゾーン(flex:1)でナビを中央に寄せる: 左=綴じ方向 / 中央=ページナビ / 右=ズーム＋閉じる。 */
 .pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; cursor: move; touch-action: none; }
@@ -385,15 +385,13 @@ button.tag-chip:hover, button.tag-chip:focus {
    ズーム時は枠内で canvas だけが拡大縮小し、はみ出たらこの枠の中だけスクロールする。
    inline-block + text-align:center にして、拡大時も左端までスクロール可能にする（flex の中央寄せ
    だとはみ出した先頭がスクロールできない問題を回避）。 */
-/* ステージをラップして、はっきり見えるカスタムのリサイズグリップを右下角に重ねる
-   （native の resize ハンドルは視認しづらいので使わない）。 */
-.pdf-viewer__stagewrap { position: relative; align-self: center; max-width: 100%; }
 /* 背景は透明にして、ページのアスペクト比でできるレターボックスの隙間を
    ビューアの半透明グレー（フロスト地）に馴染ませる。ページ自体の白は canvas 側で出す。 */
-.pdf-viewer__stage { overflow: auto; min-width: 14rem; min-height: 10rem; max-width: 92vw; max-height: 82vh; text-align: center; background: transparent; border-radius: 4px; }
-/* 右下のリサイズグリップ: 斜めストライプを三角マスクで切り出した定番の掴み。 */
+.pdf-viewer__stage { overflow: auto; align-self: center; min-width: 14rem; min-height: 10rem; max-width: 92vw; max-height: 82vh; text-align: center; background: transparent; border-radius: 4px; }
+/* リサイズグリップ: グレーのダイアログ（ビューア）の右下角に置く。斜めストライプを三角マスクで
+   切り出した定番の掴み。ドラッグでステージを変え、ダイアログが追従して大きくなる。 */
 .pdf-viewer__resizer {
-  position: absolute; right: 0; bottom: 0; width: 18px; height: 18px; z-index: 2;
+  position: absolute; right: 3px; bottom: 3px; width: 18px; height: 18px; z-index: 2;
   cursor: nwse-resize; color: var(--muted); touch-action: none;
   background: repeating-linear-gradient(135deg, currentColor 0 1.5px, transparent 1.5px 4px);
   -webkit-mask: linear-gradient(135deg, transparent 52%, #000 52%);

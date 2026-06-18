@@ -80,13 +80,12 @@
                 <button type="button" class="pdf-viewer__btn pdf-viewer__close" data-action="pdf#close" title="閉じる" aria-label="閉じる"><%= icon("x") %></button>
               </span>
             </div>
-            <div class="pdf-viewer__stagewrap">
-              <div class="pdf-viewer__stage" data-pdf-target="stage">
-                <canvas data-pdf-target="canvas"></canvas>
-              </div>
-              <span class="pdf-viewer__resizer" aria-hidden="true" title="ドラッグでビューアの大きさを変える"></span>
+            <div class="pdf-viewer__stage" data-pdf-target="stage">
+              <canvas data-pdf-target="canvas"></canvas>
             </div>
             <p class="muted" data-pdf-target="status"></p>
+            <%# リサイズグリップはグレーのダイアログ右下角に置く（ドラッグでステージを変え、ダイアログが追従）。 %>
+            <span class="pdf-viewer__resizer" aria-hidden="true" title="ドラッグでビューアの大きさを変える"></span>
           </div>
         </dialog>
         <p>
