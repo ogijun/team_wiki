@@ -108,4 +108,12 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     patch assign_material_transcription_url(@media, t), params: { assignee_id: @user.id }
     assert_redirected_to new_session_url
   end
+
+  test "assign responds with a turbo_stream replacing the part row" do
+    t = part
+    patch assign_material_transcription_url(@media, t),
+          params: { assignee_id: @user.id }, as: :turbo_stream
+    assert_response :success
+    assert_match %r{turbo-stream action="replace" target="transcription_#{t.id}"}, response.body
+  end
 end
