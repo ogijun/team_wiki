@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   resources :materials do
     get "pdf", on: :member, to: "materials/pdf#show"
     resources :transcriptions, except: [ :index ] do
+      patch :assign, on: :member
       resources :revisions, only: %i[index show], controller: "transcription_revisions"
     end
     resources :comments, only: :create
