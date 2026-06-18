@@ -45,7 +45,7 @@
                 aria-controls="search-overlay"><%= icon("search") %></button>
         <div class="topbar__search-overlay" id="search-overlay" data-search-target="overlay" hidden>
           <form action="<%= search_path %>" method="get" role="search">
-            <span class="topbar__search-overlay-icon"><%= icon("search") %></span>
+            <%# 虫めがねは Pico が input[type=search] に付ける native 装飾を使う（自前アイコンは置かない）。 %>
             <input type="search" name="q" placeholder="検索…" aria-label="検索" data-search-target="input">
           </form>
           <button type="button" class="topbar__search-close" data-action="search#close"

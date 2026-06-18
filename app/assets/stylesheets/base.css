@@ -103,17 +103,9 @@ body > header.topbar {
   box-shadow: -6px 6px 20px rgba(20, 17, 15, 0.08);
 }
 .topbar__search-overlay[hidden] { display: none; } /* display:flex が hidden 既定を上書きするので明示 */
-.topbar__search-overlay form { flex: 1; display: flex; align-items: center; gap: 0.5rem; margin: 0; min-width: 0; }
-.topbar__search-overlay-icon { display: inline-flex; color: var(--muted); }
-.topbar__search-overlay input {
-  flex: 1; width: 100%; min-width: 0; margin: 0; padding: 0.35rem 0.2rem; line-height: 1.4;
-  font-size: 1rem; background: transparent; border: 0;
-  /* WebKit(Safari)が type=search に出すネイティブ虫めがね装飾を消す（自前アイコンと二重になるため）。 */
-  appearance: none; -webkit-appearance: none;
-}
-.topbar__search-overlay input::-webkit-search-decoration,
-.topbar__search-overlay input::-webkit-search-results-button { -webkit-appearance: none; display: none; }
-.topbar__search-overlay input:focus { outline: none; box-shadow: none; }
+.topbar__search-overlay form { flex: 1; display: flex; align-items: center; margin: 0; min-width: 0; }
+/* 入力欄は Pico の native な検索装飾（虫めがね＋左 padding）をそのまま使う。 */
+.topbar__search-overlay input { flex: 1; width: 100%; min-width: 0; margin: 0; }
 .topbar__search-close {
   flex: 0 0 auto; width: auto; padding: 0 0.5rem; margin: 0;
   background: none; border: 0; cursor: pointer; color: var(--muted);
