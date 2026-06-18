@@ -34,4 +34,22 @@ class ChronicleControllerTest < ActionDispatch::IntegrationTest
     get chronicle_url
     assert_select "li", text: /1939年9月1日 〜 1945年8月/
   end
+
+  test "lists dated materials and articles with type icons and links" do
+    Article.create!(title: "年表記事", created_by: @user,
+                    starts_at: Time.zone.local(1981), starts_precision: "year")
+    material = Material.create!(user: @user, title: "年表資料", url: "https://x.test/c",
+                               published_at: Time.utc(1979, 4, 1), published_precision: "month")
+    get chronicle_url
+    assert_response :success
+    assert_select "a", text: /年表記事/
+    assert_select ".chronicle-list a[href=?]", material_path(material), text: /年表資料/
+    assert_select ".chronicle-list svg use[href*=landmark]"  # 資料アイコン
+    assert_select ".chronicle-list svg use[href*=newspaper]" # 記事アイコン
+  end
+
+  test "shows an empty-state message when nothing is dated" do
+    get chronicle_url
+    assert_select ".muted", text: /日付のある記事・資料がまだありません/
+  end
 end
