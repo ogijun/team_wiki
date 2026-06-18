@@ -153,25 +153,15 @@
 <% if @material.transcribable? %>
 <section class="transcription-section">
   <% parts = @material.transcriptions.includes(:author, :assignee).to_a %>
-  <% done, total = @material.transcription_progress %>
-  <h2>文字起こし<% if total.positive? %> <span class="pill"><%= done %> / <%= total %></span><% end %></h2>
+  <% c = @material.transcription_counts %>
+  <h2>文字起こし<% if c[:total].positive? %> <span class="pill"><%= c[:done] %> / <%= c[:total] %></span><% end %></h2>
 
   <% if parts.any? %>
+    <p class="muted transcription-summary">
+      <%= c[:total] %> パート中 ・ 完了 <strong><%= c[:done] %></strong> ・ 担当中 <strong><%= c[:in_progress] %></strong> ・ 未担当 <strong><%= c[:unassigned] %></strong>
+    </p>
     <% parts.each do |t| %>
-      <div class="transcript-part">
-        <div class="transcript-part__head">
-          <strong><%= t.display_label %></strong>
-          <%= render BadgeComponent.new(text: t.status_label, variant: :status) %>
-          <% if t.assignee %><span class="meta"><%= avatar_tag(t.assignee, size: 18) %> <%= display_name(t.assignee) %></span><% end %>
-        </div>
-        <div class="transcript-box">
-          <div class="prewrap"><%= t.body.to_s.lines.first(3).join %></div>
-          <p class="transcript-box__more">
-            <%= link_to "全文", material_transcription_path(@material, t) %>
-            ・<%= link_to "編集", edit_material_transcription_path(@material, t) %>
-          </p>
-        </div>
-      </div>
+      <%= render "materials/transcription_part", material: @material, t: t, members: @members %>
     <% end %>
     <p><%= link_to "パートを追加", new_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
   <% else %>

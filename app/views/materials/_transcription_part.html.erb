@@ -1,0 +1,40 @@
+<%# 1 文字起こしパート行。担当(assignee)は GitHub 風に自由割り当て・弱いサイン。編集ゲートではない。 %>
+<div class="transcript-part" id="<%= dom_id(t) %>">
+  <div class="transcript-part__head">
+    <strong><%= t.display_label %></strong>
+    <%= render BadgeComponent.new(text: t.assignment_state_label, variant: :status) %>
+
+    <% if t.assignable_by?(Current.user) %>
+      <details class="assignee-menu" data-controller="menu">
+        <summary class="assignee-menu__summary" role="button" title="担当者を割り当て">
+          <% if t.assignee %>
+            <%= avatar_tag(t.assignee, size: 18) %> <%= display_name(t.assignee) %>
+          <% else %>
+            <span class="muted"><%= icon("user") %> 担当者を割り当て</span>
+          <% end %>
+        </summary>
+        <div class="assignee-menu__list">
+          <% members.each do |m| %>
+            <%= button_to assign_material_transcription_path(material, t), method: :patch, params: { assignee_id: m.id }, class: "assignee-menu__item#{' is-current' if t.assignee_id == m.id}" do %>
+              <%= avatar_tag(m, size: 18) %> <%= display_name(m) %>
+            <% end %>
+          <% end %>
+          <% if t.assignee %>
+            <%= button_to assign_material_transcription_path(material, t), method: :patch, params: { assignee_id: "" }, class: "assignee-menu__item assignee-menu__item--clear" do %>
+              <%= icon("x") %> 担当を外す
+            <% end %>
+          <% end %>
+        </div>
+      </details>
+    <% elsif t.assignee %>
+      <span class="meta"><%= avatar_tag(t.assignee, size: 18) %> <%= display_name(t.assignee) %></span>
+    <% end %>
+  </div>
+  <div class="transcript-box">
+    <div class="prewrap"><%= t.body.to_s.lines.first(3).join %></div>
+    <p class="transcript-box__more">
+      <%= link_to "全文", material_transcription_path(material, t) %>
+      ・<%= link_to "編集", edit_material_transcription_path(material, t) %>
+    </p>
+  </div>
+</div>

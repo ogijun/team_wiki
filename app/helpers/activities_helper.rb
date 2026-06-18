@@ -9,6 +9,7 @@ module ActivitiesHelper
     "comment.posted"   => [ "が", "にコメントしました" ],
     "transcription.created" => [ "が", "の文字起こしを作成しました" ],
     "transcription.edited"  => [ "が", "の文字起こしを編集しました" ],
+    "transcription.assigned" => [ "が", "の文字起こしの担当を割り当てました" ],
     "tag.created"      => [ "がタグ", "を作成しました" ],
     "tag.deleted"      => [ "がタグ", "を削除しました" ],
     "user.joined"      => [ "", "が参加しました" ]
@@ -24,6 +25,7 @@ module ActivitiesHelper
     "comment.posted"   => "message-circle",
     "transcription.created" => "audio-lines",
     "transcription.edited"  => "pen-line",
+    "transcription.assigned" => "user",
     "tag.created"      => "tags",
     "tag.deleted"      => "trash-2",
     "user.joined"      => "users"
