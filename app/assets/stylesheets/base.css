@@ -136,6 +136,8 @@ body > header.topbar {
   font-size: 0.66rem; font-weight: 600; letter-spacing: 0.12em; color: var(--muted);
   padding: 0 0.55rem 0.2rem;
 }
+/* 降格した「記事(見直し中)」を区切る薄い線 */
+.nav-sep { border: 0; border-top: 1px solid var(--hairline); margin: 0.5rem 0.2rem; }
 .sidebar__about { margin-top: 0.9rem; }
 
 /* 右サイドバー: 用途未定の足場。本文(--page)＋左右サイドバーが重ならない十分広い画面でのみ表示。

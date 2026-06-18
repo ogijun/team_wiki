@@ -126,4 +126,16 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     # 活動フィード「報告します！」に time-ago 要素が出る
     assert_select "time[data-local=?]", "time-ago", minimum: 1
   end
+
+  test "sidebar is materials-first and demotes 記事 to (見直し中) below a divider" do
+    get root_url
+    # コンテンツ群に 資料/文字起こし/タグ/年表 が出る
+    assert_select ".sidebar__nav a[href=?]", materials_path
+    assert_select ".sidebar__nav a[href=?]", transcriptions_path
+    assert_select ".sidebar__nav a[href=?]", tags_path
+    assert_select ".sidebar__nav a[href=?]", chronicle_path
+    # 記事は降格: (見直し中) マーカー付き＋区切り線あり
+    assert_select ".sidebar__nav a[href=?] small.wip", articles_path, text: /見直し中/
+    assert_select ".sidebar__nav .nav-sep"
+  end
 end
