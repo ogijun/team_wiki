@@ -80,8 +80,26 @@ jobs:
     #      - 6379:6379
     #    options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
+      # libvips/qpdf の .deb をキャッシュし、毎回のフルダウンロードを避ける（third-party action は使わない）。
+      # apt は /var/cache/apt/archives に既存の .deb があれば再ダウンロードしないので、そこへ復元する。
+      - name: Restore apt package cache (libvips, qpdf)
+        uses: actions/cache@v5
+        with:
+          path: ~/apt-debs
+          key: apt-debs-${{ runner.os }}-libvips-qpdf-v1
+
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips qpdf
+        run: |
+          sudo mkdir -p /var/cache/apt/archives
+          if compgen -G "$HOME/apt-debs/*.deb" > /dev/null; then
+            echo "Using cached .deb packages"
+            sudo cp "$HOME"/apt-debs/*.deb /var/cache/apt/archives/ || true
+          fi
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libvips qpdf
+          # 次回のために取得済み .deb を user dir へ退避（archives は world-readable）。
+          mkdir -p "$HOME/apt-debs"
+          cp /var/cache/apt/archives/*.deb "$HOME/apt-debs/" 2>/dev/null || true
 
       - name: Checkout code
         uses: actions/checkout@v6
