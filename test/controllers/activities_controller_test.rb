@@ -51,4 +51,10 @@ class ActivitiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "li .timeline-more", text: /ほか3件/     # 先頭ACTION_LIST_HEAD(=2)件＋残り3件
     assert_select "li [data-controller=disclosure]"
   end
+
+  test "timeline shows the actor's avatar on each entry" do
+    Activity.record(actor: @user, action: "tag.created", subject_label: "アバター確認")
+    get activities_url
+    assert_select ".timeline li .avatar"
+  end
 end

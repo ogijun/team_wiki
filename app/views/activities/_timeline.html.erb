@@ -2,9 +2,10 @@
   <% groups.each do |item| %>
     <% if item.respond_to?(:activities) %>
       <% rep = item.activities.first %>
+      <% show_actor = local_assigns.fetch(:show_actor, true) %>
       <li>
+        <% if show_actor %><%= avatar_tag(rep.user, size: 20) %><% end %>
         <%= activity_group_icon(item) %>
-        <% show_actor = local_assigns.fetch(:show_actor, true) %>
         <% if show_actor %><strong><%= link_to display_name(rep.user), rep.user %></strong><% end %><%= activity_group_phrase(item, actor: show_actor) %>
         <span class="muted"><%= local_time_ago(rep.created_at) %></span>
       </li>
