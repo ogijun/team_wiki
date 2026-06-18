@@ -1,18 +1,18 @@
 <div class="page-header"><h1>年表 <small class="wip">(検討中)</small></h1></div>
 <p class="page-lead">
-  日付を持つ記事を時系列に並べます。現在はフラット表示で、絞り込みや表示倍率（レンズ）の変更は今後対応予定です。
+  発行日のある資料と日付のある記事を時系列に並べます。現在はフラット表示で、絞り込みや表示倍率（レンズ）の変更は今後対応予定です。
 </p>
 
-<% events = @articles.to_a %>
-<% if events.any? %>
+<% if @entries.any? %>
   <ul class="chronicle-list">
-    <% events.each do |a| %>
+    <% @entries.each do |e| %>
       <li>
-        <%= render FuzzyDateComponent.new(starts: a.starts, ends: a.ends) %>
-        <%= link_to a.title, a %>
+        <%= render FuzzyDateComponent.new(starts: e.starts, ends: e.ends) %>
+        <%= icon(e.kind == :article ? "newspaper" : "landmark") %>
+        <%= link_to e.title, e.record %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <p class="muted">日付を持つ記事がまだありません。記事に「日時」を設定すると年表に並びます。</p>
+  <p class="muted">日付のある記事・資料がまだありません。記事に「日時」、資料に「発行日」を設定すると年表に並びます。</p>
 <% end %>

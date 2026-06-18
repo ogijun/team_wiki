@@ -1,5 +1,5 @@
 class ChronicleController < ApplicationController
   def index
-    @articles = Article.chronicled
+    @entries = Chronicle.entries
   end
 end

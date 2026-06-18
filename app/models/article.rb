@@ -30,6 +30,19 @@ class Article < ApplicationRecord
 
   scope :chronicled, -> { where.not(starts_at: nil).order(:starts_at) }
 
+  # 資料から自動生成され、その後まったく手が加わっていないスタブ記事を返す（一度きりの掃除用）。
+  # 署名: status=stub / リビジョン1つ(マーカー "資料から自動作成") / タグ0 / コメント0。
+  # 編集(2リビジョン目)・status 昇格・タグ/コメント付与・マーカー無し(手動)は除外＝残す。
+  # データ規模が小さい一度きり処理なので Ruby でフィルタする。
+  def self.untouched_auto_stubs
+    where(status: "stub").includes(:revisions, :comments, :tags).select do |a|
+      a.revisions.size == 1 &&
+        a.revisions.min_by(&:id).edit_summary == "資料から自動作成" &&
+        a.comments.empty? &&
+        a.tags.empty?
+    end
+  end
+
   validates :starts_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
   validates :ends_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
 

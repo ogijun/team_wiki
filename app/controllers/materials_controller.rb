@@ -39,7 +39,7 @@ class MaterialsController < ApplicationController
 
   def create
     @material = Material.new(material_params.merge(user: Current.user))
-    if save_material_with_stub(@material)
+    if save_material(@material)
       # 重い後処理（ファイル=メタ抽出/PDF linearize、URL=サイトAPI/og:title 補完）は
       # 外部 I/O を含むのでリクエストから外して非同期で行う。
       MaterialPostProcessJob.perform_later(@material)
@@ -70,13 +70,12 @@ class MaterialsController < ApplicationController
 
   private
 
-  # 資料保存と、付随作成（初回コメント・チェック時のみのスタブ記事）を1トランザクションで行う。
+  # 資料保存と初回コメントを1トランザクションで行う。
   # 資料が無効なら save! が RecordInvalid を投げ、ロールバックして new を再描画する。
-  def save_material_with_stub(material)
+  def save_material(material)
     Material.transaction do
       material.save!
       add_first_comment(material, params[:first_comment])
-      StubArticleForMaterial.call(material: material, author: Current.user) if params[:create_stub_article] == "1"
     end
     true
   rescue ActiveRecord::RecordInvalid
@@ -96,7 +95,7 @@ class MaterialsController < ApplicationController
     permitted = [ :title, :description,
                  :source, :author, :rights, :ownership, :tag_names,
                  :isbn, :pages, :page_count, :publisher, :volume,
-                 :published_year, :published_month, :published_day ]
+                 :published_year, :published_month, :published_day, :published_hour, :published_minute ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。
     permitted += [ :file, :url ] unless @material&.persisted?
     # 信頼度の権限は Material の述語に集約（create 時は @material 未設定なので新規インスタンスで判定）。

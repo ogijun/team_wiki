@@ -333,41 +333,10 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, m.comments.count
   end
 
-  test "creating a material with the checkbox creates a stub article that cites it" do
-    assert_difference("Article.count", 1) do
-      post materials_url, params: link_params(title: "新資料Z").merge(create_stub_article: "1")
-    end
-    material = Material.find_by!(title: "新資料Z")
-    stub = material.citing_articles.first
-    assert_equal "stub", stub.status
-    assert_equal "新資料Z", stub.title
-    assert_includes stub.current_revision.body, "[[ref:#{material.slug}]]"
-  end
-
-  test "creating a material without the checkbox does not create a stub article" do
+  test "creating a material does not create a stub article" do
     assert_no_difference("Article.count") do
       post materials_url, params: link_params(title: "スタブなし資料")
     end
-  end
-
-  test "checked stub article inherits the material's published fuzzy date" do
-    post materials_url, params: { material: {
-      url: "https://example.com/dated", title: "日付つき資料",
-      published_year: "1991", published_month: "3", published_day: "16"
-    }, create_stub_article: "1" }
-    stub = Material.find_by!(title: "日付つき資料").citing_articles.first
-    assert_equal Time.zone.local(1991, 3, 16), stub.starts_at
-    assert_equal "day", stub.starts_precision
-  end
-
-  test "stub checkbox appears unchecked on new and not at all on edit" do
-    get new_material_url
-    assert_select "input[type=checkbox][name=create_stub_article]"
-    assert_select "input[name=create_stub_article][checked]", count: 0
-
-    m = Material.create!(user: @user, url: "https://example.com/e", title: "編集資料")
-    get edit_material_url(m)
-    assert_select "input[name=create_stub_article]", count: 0
   end
 
   test "create autofills title from filename (sans extension) when blank" do
@@ -609,5 +578,25 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".transcription-summary", text: /未担当/
     # 担当ピッカー: メンバーへ assign する member ルートの button_to が出る
     assert_select "form[action=?]", assign_material_transcription_path(media, media.transcriptions.first)
+  end
+
+  test "creating a material never creates a stub article (auto-generation retired)" do
+    assert_no_difference -> { Article.count } do
+      post materials_url, params: { material: { title: "スタブ無し資料", url: "https://x.test/nostub" },
+                                    create_stub_article: "1" }
+    end
+    assert_raises(NameError) { StubArticleForMaterial } # サービスは削除済み
+  end
+
+  test "published_at can be entered down to the minute" do
+    post materials_url, params: { material: {
+      title: "時刻あり資料", url: "https://x.test/time",
+      published_year: "1982", published_month: "3", published_day: "1",
+      published_hour: "14", published_minute: "30"
+    } }
+    m = Material.find_by!(title: "時刻あり資料")
+    assert_equal "time", m.published_precision      # 時刻まで入れたら time 精度（FuzzyDate）
+    assert_equal 14, m.published_at.hour
+    assert_equal 30, m.published_at.min
   end
 end
