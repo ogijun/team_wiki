@@ -336,8 +336,10 @@ button.tag-chip:hover, button.tag-chip:focus {
 .lightbox::backdrop { background: rgba(20, 17, 15, 0.55); }
 .lightbox img { display: block; max-width: min(92vw, 70rem); max-height: 88vh; object-fit: contain; }
 /* PDF ダイアログは中身（ページのアスペクト比）に合わせて縮む。70rem 上限は外す。
-   ビューアの地は light/dark どちらでも馴染む中明度グレーの半透明＋ぼかし（ページの白は前面のステージ）。 */
+   ビューアの地は light/dark どちらでも馴染む中明度グレーの半透明＋ぼかし（ページの白は前面のステージ）。
+   ビューアは「元の文書の上に浮く窓」なので、外側(backdrop)は塗らず元の画面をそのまま見せる。 */
 .lightbox--pdf { max-width: 96vw; background: rgba(128, 130, 138, 0.45); backdrop-filter: blur(14px) saturate(1.1); }
+.lightbox--pdf::backdrop { background: transparent; }
 
 /* PDF ビューア（PDF.js・ページ単位の部分読み込み）。
    ダイアログは中身ぴったりに縮み、ページは本来のアスペクト比でビューポート最大まで表示する。 */
@@ -377,7 +379,20 @@ button.tag-chip:hover, button.tag-chip:focus {
    ズーム時は枠内で canvas だけが拡大縮小し、はみ出たらこの枠の中だけスクロールする。
    inline-block + text-align:center にして、拡大時も左端までスクロール可能にする（flex の中央寄せ
    だとはみ出した先頭がスクロールできない問題を回避）。 */
-.pdf-viewer__stage { overflow: auto; resize: both; min-width: 14rem; min-height: 10rem; max-width: 92vw; max-height: 82vh; margin: 0 auto; text-align: center; background: var(--surface); border-radius: 4px; }
+/* ステージをラップして、はっきり見えるカスタムのリサイズグリップを右下角に重ねる
+   （native の resize ハンドルは視認しづらいので使わない）。 */
+.pdf-viewer__stagewrap { position: relative; align-self: center; max-width: 100%; }
+.pdf-viewer__stage { overflow: auto; min-width: 14rem; min-height: 10rem; max-width: 92vw; max-height: 82vh; text-align: center; background: var(--surface); border-radius: 4px; }
+/* 右下のリサイズグリップ: 斜めストライプを三角マスクで切り出した定番の掴み。 */
+.pdf-viewer__resizer {
+  position: absolute; right: 0; bottom: 0; width: 18px; height: 18px; z-index: 2;
+  cursor: nwse-resize; color: var(--muted); touch-action: none;
+  background: repeating-linear-gradient(135deg, currentColor 0 1.5px, transparent 1.5px 4px);
+  -webkit-mask: linear-gradient(135deg, transparent 52%, #000 52%);
+          mask: linear-gradient(135deg, transparent 52%, #000 52%);
+  border-bottom-right-radius: 4px;
+}
+.pdf-viewer__resizer:hover { color: var(--accent); }
 .pdf-viewer__stage canvas { display: inline-block; vertical-align: top; border: 1px solid var(--hairline); background: #fff; }
 /* 拡大でスクロール可能なときだけ掴めるカーソルに（パン中は握り） */
 .pdf-viewer__stage.is-pannable { cursor: grab; }

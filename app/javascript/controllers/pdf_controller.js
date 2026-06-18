@@ -26,6 +26,7 @@ export default class extends Controller {
     window.addEventListener("resize", this.onResize)
     this.setupStageInteractions()
     this.setupDrag()
+    this.setupResizer()
   }
 
   disconnect() {
@@ -172,6 +173,34 @@ export default class extends Controller {
     }
     bar.addEventListener("pointerup", end)
     bar.addEventListener("pointercancel", end)
+  }
+
+  // 右下のグリップでステージをリサイズ。実際の寸法変更は ResizeObserver(onStageResize) が拾って
+  // 再フィット/枠変更する（native の resize ハンドルは視認しづらいので自前グリップで代替）。
+  setupResizer() {
+    const handle = this.element.querySelector(".pdf-viewer__resizer")
+    if (!handle) return
+    let resizing = false
+    let sx = 0, sy = 0, sw = 0, sh = 0
+    handle.addEventListener("pointerdown", (e) => {
+      e.preventDefault()
+      resizing = true
+      sx = e.clientX; sy = e.clientY
+      sw = this.stageTarget.clientWidth; sh = this.stageTarget.clientHeight
+      handle.setPointerCapture(e.pointerId)
+    })
+    handle.addEventListener("pointermove", (e) => {
+      if (!resizing) return
+      this.stageTarget.style.width = `${Math.max(220, sw + (e.clientX - sx))}px`
+      this.stageTarget.style.height = `${Math.max(160, sh + (e.clientY - sy))}px`
+    })
+    const end = (e) => {
+      if (!resizing) return
+      resizing = false
+      try { handle.releasePointerCapture(e.pointerId) } catch { /* already released */ }
+    }
+    handle.addEventListener("pointerup", end)
+    handle.addEventListener("pointercancel", end)
   }
 
   // 隅のハンドルでステージが変わったときの処理（自前の sizeStage 由来はスキップ）。
