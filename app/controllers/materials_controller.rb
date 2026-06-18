@@ -30,7 +30,7 @@ class MaterialsController < ApplicationController
   end
 
   def show
-    @members = User.with_attached_avatar.order(:name).to_a # 担当(assignee)ピッカー用
+    @members = User.for_picker.to_a # 担当(assignee)ピッカー用のメンバー一覧
   end
 
   def new

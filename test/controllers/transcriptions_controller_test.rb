@@ -111,6 +111,13 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
+  test "assign does not bump lock_version (independent of versioned body edits)" do
+    t = part
+    before = t.lock_version
+    patch assign_material_transcription_url(@media, t), params: { assignee_id: @user.id }
+    assert_equal before, t.reload.lock_version
+  end
+
   test "assign responds with a turbo_stream replacing the part row" do
     t = part
     patch assign_material_transcription_url(@media, t),

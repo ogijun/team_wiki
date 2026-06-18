@@ -153,7 +153,7 @@
 <% if @material.transcribable? %>
 <section class="transcription-section">
   <% parts = @material.transcriptions.includes(:author, :assignee).to_a %>
-  <% c = @material.transcription_counts %>
+  <% c = @material.transcription_counts(parts) %>
   <h2>文字起こし<% if c[:total].positive? %> <span class="pill"><%= c[:done] %> / <%= c[:total] %></span><% end %></h2>
 
   <% if parts.any? %>
