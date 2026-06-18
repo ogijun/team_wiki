@@ -41,13 +41,15 @@
       <%# 検索: アイコンだけ出し、押すとトップバーを覆うオーバーレイで検索窓を出す（全画面共通）。 %>
       <div class="topbar__search" data-controller="search">
         <button type="button" class="topbar__search-toggle" data-action="search#open"
-                data-search-target="toggle" aria-label="検索を開く" aria-expanded="false"><%= icon("search") %></button>
-        <div class="topbar__search-overlay" data-search-target="overlay" hidden>
+                data-search-target="toggle" aria-label="検索を開く" aria-expanded="false"
+                aria-controls="search-overlay"><%= icon("search") %></button>
+        <div class="topbar__search-overlay" id="search-overlay" data-search-target="overlay" hidden>
           <form action="<%= search_path %>" method="get" role="search">
             <span class="topbar__search-overlay-icon"><%= icon("search") %></span>
             <input type="search" name="q" placeholder="検索…" aria-label="検索" data-search-target="input">
           </form>
-          <button type="button" class="topbar__search-close" data-action="search#close" aria-label="検索を閉じる">×</button>
+          <button type="button" class="topbar__search-close" data-action="search#close"
+                  data-search-target="close" aria-label="検索を閉じる">×</button>
         </div>
       </div>
       <% if Current.user %>

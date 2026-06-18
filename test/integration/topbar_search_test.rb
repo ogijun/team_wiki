@@ -16,5 +16,8 @@ class TopbarSearchTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller='search'] form[role='search'] input[type='search'][name='q']"
     # 閉じるボタン
     assert_select "[data-controller='search'] button[aria-label=?]", "検索を閉じる"
+    # トグルは aria-controls でオーバーレイ(id)を指す（開示パターンの関連付け）
+    assert_select "button[data-search-target='toggle'][aria-controls='search-overlay']"
+    assert_select "#search-overlay[data-search-target='overlay']"
   end
 end
