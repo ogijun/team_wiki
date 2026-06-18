@@ -46,6 +46,7 @@
 .timeline { list-style: none; padding-left: 0; margin: 0; }
 .timeline li { list-style: none; margin-bottom: 0.45rem; }
 .timeline li::marker { content: none; }
+.timeline li .avatar { margin-right: 0.3rem; }
 .timeline__icon { color: var(--muted); margin-right: 0.35rem; }
 .timeline__overflow { font-size: 0.85rem; padding-left: 1.6rem; }
 
