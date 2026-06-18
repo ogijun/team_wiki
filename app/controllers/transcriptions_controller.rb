@@ -46,7 +46,8 @@ class TranscriptionsController < ApplicationController
     return head :forbidden unless @transcription.assignable_by?(Current.user)
     assignee = params[:assignee_id].present? ? User.find(params[:assignee_id]) : nil
     @transcription.update!(assignee: assignee)
-    Activity.record(actor: Current.user, action: "transcription.assigned", subject: @material) if assignee
+    # 活動は「担当にされた人」を主語(actor)にする（タイムラインは「xxx が zzz の担当になりました」と出る）。
+    Activity.record(actor: assignee, action: "transcription.assigned", subject: @material) if assignee
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(

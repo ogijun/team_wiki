@@ -91,6 +91,8 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to @media
     assert_equal other, t.reload.assignee
+    # 活動は「担当にされた人」が actor（タイムラインに本人として出る）
+    assert_equal other, Activity.where(action: "transcription.assigned").last.user
   end
 
   test "assign with blank assignee_id clears the assignee (and does not log)" do

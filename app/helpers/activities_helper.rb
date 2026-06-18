@@ -9,7 +9,7 @@ module ActivitiesHelper
     "comment.posted"   => [ "が", "にコメントしました" ],
     "transcription.created" => [ "が", "の文字起こしを作成しました" ],
     "transcription.edited"  => [ "が", "の文字起こしを編集しました" ],
-    "transcription.assigned" => [ "が", "の文字起こしの担当を割り当てました" ],
+    "transcription.assigned" => [ "が", "の文字起こし担当になりました" ],
     "tag.created"      => [ "がタグ", "を作成しました" ],
     "tag.deleted"      => [ "がタグ", "を削除しました" ],
     "user.joined"      => [ "", "が参加しました" ]
