@@ -47,7 +47,7 @@
 /* 左=アバター / 右=本文。マーカー分のインデントは付けない（padding-left:0）。 */
 .timeline li { display: flex; align-items: flex-start; gap: 0.45rem; list-style: none; margin-bottom: 0.5rem; }
 .timeline li::marker { content: none; }
-.timeline li .avatar { flex: 0 0 auto; }
+.timeline li .avatar { flex: 0 0 auto; margin-top: 2px; } /* 視覚補正で少し下げる */
 .timeline__body { flex: 1; min-width: 0; } /* テキストはアバターの右から始まり、折り返しても潜り込まない */
 .timeline__icon { color: var(--muted); margin-right: 0.35rem; }
 /* 「ほかN件」はアバター幅(32px)＋gap ぶん右に寄せて本文と揃える */
