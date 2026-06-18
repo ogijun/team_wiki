@@ -141,10 +141,29 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
       assert_select ".placeholder"                            # 既定はプレースホルダ表示
       assert_select "dialog.lightbox:not([open]) .pdf-viewer" # オーバーレイは閉じた状態
       assert_select "input.pdf-viewer__pageinput[data-action=?]", "change->pdf#jump" # 番号入力でページジャンプ
+      assert_select ".pdf-viewer > .pdf-viewer__resizer"                             # ダイアログ右下にリサイズグリップ
       assert_select "a[data-action='pdf#open']", text: /doc\.pdf/
       assert_select "a[href=?] svg use[href*=download]", rails_blob_path(pdf.file)
       assert_select "a[href=?][aria-label=?]", rails_blob_path(pdf.file), "ダウンロード" # アイコンのみDLリンクのアクセシブル名
     end
+  end
+
+  test "pdf viewer controls are icon buttons with tooltips" do
+    pdf = Material.new(user: @user, title: "PDFアイコン操作")
+    pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "icons.pdf", content_type: "application/pdf")
+    pdf.save!
+    get material_url(pdf)
+    # 前後/拡大縮小/フィット/閉じる は アイコン＋title(ツールチップ) のボタン
+    assert_select ".pdf-viewer__bar button[data-action='pdf#prev'][title=?] svg use[href*=chevron-left]", "前のページ"
+    assert_select ".pdf-viewer__bar button[data-action='pdf#next'][title=?] svg use[href*=chevron-right]", "次のページ"
+    assert_select ".pdf-viewer__bar button[data-action='pdf#zoomOut'][title=?] svg use[href*=zoom-out]", "縮小"
+    assert_select ".pdf-viewer__bar button[data-action='pdf#zoomIn'][title=?] svg use[href*=zoom-in]", "拡大"
+    assert_select ".pdf-viewer__bar button[data-action='pdf#fit'][title] svg use[href*=maximize]"
+    assert_select ".pdf-viewer__bar button[data-action='pdf#close'][title=?] svg use[href*='#x']", "閉じる"
+    # 等倍(100%)は % 表示自体をクリック式ボタンに統合
+    assert_select "button.pdf-viewer__pct[data-action='pdf#actualSize'][title]"
+    # 綴じ方向はアイコンボタン（状態は title/aria-label と JS で表現）
+    assert_select ".pdf-viewer__bar button[data-pdf-target='dir'][data-action='pdf#toggleDirection'] svg use[href*=book-open]"
   end
 
   test "image material mirrors the overlay viewer + download-icon composition" do
