@@ -52,8 +52,6 @@
 .timeline__icon { color: var(--muted); margin-right: 0.35rem; }
 /* 「ほかN件」はアバター幅(32px)＋gap ぶん右に寄せて本文と揃える */
 .timeline__overflow { font-size: 0.85rem; padding-left: calc(32px + 0.45rem); }
-/* .dashboard-card ul の左パディング(1.1rem)が timeline にも効いて左スキマになるのを打ち消す。 */
-.dashboard-card .timeline { padding-left: 0; }
 
 /* 改行を保持して表示（文字起こし本文など） */
 .prewrap { white-space: pre-wrap; }
@@ -447,7 +445,8 @@ button.tag-chip:hover, button.tag-chip:focus {
 .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.2rem; }
 .dashboard-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
 .dashboard-card h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
-.dashboard-card ul { margin: 0; padding-left: 1.1rem; }
+/* カード内の箇条書き（資料リスト等）は marker 分インデント。timeline は別レイアウトなので除外。 */
+.dashboard-card ul:not(.timeline) { margin: 0; padding-left: 1.1rem; }
 .dashboard-card li { margin-bottom: 0.35rem; }
 
 /* 統計の推移（スパークライン） */
