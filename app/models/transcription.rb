@@ -26,6 +26,16 @@ class Transcription < ApplicationRecord
 
   def status_label = STATUSES[status]
 
+  # 表示状態は (assignee, status) から導出する（新カラムは持たない）。
+  ASSIGNMENT_STATE_LABELS = { done: "完了", in_progress: "担当中", unassigned: "未担当" }.freeze
+
+  def assignment_state
+    return :done if status == "done"
+    assignee_id.present? ? :in_progress : :unassigned
+  end
+
+  def assignment_state_label = ASSIGNMENT_STATE_LABELS[assignment_state]
+
   def display_label = label.presence || "パート#{position}"
 
   # 認可述語（自作。詳細は [[project-authorization-approach]]）。現状はメンバーなら誰でも編集可。
