@@ -12,15 +12,20 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
-  test "shows dashboard sections" do
-    Article.create!(title: "ダッシュ記事", created_by: @user, status: "stub")
+  test "home shows the materials-first 2-column body (report feed + help-wanted materials)" do
+    media = Material.new(user: @user, title: "未完成サンプル音声")
+    media.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
+    media.save!
     get root_url
     assert_response :success
-    assert_select "h2", text: /最近更新された記事/
-    assert_select "h2", text: /加筆を求む/
-    assert_select "h2", text: /最近の動き/
-    assert_select ".home-hero__sum"
-    assert_select "a", text: /ダッシュ記事/
+    assert_select "h2", text: /報告します/
+    assert_select "h2", text: /この続き、誰かお願い/
+    # 右カラムに未完成資料が出て、「すべての未完成資料を表示」が進捗ボードへ
+    assert_select "a", text: /未完成サンプル音声/
+    assert_select "a[href=?]", transcriptions_path, text: /すべての未完成資料を表示/
+    # 廃止: 最近更新された記事 / 加筆を求む の見出しは出ない
+    assert_select "h2", text: /最近更新された記事/, count: 0
+    assert_select "h2", text: /加筆を求む/, count: 0
   end
 
   test "pages without content_for(:aside) do not render an empty right-sidebar landmark" do
@@ -28,18 +33,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "aside.sidebar-right", count: 0
   end
 
-  test "hero offers the primary create/transcribe actions as buttons" do
+  test "hero CTA is materials-first: 資料を追加する / 文字起こしをする (no 記事を書く)" do
     get root_url
     assert_response :success
-    assert_select ".home-hero__cta a[href=?]", new_article_path, text: /記事を書く/
-    assert_select ".home-hero__cta a[href=?]", new_material_path, text: /資料を追加/
+    assert_select ".home-hero__cta a[href=?]", new_material_path, text: /資料を追加する/
     assert_select ".home-hero__cta a[href=?]", transcriptions_path, text: /文字起こし/
-  end
-
-  test "hero frames transcription as the fallback path with a connector phrase" do
-    # 「記事を書く/資料を追加 → どちらもなければ文字起こし」という導線の意味づけ。
-    get root_url
-    assert_select ".home-hero__cta-or", text: "どちらもなければ"
+    assert_select ".home-hero__cta a[href=?]", new_article_path, count: 0
   end
 
   test "home shows the configured heading as a visible h1" do
@@ -101,13 +100,16 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select ".home-hero__sum a[href=?] svg", stats_path
   end
 
-  test "stats include the total transcribed characters" do
+  test "summary shows 資料 / 文字起こし済 / 未完成資料 and not 記事 / 未確認資料" do
     m = Material.new(user: @user, title: "統計音声")
     m.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
     m.save!
     Transcription.create!(material: m, author: @user, body: "あ" * 1234, status: "drafting")
     get root_url
     assert_select ".home-hero__sum", text: /1,234.*文字起こし済/m
+    assert_select ".home-hero__sum", text: /未完成資料/
+    assert_select ".home-hero__sum", text: /記事/, count: 0
+    assert_select ".home-hero__sum", text: /未確認資料/, count: 0
   end
 
   test "does not show a personal streak line on the home page" do
@@ -121,7 +123,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     Activity.record(actor: @user, action: "article.created", subject: article)
     get root_url
     assert_response :success
-    # 最近更新された記事 と 最近の動き の両方に time-ago 要素が出る
-    assert_select "time[data-local=?]", "time-ago", minimum: 2
+    # 活動フィード「報告します！」に time-ago 要素が出る
+    assert_select "time[data-local=?]", "time-ago", minimum: 1
   end
 end
