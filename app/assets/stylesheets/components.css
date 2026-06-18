@@ -344,9 +344,12 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* PDF ビューア（PDF.js・ページ単位の部分読み込み）。
    ダイアログは中身ぴったりに縮み、ページは本来のアスペクト比でビューポート最大まで表示する。 */
 .pdf-viewer { padding: 0.7rem 0.8rem; display: flex; flex-direction: column; max-height: 94vh; }
-/* ツールバーは「つかんで動かす」ハンドルも兼ねる（ボタン/入力の上ではドラッグしない）。 */
+/* ツールバーは「つかんで動かす」ハンドルも兼ねる（ボタン/入力の上ではドラッグしない）。
+   左右ゾーン(flex:1)でナビを中央に寄せる: 左=綴じ方向 / 中央=ページナビ / 右=ズーム＋閉じる。 */
 .pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; cursor: move; touch-action: none; }
 .pdf-viewer__bar.is-dragging { cursor: grabbing; }
+.pdf-viewer__bar-side { flex: 1 1 0; min-width: 0; display: inline-flex; align-items: center; gap: 0.4rem; }
+.pdf-viewer__bar-side--end { justify-content: flex-end; }
 /* 関連する操作を角丸の薄いセグメントでまとめて整える。半透明グレーの地に馴染むよう
    不透明色ではなく薄い白のフロストにする。 */
 .pdf-viewer__group { display: inline-flex; align-items: center; gap: 0.1rem; padding: 0.15rem; background: rgba(255, 255, 255, 0.22); border-radius: 9px; }
@@ -361,11 +364,13 @@ button.tag-chip:hover, button.tag-chip:focus {
 .pdf-viewer__btn .icon { width: 1.15rem; height: 1.15rem; }
 /* 綴じ方向: 右開きのときは本アイコンを左右反転して状態を示す。 */
 .pdf-viewer__btn.is-rtl .icon { transform: scaleX(-1); }
-/* 前/次ナビ。右開きのときは並びを反転して「次へ」を左に置く（読み進み方向に一致）。 */
-.pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.1rem; }
+/* 前/次ナビ。中央ゾーンなので flex で縮まないよう固定。右開きのときは並びを反転して
+   「次へ」を左に置く（読み進み方向に一致）。 */
+.pdf-viewer__nav { display: inline-flex; align-items: center; gap: 0.1rem; flex: 0 0 auto; }
 .pdf-viewer__nav--rtl { flex-direction: row-reverse; }
 .pdf-viewer__page { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0 0.3rem; font-size: 0.85rem; color: var(--ink-soft); }
-.pdf-viewer__pageinput { width: 3rem; text-align: right; padding: 0.1rem 0.3rem; margin: 0; font-size: 0.85rem; background: rgba(255, 255, 255, 0.55); border-color: rgba(255, 255, 255, 0.6); }
+/* 入力は行の中で縦中央に。height と一致する line-height で数字を箱の中央に置く。 */
+.pdf-viewer__pageinput { width: 3rem; height: 1.7rem; line-height: 1.7rem; text-align: right; padding: 0 0.4rem; margin: 0; font-size: 0.85rem; background: rgba(255, 255, 255, 0.55); border-color: rgba(255, 255, 255, 0.6); }
 .pdf-viewer__pagesep { color: var(--muted); }
 .pdf-viewer__zoom { display: inline-flex; align-items: center; gap: 0.1rem; }
 /* % 表示はクリックで等倍に戻すボタン。見た目は控えめなテキスト、ホバーで操作可能と示す。 */
