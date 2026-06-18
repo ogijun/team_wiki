@@ -37,7 +37,7 @@ class Article < ApplicationRecord
   def self.untouched_auto_stubs
     where(status: "stub").includes(:revisions, :comments, :tags).select do |a|
       a.revisions.size == 1 &&
-        a.revisions.first.edit_summary == "資料から自動作成" &&
+        a.revisions.min_by(&:id).edit_summary == "資料から自動作成" &&
         a.comments.empty? &&
         a.tags.empty?
     end

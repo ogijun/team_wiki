@@ -6,8 +6,9 @@ namespace :articles do
     if ENV["DRY_RUN"] == "1"
       puts "DRY_RUN: 削除しません。"
     else
-      targets.each(&:destroy!)
-      puts "削除しました: #{targets.size} 件"
+      deleted = 0
+      Article.transaction { targets.each { |a| a.destroy!; deleted += 1 } }
+      puts "削除しました: #{deleted} 件"
     end
   end
 end

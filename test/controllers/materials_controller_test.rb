@@ -585,7 +585,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
       post materials_url, params: { material: { title: "スタブ無し資料", url: "https://x.test/nostub" },
                                     create_stub_article: "1" }
     end
-    assert_not defined?(StubArticleForMaterial), "StubArticleForMaterial は削除されているはず"
+    assert_raises(NameError) { StubArticleForMaterial } # サービスは削除済み
   end
 
   test "published_at can be entered down to the minute" do

@@ -12,7 +12,7 @@ module Chronicle
     material_entries = Material.where.not(published_at: nil).map do |m|
       Entry.new(sort_at: m.published_at, starts: m.published, ends: nil, title: m.title, record: m, kind: :material)
     end
-    # 日付昇順。同日は記事(0)→資料(1)の安定順。
-    (article_entries + material_entries).sort_by { |e| [ e.sort_at, e.kind == :article ? 0 : 1 ] }
+    # 日付昇順。同日は 記事(0)→資料(1)、さらにタイトルで決定的に並べる。
+    (article_entries + material_entries).sort_by { |e| [ e.sort_at, e.kind == :article ? 0 : 1, e.title ] }
   end
 end
