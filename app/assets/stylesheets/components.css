@@ -335,13 +335,16 @@ button.tag-chip:hover, button.tag-chip:focus {
 }
 .lightbox::backdrop { background: rgba(20, 17, 15, 0.55); }
 .lightbox img { display: block; max-width: min(92vw, 70rem); max-height: 88vh; object-fit: contain; }
-/* PDF ダイアログは中身（ページのアスペクト比）に合わせて縮む。70rem 上限は外す。 */
-.lightbox--pdf { max-width: 96vw; }
+/* PDF ダイアログは中身（ページのアスペクト比）に合わせて縮む。70rem 上限は外す。
+   ビューアの地は light/dark どちらでも馴染む中明度グレーの半透明＋ぼかし（ページの白は前面のステージ）。 */
+.lightbox--pdf { max-width: 96vw; background: rgba(128, 130, 138, 0.45); backdrop-filter: blur(14px) saturate(1.1); }
 
 /* PDF ビューア（PDF.js・ページ単位の部分読み込み）。
    ダイアログは中身ぴったりに縮み、ページは本来のアスペクト比でビューポート最大まで表示する。 */
 .pdf-viewer { padding: 0.7rem 0.8rem; display: flex; flex-direction: column; max-height: 94vh; }
-.pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; }
+/* ツールバーは「つかんで動かす」ハンドルも兼ねる（ボタン/入力の上ではドラッグしない）。 */
+.pdf-viewer__bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.6rem; cursor: move; touch-action: none; }
+.pdf-viewer__bar.is-dragging { cursor: grabbing; }
 /* 関連する操作を角丸の薄いセグメントでまとめて整える。 */
 .pdf-viewer__group { display: inline-flex; align-items: center; gap: 0.1rem; padding: 0.15rem; background: var(--code-bg); border-radius: 9px; }
 /* アイコンのみの操作ボタン（全ツールバー共通）。十分なヒット領域・ホバー・キーボードフォーカス。 */
@@ -374,7 +377,7 @@ button.tag-chip:hover, button.tag-chip:focus {
    ズーム時は枠内で canvas だけが拡大縮小し、はみ出たらこの枠の中だけスクロールする。
    inline-block + text-align:center にして、拡大時も左端までスクロール可能にする（flex の中央寄せ
    だとはみ出した先頭がスクロールできない問題を回避）。 */
-.pdf-viewer__stage { overflow: auto; max-width: 92vw; max-height: 82vh; margin: 0 auto; text-align: center; background: var(--surface); border-radius: 4px; }
+.pdf-viewer__stage { overflow: auto; resize: both; min-width: 14rem; min-height: 10rem; max-width: 92vw; max-height: 82vh; margin: 0 auto; text-align: center; background: var(--surface); border-radius: 4px; }
 .pdf-viewer__stage canvas { display: inline-block; vertical-align: top; border: 1px solid var(--hairline); background: #fff; }
 /* 拡大でスクロール可能なときだけ掴めるカーソルに（パン中は握り） */
 .pdf-viewer__stage.is-pannable { cursor: grab; }

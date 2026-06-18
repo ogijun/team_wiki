@@ -18,14 +18,19 @@ export default class extends Controller {
   connect() {
     this.rtl = false // 既定は左開き（洋書）。右開き（和書・縦書き）はビューア内トグルで切替（セッション内のみ）。
     this.fitted = true // 現在の倍率がフィット由来か（リサイズ再フィットの対象判定）。
+    this.userResized = false // 隅のハンドルで手動リサイズしたか（以後 window リサイズで自動フィットしない）。
+    this._lastStageSize = { w: 0, h: 0 } // sizeStage 由来の変更を ResizeObserver で無視するための記録。
+    this.offset = { x: 0, y: 0 } // ツールバーをつかんで動かした移動量。
     this.applyDirection()
     this.onResize = () => this.handleResize()
     window.addEventListener("resize", this.onResize)
     this.setupStageInteractions()
+    this.setupDrag()
   }
 
   disconnect() {
     window.removeEventListener("resize", this.onResize)
+    this.stageResizeObserver?.disconnect()
     this.renderTask?.cancel()
     this.doc?.destroy()
     this.doc = null
@@ -33,8 +38,14 @@ export default class extends Controller {
 
   async open(event) {
     event.preventDefault()
+    this.resetPosition() // 開くたびに中央へ（移動の持ち越しで行方不明にならないように）。
     this.dialogTarget.showModal()
     await this.load()
+  }
+
+  resetPosition() {
+    this.offset = { x: 0, y: 0 }
+    this.dialogTarget.style.transform = ""
   }
 
   // 綴じ方向トグル。右開きでは「次へ」が左に来るようナビを反転し、矢印キーの向きも入れ替える。
@@ -126,6 +137,65 @@ export default class extends Controller {
     }, { passive: false })
 
     stage.addEventListener("dblclick", () => this.toggleZoom())
+
+    // 隅のハンドル（CSS resize）でステージをリサイズ。フィット中はページを新サイズへ再フィット、
+    // それ以外の倍率なら枠だけ変える（倍率は維持してスクロール）。
+    this.stageResizeObserver = new ResizeObserver(() => this.onStageResize())
+    this.stageResizeObserver.observe(stage)
+  }
+
+  // ツールバーをつかんでビューアを移動（操作子の上では動かさない）。<dialog> は中央配置のまま
+  // transform で平行移動させる。
+  setupDrag() {
+    const bar = this.element.querySelector(".pdf-viewer__bar")
+    if (!bar) return
+    let dragging = false
+    let startX = 0, startY = 0, baseX = 0, baseY = 0
+    bar.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0 || e.target.closest("button, input, a, .pdf-viewer__pct")) return
+      dragging = true
+      startX = e.clientX; startY = e.clientY
+      baseX = this.offset.x; baseY = this.offset.y
+      bar.classList.add("is-dragging")
+      bar.setPointerCapture(e.pointerId)
+    })
+    bar.addEventListener("pointermove", (e) => {
+      if (!dragging) return
+      this.offset = { x: baseX + (e.clientX - startX), y: baseY + (e.clientY - startY) }
+      this.dialogTarget.style.transform = `translate(${this.offset.x}px, ${this.offset.y}px)`
+    })
+    const end = (e) => {
+      if (!dragging) return
+      dragging = false
+      bar.classList.remove("is-dragging")
+      try { bar.releasePointerCapture(e.pointerId) } catch { /* already released */ }
+    }
+    bar.addEventListener("pointerup", end)
+    bar.addEventListener("pointercancel", end)
+  }
+
+  // 隅のハンドルでステージが変わったときの処理（自前の sizeStage 由来はスキップ）。
+  onStageResize() {
+    if (!this.doc || !this.baseViewport) return
+    const w = this.stageTarget.clientWidth
+    const h = this.stageTarget.clientHeight
+    if (Math.abs(w - this._lastStageSize.w) < 2 && Math.abs(h - this._lastStageSize.h) < 2) return
+    this._lastStageSize = { w, h }
+    this.userResized = true
+    this.syncViewerWidth()
+    if (this.fitted) {
+      this.scale = this.fitScaleToStage()
+      this.render()
+    } else {
+      this.stageTarget.classList.toggle("is-pannable", this.scrollable())
+    }
+  }
+
+  // ステージ内側にページ全体が収まる倍率（手動リサイズ時の再フィット用）。−2 は canvas の枠線分。
+  fitScaleToStage() {
+    const availW = this.stageTarget.clientWidth - 2
+    const availH = this.stageTarget.clientHeight - 2
+    return Math.min(availW / this.baseViewport.width, availH / this.baseViewport.height)
   }
 
   scrollable() {
@@ -147,10 +217,19 @@ export default class extends Controller {
     const w = this.baseViewport.width * fs + 2 // +2 は canvas の枠線分
     this.stageTarget.style.width = `${w}px`
     this.stageTarget.style.height = `${this.baseViewport.height * fs + 2}px`
-    // dialog がページをぎりぎり囲むよう、viewer 幅をステージ幅＋左右パディング(0.8rem×2)に揃える
-    // （box-sizing: border-box 前提）。ツールバーはこの幅内で折り返し、dialog は中身に追従する。
+    this.syncViewerWidth()
+    this.rememberStageSize() // ResizeObserver が「自前の変更」を手動リサイズと誤認しないよう記録
+  }
+
+  // dialog がページをぎりぎり囲むよう、viewer 幅をステージ幅＋左右パディング(0.8rem×2)に揃える
+  // （box-sizing: border-box 前提）。ツールバーはこの幅内で折り返し、dialog は中身に追従する。
+  syncViewerWidth() {
     const viewer = this.stageTarget.closest(".pdf-viewer")
-    if (viewer) viewer.style.maxWidth = `calc(${w}px + 1.6rem)`
+    if (viewer) viewer.style.maxWidth = `calc(${this.stageTarget.clientWidth}px + 1.6rem)`
+  }
+
+  rememberStageSize() {
+    this._lastStageSize = { w: this.stageTarget.clientWidth, h: this.stageTarget.clientHeight }
   }
 
   async render() {
@@ -220,8 +299,10 @@ export default class extends Controller {
   zoomOut() { this.scale = (this.scale ?? 1) / 1.25; this.fitted = false; this.render() }
   actualSize() { this.scale = 1; this.fitted = false; this.render() } // 等倍 (1pt = 1px)
 
+  // フィット = 画面に合わせて再フィット。手動リサイズ/移動の解除（リセット）も兼ねる。
   fit() {
     if (!this.baseViewport) return
+    this.userResized = false
     this.scale = this.fitScaleFor(this.baseViewport)
     this.fitted = true
     this.sizeStage()
@@ -239,6 +320,7 @@ export default class extends Controller {
   // ウィンドウのリサイズ/回転時、フィット表示中ならフィット倍率を取り直して追従する。
   handleResize() {
     if (!this.doc || !this.dialogTarget.open || !this.fitted || !this.baseViewport) return
+    if (this.userResized) return // 手動リサイズ後は window リサイズで勝手に変えない
     this.scale = this.fitScaleFor(this.baseViewport)
     this.sizeStage()
     this.render()
