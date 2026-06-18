@@ -11,6 +11,8 @@
 .back-link { display: inline-block; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 0.5rem; }
 .back-link:hover { color: var(--accent); }
 .page-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+/* 一覧/索引ページの h1 直下リード文: そのページの意味＋現状(件数等)を1行で（一等地の活用）。 */
+.page-lead { margin: 0.15rem 0 1.3rem; color: var(--muted); font-size: 0.9rem; max-width: 50rem; }
 .actions { display: flex; align-items: center; gap: 0.9rem; margin: 0.6rem 0 1.4rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--hairline); }
 /* h1 直下のメタ1行：バッジ・作成者・日付・タグ・貢献者をここに集約する（詳細ページ共通の文法） */
 .page-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.6rem; margin: 0.25rem 0 0.4rem; font-size: 0.9rem; color: var(--ink-soft); }
@@ -386,7 +388,6 @@ button.tag-chip:hover, button.tag-chip:focus {
 .search-snippet mark { background: #f5e1a4; color: var(--ink); padding: 0 0.15em; border-radius: 3px; }
 
 /* Chronicle (interim flat view) */
-.chronicle-note { margin: 0 0 1.4rem; }
 .chronicle-list { margin: 0; padding-left: 1.1rem; }
 .chronicle-list li { margin-bottom: 0.35rem; }
 
