@@ -181,6 +181,14 @@ class Material < ApplicationRecord
     [ parts.count { |t| t.status == "done" }, parts.size ]
   end
 
+  # 表示用カウント: 完了 / 担当中(担当あり・未完) / 未担当(担当なし・未完) と総数。
+  # 既にロード済みの配列があれば渡して再クエリを避ける（show は parts を持っている）。
+  def transcription_counts(parts = transcriptions.to_a)
+    done = parts.count { |t| t.status == "done" }
+    in_progress = parts.count { |t| t.status != "done" && t.assignee_id.present? }
+    { total: parts.size, done: done, in_progress: in_progress, unassigned: parts.size - done - in_progress }
+  end
+
   private
 
   def assign_slug

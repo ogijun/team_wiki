@@ -30,6 +30,7 @@ class MaterialsController < ApplicationController
   end
 
   def show
+    @members = User.for_picker.to_a # 担当(assignee)ピッカー用のメンバー一覧
   end
 
   def new

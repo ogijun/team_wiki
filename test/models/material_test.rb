@@ -360,4 +360,20 @@ class MaterialTest < ActiveSupport::TestCase
       m.destroy
     end
   end
+
+  test "transcription_counts breaks parts into done / in_progress / unassigned" do
+    u = User.create!(email_address: "c@example.com", name: "C", provider: "discord", uid: "cnt")
+    m = Material.new(user: u, title: "数えるカウント")
+    m.file.attach(io: StringIO.new("x"), filename: "c.mp3", content_type: "audio/mpeg")
+    m.save!
+    m.transcriptions.create!(author: u, body: "a", position: 1, status: "done")
+    m.transcriptions.create!(author: u, body: "b", position: 2, status: "drafting", assignee: u)
+    m.transcriptions.create!(author: u, body: "c", position: 3, status: "drafting")
+
+    counts = m.transcription_counts
+    assert_equal 3, counts[:total]
+    assert_equal 1, counts[:done]
+    assert_equal 1, counts[:in_progress]
+    assert_equal 1, counts[:unassigned]
+  end
 end

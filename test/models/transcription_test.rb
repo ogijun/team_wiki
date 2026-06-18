@@ -112,4 +112,32 @@ class TranscriptionTest < ActiveSupport::TestCase
     second = m.transcriptions.create!(author: @user, body: "2", position: 2)
     assert_predicate second, :persisted?
   end
+
+  def build_part(attrs = {})
+    @material.transcriptions.create!({ author: @user, body: "本文", position: 1 }.merge(attrs))
+  end
+
+  test "assignment_state: 未担当 when no assignee and not done" do
+    t = build_part(status: "drafting", assignee: nil)
+    assert_equal :unassigned, t.assignment_state
+    assert_equal "未担当", t.assignment_state_label
+  end
+
+  test "assignment_state: 担当中 when assignee present and drafting" do
+    t = build_part(status: "drafting", assignee: @user)
+    assert_equal :in_progress, t.assignment_state
+    assert_equal "担当中", t.assignment_state_label
+  end
+
+  test "assignment_state: 完了 when done regardless of assignee" do
+    t = build_part(status: "done", assignee: nil)
+    assert_equal :done, t.assignment_state
+    assert_equal "完了", t.assignment_state_label
+  end
+
+  test "assignable_by? is true for any logged-in user, false for nil" do
+    t = build_part
+    assert t.assignable_by?(@user)
+    assert_not t.assignable_by?(nil)
+  end
 end

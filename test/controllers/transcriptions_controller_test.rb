@@ -82,4 +82,47 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to material_url(@media)
   end
+
+  test "assign sets the assignee (to anyone) and records activity" do
+    other = User.create!(email_address: "o@example.com", name: "O", provider: "discord", uid: "tc-other")
+    t = part
+    assert_difference -> { Activity.where(action: "transcription.assigned").count }, 1 do
+      patch assign_material_transcription_url(@media, t), params: { assignee_id: other.id }
+    end
+    assert_redirected_to @media
+    assert_equal other, t.reload.assignee
+    # 活動は「担当にされた人」が actor（タイムラインに本人として出る）
+    assert_equal other, Activity.where(action: "transcription.assigned").last.user
+  end
+
+  test "assign with blank assignee_id clears the assignee (and does not log)" do
+    other = User.create!(email_address: "o2@example.com", name: "O2", provider: "discord", uid: "tc-other2")
+    t = part(assignee: other)
+    assert_no_difference -> { Activity.where(action: "transcription.assigned").count } do
+      patch assign_material_transcription_url(@media, t), params: { assignee_id: "" }
+    end
+    assert_nil t.reload.assignee
+  end
+
+  test "assign requires login" do
+    t = part
+    delete session_url
+    patch assign_material_transcription_url(@media, t), params: { assignee_id: @user.id }
+    assert_redirected_to new_session_url
+  end
+
+  test "assign does not bump lock_version (independent of versioned body edits)" do
+    t = part
+    before = t.lock_version
+    patch assign_material_transcription_url(@media, t), params: { assignee_id: @user.id }
+    assert_equal before, t.reload.lock_version
+  end
+
+  test "assign responds with a turbo_stream replacing the part row" do
+    t = part
+    patch assign_material_transcription_url(@media, t),
+          params: { assignee_id: @user.id }, as: :turbo_stream
+    assert_response :success
+    assert_match %r{turbo-stream action="replace" target="transcription_#{t.id}"}, response.body
+  end
 end

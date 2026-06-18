@@ -590,4 +590,24 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     get material_url(link)
     assert_select "a[href=?]", new_material_transcription_path(link)
   end
+
+  test "transcription parts show assignment-state badge, assignee picker, and progress summary" do
+    media = Material.new(user: @user, title: "担当UI音声")
+    media.file.attach(io: StringIO.new("x"), filename: "ui.mp3", content_type: "audio/mpeg")
+    media.save!
+    other = User.create!(email_address: "ui2@example.com", name: "UI2", provider: "discord", uid: "ui2")
+    media.transcriptions.create!(author: @user, body: "a", position: 1, status: "drafting", assignee: other)
+    media.transcriptions.create!(author: @user, body: "b", position: 2, status: "drafting")
+
+    get material_url(media)
+    assert_response :success
+    # 状態バッジ（未担当/担当中）
+    assert_select ".transcript-part", text: /担当中/
+    assert_select ".transcript-part", text: /未担当/
+    # 進捗要約（担当中/未担当のカウント）
+    assert_select ".transcription-summary", text: /担当中/
+    assert_select ".transcription-summary", text: /未担当/
+    # 担当ピッカー: メンバーへ assign する member ルートの button_to が出る
+    assert_select "form[action=?]", assign_material_transcription_path(media, media.transcriptions.first)
+  end
 end

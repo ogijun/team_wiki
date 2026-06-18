@@ -6,6 +6,9 @@ class User < ApplicationRecord
   AVATAR_CONTENT_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
   AVATAR_MAX_BYTES = 5.megabytes
 
+  # 担当(assignee)ピッカー等の「メンバー一覧」用。アバター prefetch ＋ 名前順（単一の出所）。
+  scope :for_picker, -> { with_attached_avatar.order(:name) }
+
   attr_accessor :current_password
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
