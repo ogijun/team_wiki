@@ -270,16 +270,6 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal before, m.reload.file.blob.id
   end
 
-  test "transcribable? is true for every material, including links" do
-    audio = Material.new(user: @user)
-    audio.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
-    audio.save!
-    assert_predicate audio, :transcribable?
-
-    link = Material.create!(user: @user, title: "外部記事", url: "https://example.com/article")
-    assert_predicate link, :transcribable?
-  end
-
   test "bibliography_present? includes page_count" do
     assert_predicate Material.new(user: @user, url: "https://x.test/pc", page_count: 100), :bibliography_present?
   end

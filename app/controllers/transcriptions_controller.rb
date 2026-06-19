@@ -72,7 +72,6 @@ class TranscriptionsController < ApplicationController
 
   def set_material
     @material = Material.find(params[:material_id])
-    redirect_to @material, alert: "この資料は文字起こし対象ではありません。" unless @material.transcribable?
   end
 
   def set_transcription

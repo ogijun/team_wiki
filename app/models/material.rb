@@ -147,9 +147,6 @@ class Material < ApplicationRecord
     File.unlink(out) if out && File.exist?(out)
   end
 
-  # すべての資料を文字起こし対象とする（ファイル/URL を問わず）。
-  def transcribable? = true
-
   # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。
   def bibliography_present?
     author.present? || source.present? || published_at.present? ||

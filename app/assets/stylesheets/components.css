@@ -84,9 +84,6 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* 件数・ラベルの小チップ */
 .pill { font-size: 0.75rem; color: var(--ink-soft); background: var(--accent-weak); border-radius: 999px; padding: 0.05rem 0.55rem; }
 
-/* 見出し＋付随要素（件数バッジ等） */
-.section-head { display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; margin: 0 0 0.5rem; }
-
 /* タブ（文字起こし進捗など）。JS無効時は全パネルが見えるだけで機能は損なわない */
 .tabs { display: flex; gap: 0.3rem; border-bottom: 1px solid var(--hairline); margin: 0 0 0.8rem; flex-wrap: wrap; }
 .tab {
@@ -105,7 +102,6 @@ button.tag-chip:hover, button.tag-chip:focus {
 .home-hero__heading + .home-hero__tagline { margin-top: -1rem; }
 .home-hero__tagline { max-width: 42rem; margin: 0; color: var(--muted); font-size: 1.05rem; }
 .home-hero__cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.6rem; margin: 0; }
-.home-hero__cta-or { color: var(--muted); font-size: 0.9rem; }
 .btn-hero {
   display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.6rem 1.15rem;
   border: 1px solid var(--accent); border-radius: 8px; font-weight: 600;
@@ -113,8 +109,6 @@ button.tag-chip:hover, button.tag-chip:focus {
 }
 .btn-hero:hover { background: var(--accent-weak); }
 .btn-hero:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* ボタンは枠線+左paddingで中身が内側に寄るので、サマリも同じぶんインデントして
-   光学的な左端を揃える（揃えないと stats だけ左に飛び出して見える）。 */
 .home-hero__sum { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem; margin: 0; color: var(--ink-soft); font-size: 0.9rem; }
 .home-hero__sum strong { font-size: 1.15rem; color: var(--ink); }
 .home-hero__sum a { display: inline-flex; align-items: center; }
@@ -517,7 +511,6 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* 時間帯グラフ（24本の縦棒＋x軸＋ピーク）。 */
 .hourly__bars { display: flex; align-items: flex-end; gap: 1px; height: 48px; }
 .hourly__bar { flex: 1; min-height: 1px; background: #6b82b0; border-radius: 1px 1px 0 0; }
-.hourly--sm .hourly__bars { height: 30px; }
 .hourly__axis { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
 .hourly__peak { font-size: 0.75rem; margin-top: 0.1rem; }
 
