@@ -4,10 +4,11 @@
       <% rep = item.activities.first %>
       <% show_actor = local_assigns.fetch(:show_actor, true) %>
       <li>
-        <% if show_actor %><%= avatar_tag(rep.user, size: 20) %><% end %>
-        <%= activity_group_icon(item) %>
-        <% if show_actor %><strong><%= link_to display_name(rep.user), rep.user %></strong><% end %><%= activity_group_phrase(item, actor: show_actor) %>
-        <span class="muted"><%= local_time_ago(rep.created_at) %></span>
+        <% if show_actor %><%= avatar_tag(rep.user, size: 32) %><% end %>
+        <span class="timeline__body">
+          <%= activity_group_icon(item) %><% if show_actor %><strong><%= link_to display_name(rep.user), rep.user %></strong><% end %><%= activity_group_phrase(item, actor: show_actor) %>
+          <span class="muted"><%= local_time_ago(rep.created_at) %></span>
+        </span>
       </li>
     <% else %>
       <li class="timeline__overflow muted" title="<%= display_name(item.user) %> のほか<%= item.count %>件の活動">ほか<%= item.count %>件</li>
