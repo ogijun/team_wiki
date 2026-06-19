@@ -1,6 +1,44 @@
+<%= link_to "← タグ一覧", tags_path, class: "back-link" %>
 <h1>#<%= @tag.name %></h1>
-<ul>
-  <% @articles.each do |article| %>
-    <li><%= link_to article.title, article %></li>
-  <% end %>
-</ul>
+<p class="page-lead">
+  このタグの資料 <%= @materials.size %> 件<% if @articles.any? %> ・ 記事 <%= @articles.size %> 件<% end %>
+</p>
+
+<% if @materials.any? %>
+  <section class="tag-section">
+    <h2><%= icon("library-big") %> 資料</h2>
+    <ul class="tag-materials">
+      <% @materials.each do |m| %>
+        <li>
+          <%= link_to material_path(m), class: "tag-materials__thumb" do %><%= render MaterialThumbComponent.new(material: m) %><% end %>
+          <span class="tag-materials__body">
+            <%= link_to m.title, material_path(m), class: "tag-materials__title" %>
+            <span class="tag-materials__meta">
+              <%= avatar_link(m.user, size: 20) %>
+              <% if m.published %><span>・<%= m.published.slashes %></span><% end %>
+              <% if (st = transcription_status_label(m)) %><span>・<%= st %></span><% end %>
+            </span>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+    <p><%= link_to "資料一覧でこのタグを絞り込む →", materials_path(tag: @tag.slug), class: "muted" %></p>
+  </section>
+<% end %>
+
+<% if @articles.any? %>
+  <section class="tag-section">
+    <h2><%= icon("file-text") %> 記事 <small class="wip">（見直し中）</small></h2>
+    <ul>
+      <% @articles.each do |article| %>
+        <li><%= link_to article.title, article %></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
+
+<% if @materials.empty? && @articles.empty? %>
+  <div class="empty-state">
+    このタグが付いた資料・記事はまだありません。資料や記事の編集画面で「タグ」欄に <code>#<%= @tag.name %></code> を入れると、ここに集まります。
+  </div>
+<% end %>

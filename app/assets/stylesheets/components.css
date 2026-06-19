@@ -297,6 +297,15 @@ button.tag-chip:hover, button.tag-chip:focus {
 .material-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; vertical-align: middle; }
 .material-thumb--icon { display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; background: var(--code-bg); }
 
+/* タグ詳細ページの資料リスト: サムネ＋タイトル＋メタ(投稿者/発行日/文字起こし状態)を1行に。 */
+.tag-section { margin-top: 1.6rem; }
+.tag-materials { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.tag-materials li { display: flex; align-items: center; gap: 0.7rem; }
+.tag-materials__thumb { flex: 0 0 auto; line-height: 0; }
+.tag-materials__body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.tag-materials__title { font-weight: 600; }
+.tag-materials__meta { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.2rem; font-size: 0.82rem; color: var(--muted); }
+
 /* Materials table */
 /* 横スクロールするテーブルラッパ（多列テーブルの汎用）。テーブル幅は締めず、はみ出たらここで横スクロール。 */
 .table-scroll { overflow-x: auto; }
