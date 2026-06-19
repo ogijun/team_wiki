@@ -40,11 +40,7 @@
 <% if @materials.empty? && @articles.empty? %>
   <div class="empty-state">
     このタグが付いた資料・記事はまだありません。
-    <div class="empty-state__cta">
-      <%= link_to search_path(q: @tag.name), role: "button", class: "btn-sm" do %>
-        <%= icon("search") %> 「<%= @tag.name %>」で本文を検索
-      <% end %>
-    </div>
+    <p><%= link_to search_path(q: @tag.name) do %><%= icon("search") %> 「<%= @tag.name %>」で本文を検索<% end %></p>
     <p class="muted">本文・書誌・文字起こしにこの語が出てくる資料が見つかれば、そこからこのタグを付けられます。</p>
   </div>
 <% end %>
