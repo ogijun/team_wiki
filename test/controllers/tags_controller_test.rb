@@ -47,6 +47,30 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /ruby/
   end
 
+  test "index shows the tag total as an integer, not a grouped-count hash" do
+    # with_usage_count はグループ化されるので .size はHashを返す（=> 表示が壊れる）。
+    # 整数で「タグ N 個」と出ること。
+    get tags_url
+    assert_response :success
+    assert_select "p.page-lead", text: /タグ\s+\d+\s+個/
+  end
+
+  test "index orders tags by usage count descending" do
+    # ruby は setup で1記事に付与済み（使用数1）。
+    2.times do |i|
+      a = Article.create!(title: "P#{i}", created_by: @user)
+      a.tag_names = "popular"
+      a.revise!(body: "x", author: @user)
+    end
+    Tag.create!(name: "lonely") # 使用数0
+
+    get tags_url
+    assert_response :success
+    body = response.body
+    assert body.index("#popular") < body.index("#ruby"), "使用数の多いタグが先に出るべき"
+    assert body.index("#ruby") < body.index("#lonely"), "使用数0のタグは末尾に出るべき"
+  end
+
   test "create makes a new tag" do
     assert_difference("Tag.count", 1) do
       post tags_url, params: { tag: { name: "rails" } }

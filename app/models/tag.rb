@@ -10,6 +10,7 @@ class Tag < ApplicationRecord
   scope :with_usage_count, -> {
     left_joins(:taggings)
       .group(:id)
+      .order(Arel.sql("COUNT(taggings.id) DESC"))
       .order(:name)
       .select("tags.*, COUNT(taggings.id) AS usage_count")
   }
