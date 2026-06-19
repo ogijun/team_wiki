@@ -149,8 +149,7 @@
 
 </section>
 
-<%# ── ④ 文字起こし（複数パート） ── %>
-<% if @material.transcribable? %>
+<%# ── ④ 文字起こし（複数パート）。全資料が対象。 ── %>
 <section class="transcription-section">
   <% parts = @material.transcriptions.includes(:author, :assignee).to_a %>
   <% c = @material.transcription_counts(parts) %>
@@ -169,7 +168,6 @@
     <%= link_to "最初のパートを作成", new_material_transcription_path(@material), role: "button", class: "btn-sm" %>
   <% end %>
 </section>
-<% end %>
 
 <%# ── ⑤ 議論 ── %>
 <%= render "comments/comments", commentable: @material %>

@@ -17,10 +17,8 @@ module MaterialsHelper
     icon(MEDIA_ICONS.fetch(material.media_kind))
   end
 
-  # 一覧などで使う書き起こし状況ラベル。対象外（リンク等）は nil。
-  # 対象メディアで未作成なら「未着手」、ありなら作業中/完了。
+  # 一覧などで使う書き起こし状況ラベル。未作成なら「未着手」、ありなら作業中/完了。
   def transcription_status_label(material)
-    return nil unless material.transcribable?
     { "todo" => "未着手", "drafting" => "作業中", "done" => "完了" }[material.transcription_status]
   end
 
@@ -35,14 +33,12 @@ module MaterialsHelper
       { text: "書誌を追記", done: false, path: edit_material_path(material) }
     end
 
-    if material.transcribable?
-      done, total = material.transcription_progress
-      steps << if total.positive? && material.transcription_status == "done"
-        { text: "文字起こし", done: true }
-      else
-        label = total.positive? ? "文字起こし #{done}/#{total}" : "文字起こし 未着手"
-        { text: label, done: false, path: new_material_transcription_path(material) }
-      end
+    done, total = material.transcription_progress
+    steps << if total.positive? && material.transcription_status == "done"
+      { text: "文字起こし", done: true }
+    else
+      label = total.positive? ? "文字起こし #{done}/#{total}" : "文字起こし 未着手"
+      { text: label, done: false, path: new_material_transcription_path(material) }
     end
 
     steps << if material.confidence == "confirmed"

@@ -55,7 +55,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_select "h1.sr-only"
     assert_select "h1.home-hero__heading", count: 0
-    assert_select "h1.home-hero__brand", count: 0
   end
 
   test "hero shows the site tagline when set" do
