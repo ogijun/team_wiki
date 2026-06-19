@@ -34,6 +34,13 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".empty-state"
   end
 
+  test "empty tag links to a body search using the tag name as the query" do
+    empty = Tag.create!(name: "未使用タグ")
+    get tag_url(empty)
+    assert_response :success
+    assert_select ".empty-state a[href=?]", search_path(q: "未使用タグ")
+  end
+
   test "index lists all tags" do
     get tags_url
     assert_response :success

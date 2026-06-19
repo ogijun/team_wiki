@@ -39,6 +39,12 @@
 
 <% if @materials.empty? && @articles.empty? %>
   <div class="empty-state">
-    このタグが付いた資料・記事はまだありません。資料や記事の編集画面で「タグ」欄に <code>#<%= @tag.name %></code> を入れると、ここに集まります。
+    このタグが付いた資料・記事はまだありません。
+    <div class="empty-state__cta">
+      <%= link_to search_path(q: @tag.name), role: "button", class: "btn-sm" do %>
+        <%= icon("search") %> 「<%= @tag.name %>」で本文を検索
+      <% end %>
+    </div>
+    <p class="muted">本文・書誌・文字起こしにこの語が出てくる資料が見つかれば、そこからこのタグを付けられます。</p>
   </div>
 <% end %>
