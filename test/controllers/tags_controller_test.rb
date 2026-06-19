@@ -10,10 +10,28 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     @tag = Tag.find_by(name: "ruby")
   end
 
-  test "show lists articles with the tag" do
+  test "show lists materials with the tag (materials-first)" do
+    material = Material.new(user: @user, title: "タグ付き資料")
+    material.tag_names = "ruby"
+    material.file.attach(io: StringIO.new("x"), filename: "m.mp3", content_type: "audio/mpeg")
+    material.save!
+
+    get tag_url(@tag)
+    assert_response :success
+    assert_select "a", text: "タグ付き資料"
+  end
+
+  test "show still lists articles with the tag" do
     get tag_url(@tag)
     assert_response :success
     assert_select "a", text: "Tagged"
+  end
+
+  test "show explains the empty case when nothing carries the tag" do
+    empty = Tag.create!(name: "empty-tag")
+    get tag_url(empty)
+    assert_response :success
+    assert_select ".empty-state"
   end
 
   test "index lists all tags" do
