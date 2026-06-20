@@ -221,13 +221,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".progress-strip .strip-step--done", text: /引用 1件/
   end
 
-  test "detail page badges the media kind and drops the confidence badge" do
+  test "detail shows the media kind in the identity line and drops the confidence badge" do
     m = Material.new(user: @user, title: "種別資料")
     m.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
     m.save!
     get material_url(m)
     assert_response :success
-    assert_select ".page-meta .badge", text: "音声"             # 分類バッジ
+    assert_select ".material-identity", text: /音声/            # 分類は identity 行に表示
     assert_select ".page-meta .badge", text: "未確認", count: 0  # confidence バッジは撤去
     assert_select ".page-meta .badge", text: "原本確認済", count: 0
   end
@@ -579,24 +579,28 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".field__hint", text: /Spotify/
   end
 
-  test "kind persists from the form and the detail badge reflects it" do
+  test "kind persists from the form and the detail identity reflects it" do
     post materials_url, params: { material: { url: "https://example.com/podcast", kind: "audio", title: "ポッドキャスト" } }
     m = Material.find_by!(title: "ポッドキャスト")
     assert_equal "audio", m.kind
     get material_url(m)
-    assert_select ".page-meta .badge", text: "音声"
+    assert_select ".material-identity", text: /音声/
   end
 
-  test "an unclassified PDF detail badges 未分類; a YouTube link auto-badges 動画" do
+  test "auto-detected kind is persisted on save (web/video), PDF stays 未分類" do
+    web = Material.create!(user: @user, url: "https://example.com/page", title: "Web記事")
+    assert_equal "web", web.kind   # 保存時に推定値で固定
+    yt = Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ", title: "動画リンク")
+    assert_equal "video", yt.kind
+    get material_url(yt)
+    assert_select ".material-identity", text: /動画/
+
     pdf = Material.new(user: @user, title: "未分類PDF")
     pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "d.pdf", content_type: "application/pdf")
     pdf.save!
+    assert_nil pdf.kind            # PDFは推定不能 → 未選択のまま
     get material_url(pdf)
-    assert_select ".page-meta .badge", text: "未分類"
-
-    yt = Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ", title: "動画リンク")
-    get material_url(yt)
-    assert_select ".page-meta .badge", text: "動画"
+    assert_select ".material-identity", text: /未分類/
   end
 
   test "tags stay visible outside the collapsible while bibliographic fields sit inside it" do

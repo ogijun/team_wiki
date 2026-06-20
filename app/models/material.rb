@@ -69,6 +69,8 @@ class Material < ApplicationRecord
 
   before_validation :assign_slug, on: :create
   before_validation :ensure_title, on: :create
+  # 未選択(自動判定)の分類は、保存時に推定値で固定する（判定後はその値で持つ）。
+  before_save :assign_default_kind, if: -> { kind.blank? }
   validates :slug, presence: true, uniqueness: true
   validates :title, presence: true
 
@@ -119,6 +121,7 @@ class Material < ApplicationRecord
   end
 
   # 実効分類: ユーザ選択があればそれ、なければ自動推定（nil の場合あり=未分類）。
+  # 通常は before_save で kind に固定されるが、コールバック前/旧データ用にフォールバックを残す。
   def effective_kind = kind.presence || default_kind
 
   # 種別ごとの件数（画像/動画/音声/文書/リンク）。リンクは url 有無、ファイルは blob の content_type で判定。
@@ -225,6 +228,11 @@ class Material < ApplicationRecord
   end
 
   private
+
+  # 自動判定できた分類を保存値に固定（断定できない PDF 等は nil のまま＝未分類）。
+  def assign_default_kind
+    self.kind = default_kind
+  end
 
   def assign_slug
     self.slug ||= Slug.unique_token { |c| Material.exists?(slug: c) }

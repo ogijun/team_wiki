@@ -264,9 +264,15 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal "book", m.effective_kind
   end
 
-  test "kind must be a known value; blank normalizes to nil" do
+  test "kind must be a known value; blank normalizes to nil before save" do
     assert_predicate Material.new(user: @user, url: "https://x.test/a", kind: "bogus"), :invalid?
-    assert_nil Material.create!(user: @user, url: "https://x.test/a", kind: "").kind
+    # 保存前は "" → nil（保存時に before_save が自動推定で埋める＝別テストで検証）
+    assert_nil Material.new(user: @user, url: "https://x.test/a", kind: "").kind
+  end
+
+  test "default kind is persisted on save when left blank" do
+    m = Material.create!(user: @user, url: "https://example.com/x", kind: "")
+    assert_equal "web", m.kind
   end
 
   test "linearize_file! replaces the blob with a linearized PDF and is idempotent" do

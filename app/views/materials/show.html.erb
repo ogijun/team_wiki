@@ -1,8 +1,7 @@
 <%= link_to "← 資料一覧", materials_path, class: "back-link" %>
 <h1><%= @material.title %></h1>
 <p class="page-meta">
-  <%# 分類（ユーザ選択 or 自動推定）を一目で。confidence バッジは撤去（将来はカラム毎 confirm へ）。 %>
-  <%= render BadgeComponent.new(text: material_kind_label(@material)) %>
+  <%# 分類・初出は本体近くの identity 行に出す。confidence バッジは撤去（将来はカラム毎 confirm へ）。 %>
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
   <% if @material.ownership %><%= render BadgeComponent.new(text: @material.ownership_label) %><% end %>
   <span>by <%= link_to display_name(@material.user), @material.user %> ・ <%= @material.created_at.to_fs(:jp) %></span>
@@ -94,13 +93,12 @@
     <% end %>
   <% end %>
 
-  <%# 一級市民の出典元・初出を本体近くに明示（書誌の奥に埋もれさせない） %>
-  <% if @material.source.present? || @material.published %>
-    <p class="material-identity">
-      <% if @material.source.present? %><span class="material-identity__item"><span class="material-identity__label">出典元</span><%= @material.source %></span><% end %>
-      <% if @material.published %><span class="material-identity__item"><span class="material-identity__label">初出</span><%= @material.published.label %></span><% end %>
-    </p>
-  <% end %>
+  <%# 一級市民の分類・初出・出典元を本体近くに明示（書誌の奥に埋もれさせない）。分類は常に出す。 %>
+  <p class="material-identity">
+    <span class="material-identity__item"><span class="material-identity__label">分類</span><%= material_kind_label(@material) %></span>
+    <% if @material.published %><span class="material-identity__item"><span class="material-identity__label">初出</span><%= @material.published.label %></span><% end %>
+    <% if @material.source.present? %><span class="material-identity__item"><span class="material-identity__label">出典元</span><%= @material.source %></span><% end %>
+  </p>
 
   <% if @material.description.present? %>
     <%= simple_format @material.description %>
