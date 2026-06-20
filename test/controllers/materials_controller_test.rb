@@ -570,6 +570,35 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "label[for=?]", "material_published_year", text: "初出"
   end
 
+  test "new form offers a 分類 select with 自動で判定 and grouped + top-level options, and lists Spotify in the URL hint" do
+    get new_material_url
+    assert_response :success
+    assert_select "select[name=?] option", "material[kind]", text: "自動で判定"
+    assert_select "select[name=?] option[value=video]", "material[kind]", text: "動画"          # 1段目で直接
+    assert_select "select[name=?] optgroup[label=?] option[value=book]", "material[kind]", "出版物・文書", text: "書籍"
+    assert_select ".field__hint", text: /Spotify/
+  end
+
+  test "kind persists from the form and the detail badge reflects it" do
+    post materials_url, params: { material: { url: "https://example.com/podcast", kind: "audio", title: "ポッドキャスト" } }
+    m = Material.find_by!(title: "ポッドキャスト")
+    assert_equal "audio", m.kind
+    get material_url(m)
+    assert_select ".page-meta .badge", text: "音声"
+  end
+
+  test "an unclassified PDF detail badges 未分類; a YouTube link auto-badges 動画" do
+    pdf = Material.new(user: @user, title: "未分類PDF")
+    pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "d.pdf", content_type: "application/pdf")
+    pdf.save!
+    get material_url(pdf)
+    assert_select ".page-meta .badge", text: "未分類"
+
+    yt = Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ", title: "動画リンク")
+    get material_url(yt)
+    assert_select ".page-meta .badge", text: "動画"
+  end
+
   test "tags stay visible outside the collapsible while bibliographic fields sit inside it" do
     get new_material_url
     assert_response :success

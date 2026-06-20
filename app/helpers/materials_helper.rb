@@ -11,17 +11,21 @@ module MaterialsHelper
   end
 
   MEDIA_ICONS = { link: "link", image: "image", video: "film", audio: "music", document: "file-text" }.freeze
-  # 種別の日本語ラベル（一級市民「分類」の表示に使う・MEDIA_ICONS と並ぶ単一窓口）。
-  MEDIA_KIND_LABELS = { link: "リンク", image: "画像", video: "動画", audio: "音声", document: "文書" }.freeze
-
-  # Material#media_kind をアイコンに対応づける（表示の単一窓口）。
+  # Material#media_kind をアイコンに対応づける（表示の単一窓口・技術的形態）。
   def media_icon(material)
     icon(MEDIA_ICONS.fetch(material.media_kind))
   end
 
-  # Material#media_kind を日本語ラベルに（「分類」の表示）。
-  def media_kind_label(material)
-    MEDIA_KIND_LABELS.fetch(material.media_kind)
+  # 一級市民「分類」のラベル（ユーザ選択 or 自動推定 or 未分類）。
+  def material_kind_label(material)
+    Material::KINDS[material.effective_kind] || "未分類"
+  end
+
+  # 分類セレクト用オプション。映像/音声/画像は1段目で直接、残りは optgroup で2段階。保存値はフラット。
+  def material_kind_options(selected)
+    top = Material::KIND_TOP.map { |s| [ Material::KINDS[s], s ] }
+    groups = Material::KIND_GROUPS.map { |label, slugs| [ label, slugs.map { |s| [ Material::KINDS[s], s ] } ] }
+    safe_join([ options_for_select(top, selected), grouped_options_for_select(groups, selected) ])
   end
 
   # 一覧などで使う書き起こし状況ラベル。未作成なら「未着手」、ありなら作業中/完了。

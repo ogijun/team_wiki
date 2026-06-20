@@ -241,6 +241,34 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal "未設定", Material.new(user: @user, url: "https://x.test/a", rights: nil).rights_label
   end
 
+  test "default_kind guesses from media form; documents are unguessable" do
+    audio = Material.new(user: @user, title: "a")
+    audio.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
+    audio.save!
+    assert_equal "audio", audio.default_kind
+
+    assert_equal "video", Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ").default_kind
+    assert_equal "audio", Material.create!(user: @user, url: "https://open.spotify.com/episode/abc123").default_kind
+    assert_equal "web", Material.create!(user: @user, url: "https://example.com/x").default_kind
+
+    doc = Material.new(user: @user, title: "d")
+    doc.file.attach(io: StringIO.new("%PDF-1.4"), filename: "d.pdf", content_type: "application/pdf")
+    doc.save!
+    assert_nil doc.default_kind
+  end
+
+  test "effective_kind prefers the user-set kind over the auto guess" do
+    m = Material.create!(user: @user, url: "https://example.com/x")
+    assert_equal "web", m.effective_kind
+    m.update!(kind: "book")
+    assert_equal "book", m.effective_kind
+  end
+
+  test "kind must be a known value; blank normalizes to nil" do
+    assert_predicate Material.new(user: @user, url: "https://x.test/a", kind: "bogus"), :invalid?
+    assert_nil Material.create!(user: @user, url: "https://x.test/a", kind: "").kind
+  end
+
   test "linearize_file! replaces the blob with a linearized PDF and is idempotent" do
     m = Material.new(user: @user, title: "PDF")
     m.file.attach(io: one_page_pdf, filename: "doc.pdf", content_type: "application/pdf")

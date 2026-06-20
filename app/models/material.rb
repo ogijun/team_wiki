@@ -30,6 +30,19 @@ class Material < ApplicationRecord
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
   # 実物の所持状況（nil=未設定）。出典検証の confidence と違い、所持は事実なので編集は誰でも可。
   OWNERSHIP_STATUSES = { "original" => "原本所有", "partial" => "部分所有", "none" => "未所持（データのみ）" }.freeze
+  # ユーザが選べる「分類（資料種類）」。保存はフラットな単一 enum（nil=自動判定にフォールバック）。
+  KINDS = {
+    "video" => "動画", "audio" => "音声", "image" => "画像",
+    "book" => "書籍", "magazine" => "雑誌記事", "pamphlet" => "パンフレット",
+    "newspaper" => "新聞", "setting" => "設定資料",
+    "web" => "Webページ", "other" => "その他"
+  }.freeze
+  # 選択UI: 映像/音声/画像は1段目で直接、残りは大分類でグルーピング（2段階）。保存値はフラット。
+  KIND_TOP = %w[video audio image].freeze
+  KIND_GROUPS = {
+    "出版物・文書" => %w[book magazine pamphlet newspaper setting],
+    "Web・その他"  => %w[web other]
+  }.freeze
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
@@ -46,6 +59,8 @@ class Material < ApplicationRecord
   validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
   normalizes :ownership, with: ->(v) { v.presence }
   validates :ownership, inclusion: { in: OWNERSHIP_STATUSES.keys }, allow_nil: true
+  normalizes :kind, with: ->(v) { v.presence }
+  validates :kind, inclusion: { in: KINDS.keys }, allow_nil: true
 
   # 書誌の詳細（すべて任意・自由記述）。空文字は nil に揃える。
   normalizes :isbn, :pages, :publisher, :volume, with: ->(v) { v.presence }
@@ -83,11 +98,28 @@ class Material < ApplicationRecord
     end
   end
 
-  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。
+  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。技術的形態＝サムネ/埋め込みの窓口。
   def media_kind
     return :link if link?
     self.class.kind_for(file.content_type)
   end
+
+  # ユーザ未選択時の「分類」自動推定。確信が持てる範囲だけ（文書は種類を断定できないので nil）。
+  def default_kind
+    case media_kind
+    when :video then "video"
+    when :audio then "audio"
+    when :image then "image"
+    when :link
+      if MaterialEmbed.spotify_embed(url) then "audio"      # Spotify=音声
+      elsif MaterialEmbed.embed_src(url)  then "video"      # YouTube/Vimeo/Dailymotion=動画
+      else "web"
+      end
+    end # :document（PDF等）は断定不能 → nil（未分類）
+  end
+
+  # 実効分類: ユーザ選択があればそれ、なければ自動推定（nil の場合あり=未分類）。
+  def effective_kind = kind.presence || default_kind
 
   # 種別ごとの件数（画像/動画/音声/文書/リンク）。リンクは url 有無、ファイルは blob の content_type で判定。
   # 27件規模では grouped count で十分。500件超で media_kind をカラム化する（WHEN-IT-HURTS 閾値）。

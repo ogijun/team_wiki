@@ -92,7 +92,7 @@ class MaterialsController < ApplicationController
   end
 
   def material_params
-    permitted = [ :title, :description,
+    permitted = [ :title, :description, :kind,
                  :source, :author, :rights, :ownership, :tag_names,
                  :isbn, :pages, :page_count, :publisher, :volume,
                  :published_year, :published_month, :published_day, :published_hour, :published_minute ]

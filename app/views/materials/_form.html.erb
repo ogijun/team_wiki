@@ -1,21 +1,31 @@
 <%= form_with model: material, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: material %>
 
-  <%# ── 一級市民: 実体 / 内容を1行で / 出典元 / 初出 ── %>
+  <%# ── 一級市民: 実体 / 分類 / 内容を1行で / 出典元 / 初出 ── %>
   <% if material.new_record? %>
     <fieldset>
       <legend>ファイル または URL のどちらか一方（登録後は変更できません）<%= required_badge %></legend>
       <div class="field"><%= f.label :file, "ファイル" %><%= f.file_field :file %></div>
-      <div class="field"><%= f.label :url, "URL（YouTube等）" %><%= f.url_field :url, value: material.url %></div>
+      <div class="field">
+        <%= f.label :url, "URL" %>
+        <small class="field__hint">YouTube・ニコニコ動画・Vimeo・Dailymotion・Spotify はプレーヤーが埋め込み表示されます。その他のURL（記事ページ等）もリンクとして登録できます。</small>
+        <%= f.url_field :url, value: material.url %>
+      </div>
     </fieldset>
   <% else %>
     <p class="muted">
       <% if material.link? %>URL: <%= link_to material.url, material.url, target: "_blank", rel: "noopener" %>
       <% else %>ファイル: <%= material.file.filename %><% end %>
-      ・ 分類: <strong><%= media_kind_label(material) %></strong>
       <small>（実体は登録後変更できません。差し替えは新規登録してください）</small>
     </p>
   <% end %>
+
+  <div class="field">
+    <%= f.label :kind, "分類" %><%= optional_badge %>
+    <small class="field__hint">未選択なら種類を自動で推定します。リンクでも動画/音声/Web 等に分けられます。</small>
+    <%# 保存はフラット enum。映像/音声/画像は1段目で直接、残りは optgroup で2段階。 %>
+    <%= f.select :kind, material_kind_options(material.kind), { include_blank: "自動で判定" } %>
+  </div>
 
   <div class="field">
     <%= f.label :title, "内容を1行で" %><%= optional_badge %>

@@ -1,8 +1,8 @@
 <%= link_to "← 資料一覧", materials_path, class: "back-link" %>
 <h1><%= @material.title %></h1>
 <p class="page-meta">
-  <%# 分類（media_kind）を一目で。confidence バッジは撤去（将来はカラム毎 confirm へ）。 %>
-  <%= render BadgeComponent.new(text: media_kind_label(@material)) %>
+  <%# 分類（ユーザ選択 or 自動推定）を一目で。confidence バッジは撤去（将来はカラム毎 confirm へ）。 %>
+  <%= render BadgeComponent.new(text: material_kind_label(@material)) %>
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
   <% if @material.ownership %><%= render BadgeComponent.new(text: @material.ownership_label) %><% end %>
   <span>by <%= link_to display_name(@material.user), @material.user %> ・ <%= @material.created_at.to_fs(:jp) %></span>
