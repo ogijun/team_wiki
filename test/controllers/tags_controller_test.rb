@@ -38,7 +38,18 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     empty = Tag.create!(name: "未使用タグ")
     get tag_url(empty)
     assert_response :success
-    assert_select ".empty-state a[href=?]", search_path(q: "未使用タグ")
+    assert_select ".tag-search-cta a[href=?]", search_path(q: "未使用タグ")
+  end
+
+  test "tag page keeps the body-search link even when the tag has hits" do
+    material = Material.new(user: @user, title: "ヒットあり資料")
+    material.tag_names = "ruby"
+    material.file.attach(io: StringIO.new("x"), filename: "h.mp3", content_type: "audio/mpeg")
+    material.save!
+    get tag_url(@tag)
+    assert_response :success
+    assert_select ".tag-materials a", text: "ヒットあり資料"          # タグはヒットしている
+    assert_select ".tag-search-cta a[href=?]", search_path(q: "ruby") # それでも検索導線は出る
   end
 
   test "index lists all tags" do

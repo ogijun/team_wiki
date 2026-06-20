@@ -297,7 +297,9 @@ button.tag-chip:hover, button.tag-chip:focus {
 .material-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; vertical-align: middle; }
 .material-thumb--icon { display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; background: var(--code-bg); }
 
-/* タグ詳細ページの資料リスト: サムネ＋タイトル＋メタ(投稿者/発行日/文字起こし状態)を1行に。 */
+/* タグ詳細ページ。ヒット有無に関わらず常設する本文検索への導線。 */
+.tag-search-cta { margin: 0.2rem 0 1rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; }
+/* タグ詳細ページの資料リスト: サムネ＋タイトル＋メタ(投稿者/初出/文字起こし状態)を1行に。 */
 .tag-section { margin-top: 1.6rem; }
 .tag-materials { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .tag-materials li { display: flex; align-items: center; gap: 0.7rem; }
