@@ -1,7 +1,8 @@
 <%= link_to "← 資料一覧", materials_path, class: "back-link" %>
 <h1><%= @material.title %></h1>
 <p class="page-meta">
-  <%= render BadgeComponent.new(text: @material.confidence_label, variant: :status) %>
+  <%# 分類（media_kind）を一目で。confidence バッジは撤去（将来はカラム毎 confirm へ）。 %>
+  <%= render BadgeComponent.new(text: media_kind_label(@material)) %>
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
   <% if @material.ownership %><%= render BadgeComponent.new(text: @material.ownership_label) %><% end %>
   <span>by <%= link_to display_name(@material.user), @material.user %> ・ <%= @material.created_at.to_fs(:jp) %></span>
@@ -25,7 +26,7 @@
   <% end %>
 </ul>
 
-<%# ── ① 資料本体（プレビュー・実体・説明）── %>
+<%# ── ① 資料本体（プレビュー・実体）＋ 一級の出典元/初出 ── %>
 <section class="material-body">
   <% if @material.link? %>
     <% if (src = MaterialEmbed.embed_src(@material.url)) %>
@@ -92,58 +93,21 @@
       <p><%= link_to rails_blob_path(@material.file) do %><%= icon("download") %> <%= @material.file.filename %><% end %></p>
     <% end %>
   <% end %>
+
+  <%# 一級市民の出典元・初出を本体近くに明示（書誌の奥に埋もれさせない） %>
+  <% if @material.source.present? || @material.published %>
+    <p class="material-identity">
+      <% if @material.source.present? %><span class="material-identity__item"><span class="material-identity__label">出典元</span><%= @material.source %></span><% end %>
+      <% if @material.published %><span class="material-identity__item"><span class="material-identity__label">初出</span><%= @material.published.label %></span><% end %>
+    </p>
+  <% end %>
+
   <% if @material.description.present? %>
     <%= simple_format @material.description %>
   <% end %>
 </section>
 
-<%# ── ② 書誌情報（空ならゾーンごと出さない。状態はストリップが担う）── %>
-<% tags = @material.tags.to_a %>
-<% if @material.bibliography_present? || @material.file_created_at || tags.any? %>
-<section class="bibliography-section">
-  <h2>書誌情報</h2>
-    <dl class="bibliography">
-      <% if @material.author.present? %><dt>著者・発言者</dt><dd><%= @material.author %></dd><% end %>
-      <% if @material.source.present? %><dt>出典元</dt><dd><%= @material.source %></dd><% end %>
-      <% if @material.volume %><dt>巻号</dt><dd><%= @material.volume %></dd><% end %>
-      <% if @material.publisher %><dt>出版社・発行元</dt><dd><%= @material.publisher %></dd><% end %>
-      <% if @material.published %><dt>発行日</dt><dd><%= @material.published.label %></dd><% end %>
-      <% if @material.pages %><dt>ページ</dt><dd><%= @material.pages %></dd><% end %>
-      <% if @material.page_count %><dt>総ページ数</dt><dd><%= number_with_delimiter(@material.page_count) %></dd><% end %>
-      <% if @material.isbn %><dt>ISBN</dt><dd><%= @material.isbn %></dd><% end %>
-      <% if @material.file_created_at %><dt>ファイル作成日</dt><dd><%= @material.file_created_at.to_fs(:jp) %> <small class="muted">（EXIF/PDF から自動抽出。発行日とは別）</small></dd><% end %>
-      <% if tags.any? %>
-        <dt>タグ</dt>
-        <dd><% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></dd>
-      <% end %>
-    </dl>
-</section>
-<% end %>
-
-<%= render "shared/tag_suggestions", taggable: @material %>
-
-<%# ── ③ 記事で使う（引用・被引用・文字起こし）── %>
-<section class="usage" id="usage">
-  <h2>記事で使う</h2>
-  <p class="cite-row" data-controller="clipboard" data-clipboard-text-value="[[ref:<%= @material.slug %>]]">
-    引用タグ <code>[[ref:<%= @material.slug %>]]</code>
-    <%= button_tag "引用タグをコピー", type: "button", class: "btn-sm secondary outline", data: { action: "clipboard#copy" } %>
-  </p>
-  <small class="muted">記事本文に貼ると、この資料が出典として脚注に表示されます。</small>
-
-  <% citing = @material.citing_articles.order(:title).to_a %>
-  <% if citing.any? %>
-    <h3>この資料を引用している記事</h3>
-    <ul>
-      <% citing.each do |a| %>
-        <li><%= link_to a.title, a %></li>
-      <% end %>
-    </ul>
-  <% end %>
-
-</section>
-
-<%# ── ④ 文字起こし（複数パート）。全資料が対象。 ── %>
+<%# ── ② 文字起こし（一級と同格・本体直後に昇格）。全資料が対象。 ── %>
 <section class="transcription-section">
   <% parts = @material.transcriptions.includes(:author, :assignee).to_a %>
   <% c = @material.transcription_counts(parts) %>
@@ -163,7 +127,56 @@
   <% end %>
 </section>
 
-<%# ── ⑤ 議論 ── %>
+<%# ── ③ タグ（中段）: 付与済み＋候補チップを集約 ── %>
+<% tags = @material.tags.to_a %>
+<section class="tags-section">
+  <h2><%= icon("tags") %> タグ</h2>
+  <% if tags.any? %>
+    <p class="material-tags"><% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
+  <% else %>
+    <p class="muted">まだタグがありません。</p>
+  <% end %>
+  <%= render "shared/tag_suggestions", taggable: @material %>
+</section>
+
+<%# ── ④ 書誌（その他・控えめ。出典元/初出/タグは上に出したので除く）── %>
+<% has_other_bib = @material.author.present? || @material.volume || @material.publisher || @material.pages || @material.page_count || @material.isbn || @material.file_created_at %>
+<% if has_other_bib %>
+<section class="bibliography-section">
+  <h2>書誌情報</h2>
+    <dl class="bibliography">
+      <% if @material.author.present? %><dt>著者・発言者</dt><dd><%= @material.author %></dd><% end %>
+      <% if @material.volume %><dt>巻号</dt><dd><%= @material.volume %></dd><% end %>
+      <% if @material.publisher %><dt>出版社・発行元</dt><dd><%= @material.publisher %></dd><% end %>
+      <% if @material.pages %><dt>ページ</dt><dd><%= @material.pages %></dd><% end %>
+      <% if @material.page_count %><dt>総ページ数</dt><dd><%= number_with_delimiter(@material.page_count) %></dd><% end %>
+      <% if @material.isbn %><dt>ISBN</dt><dd><%= @material.isbn %></dd><% end %>
+      <% if @material.file_created_at %><dt>ファイル作成日</dt><dd><%= @material.file_created_at.to_fs(:jp) %> <small class="muted">（EXIF/PDF から自動抽出。初出とは別）</small></dd><% end %>
+    </dl>
+</section>
+<% end %>
+
+<%# ── ⑤ 記事で使う（引用・控えめ・下位）。当面は記事生産が少なく使われないかも。 ── %>
+<section class="usage" id="usage">
+  <h2>記事で使う</h2>
+  <p class="cite-row" data-controller="clipboard" data-clipboard-text-value="[[ref:<%= @material.slug %>]]">
+    引用タグ <code>[[ref:<%= @material.slug %>]]</code>
+    <%= button_tag "引用タグをコピー", type: "button", class: "btn-sm secondary outline", data: { action: "clipboard#copy" } %>
+  </p>
+  <small class="muted">記事本文に貼ると、この資料が出典として脚注に表示されます。</small>
+
+  <% citing = @material.citing_articles.order(:title).to_a %>
+  <% if citing.any? %>
+    <h3>この資料を引用している記事</h3>
+    <ul>
+      <% citing.each do |a| %>
+        <li><%= link_to a.title, a %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>
+
+<%# ── ⑥ 議論 ── %>
 <%= render "comments/comments", commentable: @material %>
 
 <div class="danger-zone">

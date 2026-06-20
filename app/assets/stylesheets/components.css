@@ -301,6 +301,12 @@ button.tag-chip:hover, button.tag-chip:focus {
 .bibliography dt { font-size: 0.8rem; color: var(--muted); }
 .bibliography dd { margin: 0 0 0.4rem; }
 
+/* 資料詳細: 本体直下の一級アイデンティティ（出典元・初出）。 */
+.material-identity { display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; margin: 0.7rem 0 0; font-size: 0.92rem; }
+.material-identity__label { color: var(--muted); font-size: 0.8rem; margin-right: 0.35rem; }
+/* 資料詳細: タグゾーン（中段）の付与済みタグ。 */
+.material-tags { display: flex; flex-wrap: wrap; gap: 0.2rem 0.6rem; margin: 0 0 0.4rem; }
+
 /* Material thumbnails */
 .material-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; vertical-align: middle; }
 .material-thumb--icon { display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; background: var(--code-bg); }

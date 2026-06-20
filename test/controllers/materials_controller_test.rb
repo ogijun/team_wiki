@@ -112,18 +112,18 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /未着手/
   end
 
-  test "index shows uploader as an avatar link with a name tooltip, plus 投稿日時 and 発行日 columns" do
+  test "index shows uploader as an avatar link with a name tooltip, plus 投稿日時 and 初出 columns" do
     m = Material.create!(user: @user, url: "https://example.com/p", title: "資料P",
                          published_year: 2020, published_month: 3)
     get materials_url
     assert_response :success
     assert_select "a.sort-link", text: /By/
     assert_select "a.sort-link", text: /投稿日時/
-    assert_select "a.sort-link", text: /発行日/
+    assert_select "a.sort-link", text: /初出/
     # アップローダー欄は名前テキストではなくアイコン＋title 属性（tooltip）
     assert_select "table tbody a[title=?]", @user.name
     assert_select "table tbody a", text: @user.name, count: 0
-    # 発行日が一覧に出る（スラッシュ表記）
+    # 初出が一覧に出る（スラッシュ表記）
     assert_select "td", text: %r{2020/03}
   end
 
@@ -202,24 +202,47 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h3", text: "この資料を引用している記事", count: 0
   end
 
-  test "progress strip shows pending steps as action links" do
+  test "progress strip shows pending steps as action links (原本確認ステップは撤去)" do
     m = Material.create!(user: @user, url: "https://example.com/strip", title: "ストリップ資料")
     get material_url(m)
-    # 書誌なし→追記リンク / 原本未確認(非admin)はテキスト / 未引用→引用タグへのアンカー
+    # 書誌なし→追記リンク / 未引用→引用タグへのアンカー（原本確認は撤去）
     assert_select ".progress-strip a[href=?]", edit_material_path(m), text: /書誌を追記/
-    assert_select ".progress-strip", text: /原本未確認/
     assert_select ".progress-strip a[href=?]", "#usage", text: /引用タグを使う/
+    assert_select ".progress-strip", text: /原本/, count: 0
   end
 
   test "progress strip shows completed steps as checks" do
     m = Material.create!(user: @user, url: "https://example.com/done", title: "完了資料",
-                         source: "サンプル誌", confidence: "confirmed")
+                         source: "サンプル誌")
     article = Article.create!(title: "引用元記事", created_by: @user)
     article.revise!(body: "[[ref:#{m.slug}]]", author: @user)
     get material_url(m)
     assert_select ".progress-strip .strip-step--done", text: /書誌/
-    assert_select ".progress-strip .strip-step--done", text: /原本確認済/
     assert_select ".progress-strip .strip-step--done", text: /引用 1件/
+  end
+
+  test "detail page badges the media kind and drops the confidence badge" do
+    m = Material.new(user: @user, title: "種別資料")
+    m.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
+    m.save!
+    get material_url(m)
+    assert_response :success
+    assert_select ".page-meta .badge", text: "音声"             # 分類バッジ
+    assert_select ".page-meta .badge", text: "未確認", count: 0  # confidence バッジは撤去
+    assert_select ".page-meta .badge", text: "原本確認済", count: 0
+  end
+
+  test "detail elevates 文字起こし above 書誌, surfaces 出典元/初出, shows a タグ zone" do
+    m = Material.create!(user: @user, url: "https://x.test/zone", title: "ゾーン資料",
+                         source: "サンプル誌", author: "サンプル著者",
+                         published_year: 1981, published_month: 3)
+    get material_url(m)
+    assert_response :success
+    body = response.body
+    assert_operator body.index("transcription-section"), :<, body.index("bibliography-section")
+    assert_select "section.tags-section h2", text: /タグ/
+    assert_select ".material-identity", text: /出典元/
+    assert_select ".material-identity", text: /初出/
   end
 
   test "a material without a transcription shows a clear 作成 CTA in the transcription zone" do

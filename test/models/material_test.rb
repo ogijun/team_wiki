@@ -20,16 +20,12 @@ class MaterialTest < ActiveSupport::TestCase
     assert_nil Material.new(user: @user, url: "https://x.test/o2").ownership_label
   end
 
-  test "authorization predicates: editable/deletable by any member, confidence admin-only" do
-    admin = User.create!(email_address: "adm@example.com", password: "password123", name: "Adm", role: "admin")
+  test "authorization predicates: editable/deletable by any member" do
     m = Material.create!(user: @user, url: "https://x.test/authz", title: "認可")
     assert m.editable_by?(@user)
     assert m.deletable_by?(@user)
     assert_not m.editable_by?(nil)
     assert_not m.deletable_by?(nil)
-    assert m.confidence_editable_by?(admin)
-    assert_not m.confidence_editable_by?(@user)   # editor 不可
-    assert_not m.confidence_editable_by?(nil)
   end
 
   def attach_png(material)
@@ -240,8 +236,7 @@ class MaterialTest < ActiveSupport::TestCase
   end
 
   test "labels map slug to Japanese; rights nil label is 未設定" do
-    m = Material.new(user: @user, url: "https://x.test/a", confidence: "confirmed", rights: "private")
-    assert_equal "原本確認済", m.confidence_label
+    m = Material.new(user: @user, url: "https://x.test/a", rights: "private")
     assert_equal "全文非公開", m.rights_label
     assert_equal "未設定", Material.new(user: @user, url: "https://x.test/a", rights: nil).rights_label
   end

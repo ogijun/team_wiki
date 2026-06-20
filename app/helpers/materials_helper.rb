@@ -30,7 +30,8 @@ module MaterialsHelper
   end
 
   # 資料詳細の進行ストリップ。資料のライフサイクル
-  # （書誌→文字起こし→原本確認→引用）を「済み=チェック / 未=次の行動リンク」で1行に出す。
+  # （書誌→文字起こし→引用）を「済み=チェック / 未=次の行動リンク」で1行に出す。
+  # 原本確認(confidence)はカラム毎 confirm へ移行予定のため当面ストリップから外す。
   # 各要素: { text:, done:, path:(未完の行動先。nil ならプレーン表示) }
   def material_progress_steps(material)
     steps = []
@@ -46,14 +47,6 @@ module MaterialsHelper
     else
       label = total.positive? ? "文字起こし #{done}/#{total}" : "文字起こし 未着手"
       { text: label, done: false, path: new_material_transcription_path(material) }
-    end
-
-    steps << if material.confidence == "confirmed"
-      { text: "原本確認済", done: true }
-    else
-      # 信頼度の確定は admin のみ操作できるため、editor にはテキストで状態だけ示す（権限は述語に集約）
-      { text: "原本未確認", done: false,
-        path: material.confidence_editable_by?(Current.user) ? edit_material_path(material) : nil }
     end
 
     count = material.citing_articles.count

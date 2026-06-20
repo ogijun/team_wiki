@@ -153,7 +153,6 @@ class Material < ApplicationRecord
       volume.present? || publisher.present? || pages.present? || isbn.present? || page_count.present?
   end
 
-  def confidence_label = CONFIDENCE_LEVELS[confidence]
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
   def ownership_label = ownership ? OWNERSHIP_STATUSES[ownership] : nil
 
@@ -162,8 +161,8 @@ class Material < ApplicationRecord
   # 現状: メタデータ編集・削除はログイン済みメンバーなら誰でも可（wiki 的）。将来絞るならここを変える。
   def editable_by?(user) = user.present?
   def deletable_by?(user) = user.present?
-  # 信頼度（原本検証の確定）は admin のみ。インスタンス状態に依存しない役割判定。
-  def confidence_editable_by?(user) = user&.admin? || false
+  # NOTE: confidence（material 単位の信頼度）の UI/述語は撤去済み。カラム/validation は休眠で温存
+  #   し、将来は一級カラム毎の confirm 状況管理に置換する（UI は別途設計）。
 
   # 「未完成資料」の単一の出所: 文字起こしが done でない資料（未着手＝パート0、または途中＝非done パートあり）。
   # transcription_status が done 以外、と同義。将来「主要項目が未確認」等へ広げるならここを広げる。
