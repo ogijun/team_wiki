@@ -50,7 +50,11 @@
 
   <%# ── その他（副次メタデータ・既定で折りたたみ。気軽に増減できる） ── %>
   <details class="secondary-meta">
-    <summary>詳しい情報（任意・分かる範囲で）</summary>
+    <summary>
+      <%= icon("chevron-right", css: "secondary-meta__chevron") %>
+      <span>詳しい情報（任意・分かる範囲で）</span>
+      <span class="secondary-meta__hint">クリックで開く</span>
+    </summary>
     <div class="field"><%= f.label :description, "説明" %><%= optional_badge %><%= f.text_area :description %></div>
     <div class="field"><%= f.label :author, "著者・発言者" %><%= optional_badge %><%= f.text_field :author, placeholder: "例: サンプル監督（インタビューの発言者）" %></div>
     <div class="field"><%= f.label :volume, "巻号" %><%= optional_badge %><%= f.text_field :volume, placeholder: "例: 1991年4月号 / Vol.12" %></div>
