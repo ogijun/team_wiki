@@ -11,10 +11,17 @@ module MaterialsHelper
   end
 
   MEDIA_ICONS = { link: "link", image: "image", video: "film", audio: "music", document: "file-text" }.freeze
+  # 種別の日本語ラベル（一級市民「分類」の表示に使う・MEDIA_ICONS と並ぶ単一窓口）。
+  MEDIA_KIND_LABELS = { link: "リンク", image: "画像", video: "動画", audio: "音声", document: "文書" }.freeze
 
   # Material#media_kind をアイコンに対応づける（表示の単一窓口）。
   def media_icon(material)
     icon(MEDIA_ICONS.fetch(material.media_kind))
+  end
+
+  # Material#media_kind を日本語ラベルに（「分類」の表示）。
+  def media_kind_label(material)
+    MEDIA_KIND_LABELS.fetch(material.media_kind)
   end
 
   # 一覧などで使う書き起こし状況ラベル。未作成なら「未着手」、ありなら作業中/完了。
