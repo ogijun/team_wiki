@@ -483,14 +483,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1998, m.published_at.year
   end
 
-  test "create persists confidence and rights" do
+  test "create persists rights but ignores confidence (form input retired)" do
     @user.update!(role: "admin")
     post materials_url, params: { material: {
       url: "https://x.test/c", confidence: "confirmed", rights: "quotable"
     } }
     m = Material.order(:created_at).last
-    assert_equal "confirmed", m.confidence
     assert_equal "quotable", m.rights
+    assert_equal "unconfirmed", m.confidence # confidence は permit から外したので無視される
   end
 
   test "update flashes a toast notice" do
@@ -533,17 +533,33 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "material[file]", count: 0
   end
 
-  test "editor cannot change confidence (ignored)" do
-    m = Material.create!(user: @user, url: "https://x.test/e", confidence: "unconfirmed")
-    patch material_url(m), params: { material: { url: "https://x.test/e", confidence: "confirmed" } }
-    assert_equal "unconfirmed", m.reload.confidence
-  end
-
-  test "admin can change confidence" do
+  test "confidence is not settable via the material form, even for admin (retired)" do
     @user.update!(role: "admin")
     m = Material.create!(user: @user, url: "https://x.test/a2", confidence: "unconfirmed")
     patch material_url(m), params: { material: { url: "https://x.test/a2", confidence: "confirmed" } }
-    assert_equal "confirmed", m.reload.confidence
+    assert_equal "unconfirmed", m.reload.confidence
+  end
+
+  test "material form retires the confidence input and labels the date 初出" do
+    get new_material_url
+    assert_response :success
+    assert_select "[name=?]", "material[confidence]", count: 0
+    assert_select "label[for=?]", "material_published_year", text: "初出"
+  end
+
+  test "tags stay visible outside the collapsible while bibliographic fields sit inside it" do
+    get new_material_url
+    assert_response :success
+    assert_select "details.secondary-meta input[name=?]", "material[author]"             # 著者=折りたたみ内
+    assert_select "details.secondary-meta input[name=?]", "material[tag_names]", count: 0 # タグは折りたたみ外
+    assert_select "input[name=?]", "material[tag_names]"                                  # 中段に可視で存在
+  end
+
+  test "the 初出 time inputs are hidden by default behind a +時刻 toggle" do
+    get new_material_url
+    assert_response :success
+    assert_select "[data-time-disclosure-target='times'][hidden] input[name=?]", "material[published_hour]"
+    assert_select "button[data-action=?]", "time-disclosure#open"
   end
 
   test "media material shows a transcription section" do

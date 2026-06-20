@@ -179,6 +179,14 @@ button.tag-chip:hover, button.tag-chip:focus {
 .stacked-form .field > :where(input, textarea, select) { margin-bottom: 0; }
 .field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
 .field__hint code { font-size: 0.85em; }
+/* 副次メタデータの折りたたみ（資料フォーム下段「詳しい情報」）。 */
+.stacked-form .secondary-meta { margin: 0 0 1.6rem; }
+.secondary-meta > summary { cursor: pointer; color: var(--ink-soft); font-size: 0.9rem; padding: 0.3rem 0; user-select: none; }
+.secondary-meta[open] > summary { margin-bottom: 0.8rem; }
+/* 「初出」の時刻は既定で隠し、＋ボタンで開く。 */
+.btn-inline-add { background: none; border: 1px dashed var(--muted); border-radius: 6px; color: var(--ink-soft); font-size: 0.8rem; padding: 0.15rem 0.45rem; cursor: pointer; line-height: 1.4; }
+.btn-inline-add:hover { color: var(--accent); border-color: var(--accent); }
+.date-row__time { display: inline-flex; align-items: center; gap: 0.1rem; }
 .field__check { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0; font-weight: 400; }
 
 /* Required / optional markers on form labels and fieldset legends */
