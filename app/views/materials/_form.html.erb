@@ -1,31 +1,16 @@
 <%= form_with model: material, class: "stacked-form" do |f| %>
   <%= render "shared/error_messages", record: material %>
 
-  <% if Current.user&.admin? %>
-    <div class="admin-box">
-      <span class="admin-box__label">管理者操作</span>
-      <div class="field">
-        <%= f.label :confidence, "信頼度（出典検証の確定）" %><%= optional_badge %>
-        <small class="field__hint">原本そのものを確認できたら「原本確認済」、できていなければ「未確認」のままで。</small>
-        <%= f.select :confidence, Material::CONFIDENCE_LEVELS.map { |slug, label| [label, slug] }, { selected: material.confidence || "unconfirmed" } %>
-      </div>
-    </div>
-  <% else %>
-    <p class="muted">信頼度: <%= render BadgeComponent.new(text: material.confidence_label, variant: :status) %> <small>（変更は管理者のみ）</small></p>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :title, "タイトル" %><%= optional_badge %>
-    <small class="field__hint">空のままなら、ファイル名や YouTube・ページのタイトルから自動で入ります。</small>
-    <%= f.text_field :title %>
-  </div>
-  <div class="field"><%= f.label :description, "説明" %><%= optional_badge %><%= f.text_area :description %></div>
-
+  <%# ── 一級市民: 実体 / 分類 / 内容を1行で / 出典元 / 初出 ── %>
   <% if material.new_record? %>
     <fieldset>
       <legend>ファイル または URL のどちらか一方（登録後は変更できません）<%= required_badge %></legend>
       <div class="field"><%= f.label :file, "ファイル" %><%= f.file_field :file %></div>
-      <div class="field"><%= f.label :url, "URL（YouTube等）" %><%= f.url_field :url, value: material.url %></div>
+      <div class="field">
+        <%= f.label :url, "URL" %>
+        <small class="field__hint">YouTube・ニコニコ動画・Vimeo・Dailymotion・Spotify はプレーヤーが埋め込み表示されます。その他のURL（記事ページ等）もリンクとして登録できます。</small>
+        <%= f.url_field :url, value: material.url %>
+      </div>
     </fieldset>
   <% else %>
     <p class="muted">
@@ -36,26 +21,54 @@
   <% end %>
 
   <div class="field">
+    <%= f.label :kind, "分類" %><%= optional_badge %>
+    <small class="field__hint">未選択なら種類を自動で推定します。リンクでも動画/音声/Web 等に分けられます。</small>
+    <%# 保存はフラット enum。映像/音声/画像は1段目で直接、残りは optgroup で2段階。 %>
+    <%= f.select :kind, material_kind_options(material.kind), { include_blank: "自動で判定" } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :title, "内容を1行で" %><%= optional_badge %>
+    <small class="field__hint">何の資料かが一目で分かる一文を。空のままならファイル名や YouTube・ページのタイトルから自動で入ります。</small>
+    <%= f.text_field :title %>
+  </div>
+
+  <div class="field">
+    <%= f.label :source, "出典元（掲載誌・書籍・サイト名）" %><%= optional_badge %>
+    <%= f.text_field :source, placeholder: "例: 月刊サンプル誌 / 『サンプル作品』劇場パンフレット" %>
+  </div>
+
+  <div class="field" data-controller="time-disclosure">
+    <%= f.label :published_year, "初出" %><%= optional_badge %>
+    <small class="field__hint">わかる粒度だけでOK（年だけ・年月だけでも可）。年表にも使われます。</small>
+    <span class="date-row">
+      <%= f.number_field :published_year, value: fuzzy_part(material.published, :year), placeholder: "年" %>
+      <%= f.number_field :published_month, in: 1..12, value: fuzzy_part(material.published, :month), placeholder: "月" %>
+      <%= f.number_field :published_day, in: 1..31, value: fuzzy_part(material.published, :day), placeholder: "日" %>
+      <button type="button" class="btn-inline-add" data-time-disclosure-target="toggle" data-action="time-disclosure#open" title="時刻を追加">＋時刻</button>
+      <span class="date-row__time" data-time-disclosure-target="times" hidden>
+        <%= f.number_field :published_hour, in: 0..23, value: fuzzy_part(material.published, :hour), placeholder: "時" %>:<%= f.number_field :published_minute, in: 0..59, value: fuzzy_part(material.published, :minute), placeholder: "分" %>
+      </span>
+    </span>
+  </div>
+
+  <%# ── タグ（中段・可視） ── %>
+  <div class="field">
     <%= f.label :tag_names, "タグ（カンマ区切り）" %><%= optional_badge %>
     <%= f.text_field :tag_names, value: material.tags.map(&:name).join(", ") %>
   </div>
 
-  <fieldset>
-    <legend>出典情報（書けるところだけでOK）</legend>
+  <%# ── その他（副次メタデータ・既定で折りたたみ。気軽に増減できる） ── %>
+  <details class="secondary-meta">
+    <summary>
+      <%= icon("chevron-right", css: "secondary-meta__chevron") %>
+      <span>詳しい情報（任意・分かる範囲で）</span>
+      <span class="secondary-meta__hint">クリックで開く</span>
+    </summary>
+    <div class="field"><%= f.label :description, "説明" %><%= optional_badge %><%= f.text_area :description %></div>
     <div class="field"><%= f.label :author, "著者・発言者" %><%= optional_badge %><%= f.text_field :author, placeholder: "例: サンプル監督（インタビューの発言者）" %></div>
-    <div class="field"><%= f.label :source, "出典元（掲載誌・書籍・サイト名）" %><%= optional_badge %><%= f.text_field :source, placeholder: "例: 月刊サンプル誌 / 『サンプル作品』劇場パンフレット" %></div>
     <div class="field"><%= f.label :volume, "巻号" %><%= optional_badge %><%= f.text_field :volume, placeholder: "例: 1991年4月号 / Vol.12" %></div>
     <div class="field"><%= f.label :publisher, "出版社・発行元" %><%= optional_badge %><%= f.text_field :publisher, placeholder: "例: サンプル出版" %></div>
-    <div class="field">
-      <%= f.label :published_year, "発行日" %><%= optional_badge %>
-      <small class="field__hint">わかる粒度だけでOK（年だけ・年月だけでも可）。必要なら時刻（時:分）まで。年表にも使われます。</small>
-      <span class="date-row">
-        <%= f.number_field :published_year, value: fuzzy_part(material.published, :year), placeholder: "年" %>
-        <%= f.number_field :published_month, in: 1..12, value: fuzzy_part(material.published, :month), placeholder: "月" %>
-        <%= f.number_field :published_day, in: 1..31, value: fuzzy_part(material.published, :day), placeholder: "日" %>
-        <%= f.number_field :published_hour, in: 0..23, value: fuzzy_part(material.published, :hour), placeholder: "時" %>:<%= f.number_field :published_minute, in: 0..59, value: fuzzy_part(material.published, :minute), placeholder: "分" %>
-      </span>
-    </div>
     <div class="field"><%= f.label :pages, "ページ範囲（出版物の一部のとき）" %><%= optional_badge %><%= f.text_field :pages, placeholder: "例: 12-15 / p.3 / 34-45, 52" %></div>
     <div class="field">
       <%= f.label :page_count, "総ページ数" %><%= optional_badge %>
@@ -66,14 +79,14 @@
     <div class="field">
       <%= f.label :rights, "権利状態" %><%= optional_badge %>
       <small class="field__hint">引用していいか迷うものは「要注意」、判断がつかなければ未設定のままでOK。</small>
-      <%= f.select :rights, Material::RIGHTS_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>
+      <%= f.select :rights, Material::RIGHTS_STATUSES.map { |slug, label| [ label, slug ] }, { include_blank: "未設定" } %>
     </div>
     <div class="field">
       <%= f.label :ownership, "所持状況" %><%= optional_badge %>
       <small class="field__hint">この資料の実物を持っているか。原本所有／部分所有（切り抜きなど）／未所持（データのみ）。</small>
-      <%= f.select :ownership, Material::OWNERSHIP_STATUSES.map { |slug, label| [label, slug] }, { include_blank: "未設定" } %>
+      <%= f.select :ownership, Material::OWNERSHIP_STATUSES.map { |slug, label| [ label, slug ] }, { include_blank: "未設定" } %>
     </div>
-  </fieldset>
+  </details>
 
   <% if material.new_record? %>
     <div class="field">

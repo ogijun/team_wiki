@@ -112,18 +112,18 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /未着手/
   end
 
-  test "index shows uploader as an avatar link with a name tooltip, plus 投稿日時 and 発行日 columns" do
+  test "index shows uploader as an avatar link with a name tooltip, plus 投稿日時 and 初出 columns" do
     m = Material.create!(user: @user, url: "https://example.com/p", title: "資料P",
                          published_year: 2020, published_month: 3)
     get materials_url
     assert_response :success
     assert_select "a.sort-link", text: /By/
     assert_select "a.sort-link", text: /投稿日時/
-    assert_select "a.sort-link", text: /発行日/
+    assert_select "a.sort-link", text: /初出/
     # アップローダー欄は名前テキストではなくアイコン＋title 属性（tooltip）
     assert_select "table tbody a[title=?]", @user.name
     assert_select "table tbody a", text: @user.name, count: 0
-    # 発行日が一覧に出る（スラッシュ表記）
+    # 初出が一覧に出る（スラッシュ表記）
     assert_select "td", text: %r{2020/03}
   end
 
@@ -202,24 +202,47 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h3", text: "この資料を引用している記事", count: 0
   end
 
-  test "progress strip shows pending steps as action links" do
+  test "progress strip shows pending steps as action links (原本確認ステップは撤去)" do
     m = Material.create!(user: @user, url: "https://example.com/strip", title: "ストリップ資料")
     get material_url(m)
-    # 書誌なし→追記リンク / 原本未確認(非admin)はテキスト / 未引用→引用タグへのアンカー
+    # 書誌なし→追記リンク / 未引用→引用タグへのアンカー（原本確認は撤去）
     assert_select ".progress-strip a[href=?]", edit_material_path(m), text: /書誌を追記/
-    assert_select ".progress-strip", text: /原本未確認/
     assert_select ".progress-strip a[href=?]", "#usage", text: /引用タグを使う/
+    assert_select ".progress-strip", text: /原本/, count: 0
   end
 
   test "progress strip shows completed steps as checks" do
     m = Material.create!(user: @user, url: "https://example.com/done", title: "完了資料",
-                         source: "サンプル誌", confidence: "confirmed")
+                         source: "サンプル誌")
     article = Article.create!(title: "引用元記事", created_by: @user)
     article.revise!(body: "[[ref:#{m.slug}]]", author: @user)
     get material_url(m)
     assert_select ".progress-strip .strip-step--done", text: /書誌/
-    assert_select ".progress-strip .strip-step--done", text: /原本確認済/
     assert_select ".progress-strip .strip-step--done", text: /引用 1件/
+  end
+
+  test "detail shows the media kind in the identity line and drops the confidence badge" do
+    m = Material.new(user: @user, title: "種別資料")
+    m.file.attach(io: StringIO.new("x"), filename: "s.mp3", content_type: "audio/mpeg")
+    m.save!
+    get material_url(m)
+    assert_response :success
+    assert_select ".material-identity", text: /音声/            # 分類は identity 行に表示
+    assert_select ".page-meta .badge", text: "未確認", count: 0  # confidence バッジは撤去
+    assert_select ".page-meta .badge", text: "原本確認済", count: 0
+  end
+
+  test "detail elevates 文字起こし above 書誌, surfaces 出典元/初出, shows a タグ zone" do
+    m = Material.create!(user: @user, url: "https://x.test/zone", title: "ゾーン資料",
+                         source: "サンプル誌", author: "サンプル著者",
+                         published_year: 1981, published_month: 3)
+    get material_url(m)
+    assert_response :success
+    body = response.body
+    assert_operator body.index("transcription-section"), :<, body.index("bibliography-section")
+    assert_select "section.tags-section h2", text: /タグ/
+    assert_select ".material-identity", text: /出典元/
+    assert_select ".material-identity", text: /初出/
   end
 
   test "a material without a transcription shows a clear 作成 CTA in the transcription zone" do
@@ -483,14 +506,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1998, m.published_at.year
   end
 
-  test "create persists confidence and rights" do
+  test "create persists rights but ignores confidence (form input retired)" do
     @user.update!(role: "admin")
     post materials_url, params: { material: {
       url: "https://x.test/c", confidence: "confirmed", rights: "quotable"
     } }
     m = Material.order(:created_at).last
-    assert_equal "confirmed", m.confidence
     assert_equal "quotable", m.rights
+    assert_equal "unconfirmed", m.confidence # confidence は permit から外したので無視される
   end
 
   test "update flashes a toast notice" do
@@ -533,17 +556,66 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "material[file]", count: 0
   end
 
-  test "editor cannot change confidence (ignored)" do
-    m = Material.create!(user: @user, url: "https://x.test/e", confidence: "unconfirmed")
-    patch material_url(m), params: { material: { url: "https://x.test/e", confidence: "confirmed" } }
-    assert_equal "unconfirmed", m.reload.confidence
-  end
-
-  test "admin can change confidence" do
+  test "confidence is not settable via the material form, even for admin (retired)" do
     @user.update!(role: "admin")
     m = Material.create!(user: @user, url: "https://x.test/a2", confidence: "unconfirmed")
     patch material_url(m), params: { material: { url: "https://x.test/a2", confidence: "confirmed" } }
-    assert_equal "confirmed", m.reload.confidence
+    assert_equal "unconfirmed", m.reload.confidence
+  end
+
+  test "material form retires the confidence input and labels the date 初出" do
+    get new_material_url
+    assert_response :success
+    assert_select "[name=?]", "material[confidence]", count: 0
+    assert_select "label[for=?]", "material_published_year", text: "初出"
+  end
+
+  test "new form offers a 分類 select with 自動で判定 and grouped + top-level options, and lists Spotify in the URL hint" do
+    get new_material_url
+    assert_response :success
+    assert_select "select[name=?] option", "material[kind]", text: "自動で判定"
+    assert_select "select[name=?] option[value=video]", "material[kind]", text: "動画"          # 1段目で直接
+    assert_select "select[name=?] optgroup[label=?] option[value=book]", "material[kind]", "出版物・文書", text: "書籍"
+    assert_select ".field__hint", text: /Spotify/
+  end
+
+  test "kind persists from the form and the detail identity reflects it" do
+    post materials_url, params: { material: { url: "https://example.com/podcast", kind: "audio", title: "ポッドキャスト" } }
+    m = Material.find_by!(title: "ポッドキャスト")
+    assert_equal "audio", m.kind
+    get material_url(m)
+    assert_select ".material-identity", text: /音声/
+  end
+
+  test "auto-detected kind is persisted on save (web/video), PDF stays 未分類" do
+    web = Material.create!(user: @user, url: "https://example.com/page", title: "Web記事")
+    assert_equal "web", web.kind   # 保存時に推定値で固定
+    yt = Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ", title: "動画リンク")
+    assert_equal "video", yt.kind
+    get material_url(yt)
+    assert_select ".material-identity", text: /動画/
+
+    pdf = Material.new(user: @user, title: "未分類PDF")
+    pdf.file.attach(io: StringIO.new("%PDF-1.4"), filename: "d.pdf", content_type: "application/pdf")
+    pdf.save!
+    assert_nil pdf.kind            # PDFは推定不能 → 未選択のまま
+    get material_url(pdf)
+    assert_select ".material-identity", text: /未分類/
+  end
+
+  test "tags stay visible outside the collapsible while bibliographic fields sit inside it" do
+    get new_material_url
+    assert_response :success
+    assert_select "details.secondary-meta input[name=?]", "material[author]"             # 著者=折りたたみ内
+    assert_select "details.secondary-meta input[name=?]", "material[tag_names]", count: 0 # タグは折りたたみ外
+    assert_select "input[name=?]", "material[tag_names]"                                  # 中段に可視で存在
+  end
+
+  test "the 初出 time inputs are hidden by default behind a +時刻 toggle" do
+    get new_material_url
+    assert_response :success
+    assert_select "[data-time-disclosure-target='times'][hidden] input[name=?]", "material[published_hour]"
+    assert_select "button[data-action=?]", "time-disclosure#open"
   end
 
   test "media material shows a transcription section" do

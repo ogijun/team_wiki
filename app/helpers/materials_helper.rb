@@ -11,10 +11,21 @@ module MaterialsHelper
   end
 
   MEDIA_ICONS = { link: "link", image: "image", video: "film", audio: "music", document: "file-text" }.freeze
-
-  # Material#media_kind をアイコンに対応づける（表示の単一窓口）。
+  # Material#media_kind をアイコンに対応づける（表示の単一窓口・技術的形態）。
   def media_icon(material)
     icon(MEDIA_ICONS.fetch(material.media_kind))
+  end
+
+  # 一級市民「分類」のラベル（ユーザ選択 or 自動推定 or 未分類）。
+  def material_kind_label(material)
+    Material::KINDS[material.effective_kind] || "未分類"
+  end
+
+  # 分類セレクト用オプション。映像/音声/画像は1段目で直接、残りは optgroup で2段階。保存値はフラット。
+  def material_kind_options(selected)
+    top = Material::KIND_TOP.map { |s| [ Material::KINDS[s], s ] }
+    groups = Material::KIND_GROUPS.map { |label, slugs| [ label, slugs.map { |s| [ Material::KINDS[s], s ] } ] }
+    safe_join([ options_for_select(top, selected), grouped_options_for_select(groups, selected) ])
   end
 
   # 一覧などで使う書き起こし状況ラベル。未作成なら「未着手」、ありなら作業中/完了。
@@ -23,7 +34,8 @@ module MaterialsHelper
   end
 
   # 資料詳細の進行ストリップ。資料のライフサイクル
-  # （書誌→文字起こし→原本確認→引用）を「済み=チェック / 未=次の行動リンク」で1行に出す。
+  # （書誌→文字起こし→引用）を「済み=チェック / 未=次の行動リンク」で1行に出す。
+  # 原本確認(confidence)はカラム毎 confirm へ移行予定のため当面ストリップから外す。
   # 各要素: { text:, done:, path:(未完の行動先。nil ならプレーン表示) }
   def material_progress_steps(material)
     steps = []
@@ -39,14 +51,6 @@ module MaterialsHelper
     else
       label = total.positive? ? "文字起こし #{done}/#{total}" : "文字起こし 未着手"
       { text: label, done: false, path: new_material_transcription_path(material) }
-    end
-
-    steps << if material.confidence == "confirmed"
-      { text: "原本確認済", done: true }
-    else
-      # 信頼度の確定は admin のみ操作できるため、editor にはテキストで状態だけ示す（権限は述語に集約）
-      { text: "原本未確認", done: false,
-        path: material.confidence_editable_by?(Current.user) ? edit_material_path(material) : nil }
     end
 
     count = material.citing_articles.count

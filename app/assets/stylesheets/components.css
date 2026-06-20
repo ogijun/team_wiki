@@ -114,7 +114,7 @@ button.tag-chip:hover, button.tag-chip:focus {
 .home-hero__sum a { display: inline-flex; align-items: center; }
 /* 詳細ページのゾーン見出し: h1(タイトル)と競合しない控えめなサイズに統一。
    ゾーン内の小見出し(h3)はさらに一段小さく、ラベル寄りの色にする。 */
-.bibliography-section h2, .usage h2, .transcription-section h2, .comments h2 {
+.bibliography-section h2, .usage h2, .transcription-section h2, .comments h2, .tags-section h2 {
   font-size: 1.05rem; margin: 0 0 0.6rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline);
 }
 .usage h3 { font-size: 0.92rem; color: var(--ink-soft); margin: 1.2rem 0 0.4rem; }
@@ -179,6 +179,28 @@ button.tag-chip:hover, button.tag-chip:focus {
 .stacked-form .field > :where(input, textarea, select) { margin-bottom: 0; }
 .field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
 .field__hint code { font-size: 0.85em; }
+/* 副次メタデータの折りたたみ（資料フォーム下段「詳しい情報」）。
+   「押せる／押すと広がる」が一目で分かるよう、枠＋地色＋回転シェブロン＋ヒントで明示。 */
+.stacked-form .secondary-meta { margin: 0 0 1.6rem; border: 1px solid var(--border); border-radius: 8px; }
+.secondary-meta > summary {
+  cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.6rem 0.75rem; font-size: 0.9rem; font-weight: 600; color: var(--ink-soft);
+  background: var(--code-bg); border-radius: 7px; user-select: none;
+}
+.secondary-meta > summary::-webkit-details-marker { display: none; }
+.secondary-meta > summary:hover { color: var(--accent); }
+.secondary-meta[open] > summary { border-bottom: 1px solid var(--border); border-radius: 7px 7px 0 0; }
+.secondary-meta__chevron { width: 1.05em; height: 1.05em; flex: 0 0 auto; transition: transform 0.15s ease; }
+.secondary-meta[open] .secondary-meta__chevron { transform: rotate(90deg); }
+.secondary-meta__hint { margin-left: auto; font-weight: 400; font-size: 0.78rem; color: var(--muted); }
+.secondary-meta[open] .secondary-meta__hint { display: none; }
+.secondary-meta > .field { padding-inline: 0.75rem; }
+.secondary-meta[open] > .field:first-of-type { margin-top: 1rem; }
+.secondary-meta > .field:last-child { margin-bottom: 1rem; }
+/* 「初出」の時刻は既定で隠し、＋ボタンで開く。 */
+.btn-inline-add { background: none; border: 1px dashed var(--muted); border-radius: 6px; color: var(--ink-soft); font-size: 0.8rem; padding: 0.15rem 0.45rem; cursor: pointer; line-height: 1.4; }
+.btn-inline-add:hover { color: var(--accent); border-color: var(--accent); }
+.date-row__time { display: inline-flex; align-items: center; gap: 0.1rem; }
 .field__check { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0.6rem 0; font-weight: 400; }
 
 /* Required / optional markers on form labels and fieldset legends */
@@ -292,6 +314,13 @@ button.tag-chip:hover, button.tag-chip:focus {
 .bibliography { margin: 0.5rem 0; }
 .bibliography dt { font-size: 0.8rem; color: var(--muted); }
 .bibliography dd { margin: 0 0 0.4rem; }
+
+/* 資料詳細: 本体直下の一級アイデンティティ（分類・初出・出典元）。少し大きめに見せる。 */
+.material-identity { display: flex; flex-wrap: wrap; gap: 0.35rem 1.4rem; margin: 0.8rem 0 0; font-size: 1.02rem; }
+.material-identity__item { display: inline-flex; align-items: baseline; }
+.material-identity__label { color: var(--muted); font-size: 0.78rem; margin-right: 0.4rem; }
+/* 資料詳細: タグゾーン（中段）の付与済みタグ。 */
+.material-tags { display: flex; flex-wrap: wrap; gap: 0.2rem 0.6rem; margin: 0 0 0.4rem; }
 
 /* Material thumbnails */
 .material-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; vertical-align: middle; }

@@ -20,16 +20,12 @@ class MaterialTest < ActiveSupport::TestCase
     assert_nil Material.new(user: @user, url: "https://x.test/o2").ownership_label
   end
 
-  test "authorization predicates: editable/deletable by any member, confidence admin-only" do
-    admin = User.create!(email_address: "adm@example.com", password: "password123", name: "Adm", role: "admin")
+  test "authorization predicates: editable/deletable by any member" do
     m = Material.create!(user: @user, url: "https://x.test/authz", title: "認可")
     assert m.editable_by?(@user)
     assert m.deletable_by?(@user)
     assert_not m.editable_by?(nil)
     assert_not m.deletable_by?(nil)
-    assert m.confidence_editable_by?(admin)
-    assert_not m.confidence_editable_by?(@user)   # editor 不可
-    assert_not m.confidence_editable_by?(nil)
   end
 
   def attach_png(material)
@@ -240,10 +236,43 @@ class MaterialTest < ActiveSupport::TestCase
   end
 
   test "labels map slug to Japanese; rights nil label is 未設定" do
-    m = Material.new(user: @user, url: "https://x.test/a", confidence: "confirmed", rights: "private")
-    assert_equal "原本確認済", m.confidence_label
+    m = Material.new(user: @user, url: "https://x.test/a", rights: "private")
     assert_equal "全文非公開", m.rights_label
     assert_equal "未設定", Material.new(user: @user, url: "https://x.test/a", rights: nil).rights_label
+  end
+
+  test "default_kind guesses from media form; documents are unguessable" do
+    audio = Material.new(user: @user, title: "a")
+    audio.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
+    audio.save!
+    assert_equal "audio", audio.default_kind
+
+    assert_equal "video", Material.create!(user: @user, url: "https://youtu.be/dQw4w9WgXcQ").default_kind
+    assert_equal "audio", Material.create!(user: @user, url: "https://open.spotify.com/episode/abc123").default_kind
+    assert_equal "web", Material.create!(user: @user, url: "https://example.com/x").default_kind
+
+    doc = Material.new(user: @user, title: "d")
+    doc.file.attach(io: StringIO.new("%PDF-1.4"), filename: "d.pdf", content_type: "application/pdf")
+    doc.save!
+    assert_nil doc.default_kind
+  end
+
+  test "effective_kind prefers the user-set kind over the auto guess" do
+    m = Material.create!(user: @user, url: "https://example.com/x")
+    assert_equal "web", m.effective_kind
+    m.update!(kind: "book")
+    assert_equal "book", m.effective_kind
+  end
+
+  test "kind must be a known value; blank normalizes to nil before save" do
+    assert_predicate Material.new(user: @user, url: "https://x.test/a", kind: "bogus"), :invalid?
+    # 保存前は "" → nil（保存時に before_save が自動推定で埋める＝別テストで検証）
+    assert_nil Material.new(user: @user, url: "https://x.test/a", kind: "").kind
+  end
+
+  test "default kind is persisted on save when left blank" do
+    m = Material.create!(user: @user, url: "https://example.com/x", kind: "")
+    assert_equal "web", m.kind
   end
 
   test "linearize_file! replaces the blob with a linearized PDF and is idempotent" do

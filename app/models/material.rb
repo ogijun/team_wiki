@@ -30,6 +30,19 @@ class Material < ApplicationRecord
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
   # 実物の所持状況（nil=未設定）。出典検証の confidence と違い、所持は事実なので編集は誰でも可。
   OWNERSHIP_STATUSES = { "original" => "原本所有", "partial" => "部分所有", "none" => "未所持（データのみ）" }.freeze
+  # ユーザが選べる「分類（資料種類）」。保存はフラットな単一 enum（nil=自動判定にフォールバック）。
+  KINDS = {
+    "video" => "動画", "audio" => "音声", "image" => "画像",
+    "book" => "書籍", "magazine" => "雑誌記事", "pamphlet" => "パンフレット",
+    "newspaper" => "新聞", "setting" => "設定資料",
+    "web" => "Webページ", "other" => "その他"
+  }.freeze
+  # 選択UI: 映像/音声/画像は1段目で直接、残りは大分類でグルーピング（2段階）。保存値はフラット。
+  KIND_TOP = %w[video audio image].freeze
+  KIND_GROUPS = {
+    "出版物・文書" => %w[book magazine pamphlet newspaper setting],
+    "Web・その他"  => %w[web other]
+  }.freeze
 
   validate :exactly_one_source
   validate :acceptable_file, if: -> { file.attached? }
@@ -46,6 +59,8 @@ class Material < ApplicationRecord
   validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
   normalizes :ownership, with: ->(v) { v.presence }
   validates :ownership, inclusion: { in: OWNERSHIP_STATUSES.keys }, allow_nil: true
+  normalizes :kind, with: ->(v) { v.presence }
+  validates :kind, inclusion: { in: KINDS.keys }, allow_nil: true
 
   # 書誌の詳細（すべて任意・自由記述）。空文字は nil に揃える。
   normalizes :isbn, :pages, :publisher, :volume, with: ->(v) { v.presence }
@@ -54,6 +69,8 @@ class Material < ApplicationRecord
 
   before_validation :assign_slug, on: :create
   before_validation :ensure_title, on: :create
+  # 未選択(自動判定)の分類は、保存時に推定値で固定する（判定後はその値で持つ）。
+  before_save :assign_default_kind, if: -> { kind.blank? }
   validates :slug, presence: true, uniqueness: true
   validates :title, presence: true
 
@@ -83,11 +100,29 @@ class Material < ApplicationRecord
     end
   end
 
-  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。
+  # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。技術的形態＝サムネ/埋め込みの窓口。
   def media_kind
     return :link if link?
     self.class.kind_for(file.content_type)
   end
+
+  # ユーザ未選択時の「分類」自動推定。確信が持てる範囲だけ（文書は種類を断定できないので nil）。
+  def default_kind
+    case media_kind
+    when :video then "video"
+    when :audio then "audio"
+    when :image then "image"
+    when :link
+      if MaterialEmbed.spotify_embed(url) then "audio"      # Spotify=音声
+      elsif MaterialEmbed.embed_src(url)  then "video"      # YouTube/Vimeo/Dailymotion=動画
+      else "web"
+      end
+    end # :document（PDF等）は断定不能 → nil（未分類）
+  end
+
+  # 実効分類: ユーザ選択があればそれ、なければ自動推定（nil の場合あり=未分類）。
+  # 通常は before_save で kind に固定されるが、コールバック前/旧データ用にフォールバックを残す。
+  def effective_kind = kind.presence || default_kind
 
   # 種別ごとの件数（画像/動画/音声/文書/リンク）。リンクは url 有無、ファイルは blob の content_type で判定。
   # 27件規模では grouped count で十分。500件超で media_kind をカラム化する（WHEN-IT-HURTS 閾値）。
@@ -153,7 +188,6 @@ class Material < ApplicationRecord
       volume.present? || publisher.present? || pages.present? || isbn.present? || page_count.present?
   end
 
-  def confidence_label = CONFIDENCE_LEVELS[confidence]
   def rights_label = rights ? RIGHTS_STATUSES[rights] : "未設定"
   def ownership_label = ownership ? OWNERSHIP_STATUSES[ownership] : nil
 
@@ -162,8 +196,8 @@ class Material < ApplicationRecord
   # 現状: メタデータ編集・削除はログイン済みメンバーなら誰でも可（wiki 的）。将来絞るならここを変える。
   def editable_by?(user) = user.present?
   def deletable_by?(user) = user.present?
-  # 信頼度（原本検証の確定）は admin のみ。インスタンス状態に依存しない役割判定。
-  def confidence_editable_by?(user) = user&.admin? || false
+  # NOTE: confidence（material 単位の信頼度）の UI/述語は撤去済み。カラム/validation は休眠で温存
+  #   し、将来は一級カラム毎の confirm 状況管理に置換する（UI は別途設計）。
 
   # 「未完成資料」の単一の出所: 文字起こしが done でない資料（未着手＝パート0、または途中＝非done パートあり）。
   # transcription_status が done 以外、と同義。将来「主要項目が未確認」等へ広げるならここを広げる。
@@ -194,6 +228,11 @@ class Material < ApplicationRecord
   end
 
   private
+
+  # 自動判定できた分類を保存値に固定（断定できない PDF 等は nil のまま＝未分類）。
+  def assign_default_kind
+    self.kind = default_kind
+  end
 
   def assign_slug
     self.slug ||= Slug.unique_token { |c| Material.exists?(slug: c) }
