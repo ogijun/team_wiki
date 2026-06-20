@@ -78,8 +78,8 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     get tags_url
     assert_response :success
     body = response.body
-    assert body.index("#popular") < body.index("#ruby"), "使用数の多いタグが先に出るべき"
-    assert body.index("#ruby") < body.index("#lonely"), "使用数0のタグは末尾に出るべき"
+    assert_operator body.index("#popular"), :<, body.index("#ruby"), "使用数の多いタグが先に出るべき"
+    assert_operator body.index("#ruby"), :<, body.index("#lonely"), "使用数0のタグは末尾に出るべき"
   end
 
   test "create makes a new tag" do
