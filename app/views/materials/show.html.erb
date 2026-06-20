@@ -120,8 +120,19 @@
     <% end %>
     <p><%= link_to "パートを追加", new_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
   <% else %>
-    <p class="muted">このメディアはまだ文字起こしされていません。聞き取れた／読み取れた範囲でOKです。パートに分けて複数人で分担できます。</p>
-    <%= link_to "最初のパートを作成", new_material_transcription_path(@material), role: "button", class: "btn-sm" %>
+    <%# 初回ハードル低下: 最初から書ける常設欄。保存して初めて実レコード生成（空行を残さない）。 %>
+    <div class="transcribe-starter">
+      <p class="transcribe-starter__head"><strong>文字起こし #1</strong> <span class="muted">未着手</span></p>
+      <p class="muted">聞こえた・読めた範囲でOK。完璧でなくて大丈夫。改行はそのまま残ります。</p>
+      <%= form_with model: [ @material, @material.transcriptions.build ], class: "stacked-form transcribe-starter__form" do |f| %>
+        <%= f.text_area :body, rows: 10,
+              placeholder: "ここに聞き取った／読み取った内容をそのまま入力します。\n（例）話者A: …／話者B: …  ページや時間のメモを添えてもOK。" %>
+        <div class="transcribe-starter__actions">
+          <%= f.submit "保存" %>
+          <%= link_to "詳しく設定して作成", new_material_transcription_path(@material), class: "muted" %>
+        </div>
+      <% end %>
+    </div>
   <% end %>
 </section>
 

@@ -127,6 +127,17 @@ button.tag-chip:hover, button.tag-chip:focus {
 .transcript-box .prewrap { line-height: 1.75; }
 .transcript-box .meta { margin: 0 0 0.6rem; font-size: 0.8rem; }
 .transcript-box__more { margin: 0.7rem 0 0; }
+
+/* 初回ハードル低下: 最初から書ける常設欄（白紙の壁対策）。 */
+.transcribe-starter {
+  background: var(--surface); border: 1px dashed var(--accent); border-radius: 8px;
+  padding: 0.9rem 1.1rem; margin: 0.5rem 0 0.8rem;
+}
+.transcribe-starter__head { margin: 0 0 0.2rem; }
+.transcribe-starter__form { margin-top: 0.4rem; }
+.transcribe-starter__form textarea { margin-bottom: 0.5rem; }
+.transcribe-starter__actions { display: flex; align-items: center; gap: 0.9rem; }
+.transcribe-starter__actions input[type="submit"] { margin: 0; width: auto; }
 .transcript-part { margin: 0 0 1rem; }
 .transcript-part__head { display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.3rem; }
 .transcription-summary { font-size: 0.85rem; margin: 0 0 0.8rem; }
