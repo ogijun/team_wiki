@@ -1,5 +1,5 @@
 <h1>タグ一覧</h1>
-<p class="page-lead">記事・資料に付けるタグ <%= @tags.size %> 個。クリックで関連をまとめて見られます。</p>
+<p class="page-lead">記事・資料に付けるタグ <%= @tags.length %> 個。クリックで関連をまとめて見られます。</p>
 
 <%= form_with model: @tag, url: tags_path do |f| %>
   <%= render "shared/error_messages", record: @tag %>
@@ -12,6 +12,7 @@
     <% @tags.each do |t| %>
       <li>
         <%= link_to "##{t.name}", tag_path(t) %>
+        <small class="muted">（<%= t.usage_count %>）</small>
         <% if t.usage_count.zero? %>
           <%= button_to "削除", tag_path(t), method: :delete, class: "btn-sm btn-danger", data: { turbo_confirm: "タグ「#{t.name}」を削除しますか？" } %>
         <% end %>

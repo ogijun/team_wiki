@@ -17,6 +17,11 @@ class TagsController < ApplicationController
 
   def show
     @tag = Tag.find_by!(slug: params[:id])
+    # 資料主役: 資料を主に並べ、記事は副として残す。
+    @materials = @tag.materials
+                     .includes(:transcriptions, user: { avatar_attachment: :blob })
+                     .with_attached_file
+                     .order(created_at: :desc)
     @articles = @tag.articles.order(updated_at: :desc)
   end
 
