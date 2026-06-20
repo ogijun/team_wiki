@@ -1,7 +1,8 @@
 <%# 1 文字起こしパート行。担当(assignee)は GitHub 風に自由割り当て・弱いサイン。編集ゲートではない。 %>
 <div class="transcript-part" id="<%= dom_id(t) %>">
   <div class="transcript-part__head">
-    <strong><%= t.display_label %></strong>
+    <%# パート番号/見出しは複数パートのときだけ（1つだけなら不要・ゾーン見出しと重複）。 %>
+    <% if local_assigns.fetch(:numbered, true) %><strong><%= t.display_label %></strong><% end %>
     <%= render BadgeComponent.new(text: t.assignment_state_label, variant: :status) %>
 
     <% if t.assignable_by?(Current.user) %>

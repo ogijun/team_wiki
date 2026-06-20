@@ -133,7 +133,6 @@ button.tag-chip:hover, button.tag-chip:focus {
   background: var(--surface); border: 1px dashed var(--accent); border-radius: 8px;
   padding: 0.9rem 1.1rem; margin: 0.5rem 0 0.8rem;
 }
-.transcribe-starter__head { margin: 0 0 0.2rem; }
 .transcribe-starter__form { margin-top: 0.4rem; }
 .transcribe-starter__form textarea { margin-bottom: 0.5rem; }
 .transcribe-starter__actions { display: flex; align-items: center; gap: 0.9rem; }

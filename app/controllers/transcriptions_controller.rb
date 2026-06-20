@@ -56,7 +56,8 @@ class TranscriptionsController < ApplicationController
         render turbo_stream: turbo_stream.replace(
           @transcription,
           partial: "materials/transcription_part",
-          locals: { material: @material, t: @transcription, members: User.for_picker.to_a }
+          locals: { material: @material, t: @transcription, members: User.for_picker.to_a,
+                    numbered: @material.transcriptions.count > 1 }
         )
       end
       format.html { redirect_to @material }

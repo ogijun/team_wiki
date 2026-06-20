@@ -116,13 +116,13 @@
       <%= c[:total] %> パート中 ・ 完了 <strong><%= c[:done] %></strong> ・ 担当中 <strong><%= c[:in_progress] %></strong> ・ 未担当 <strong><%= c[:unassigned] %></strong>
     </p>
     <% parts.each do |t| %>
-      <%= render "materials/transcription_part", material: @material, t: t, members: @members %>
+      <%= render "materials/transcription_part", material: @material, t: t, members: @members, numbered: parts.size > 1 %>
     <% end %>
     <p><%= link_to "パートを追加", new_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
   <% else %>
     <%# 初回ハードル低下: 最初から書ける常設欄。保存して初めて実レコード生成（空行を残さない）。 %>
     <div class="transcribe-starter">
-      <p class="transcribe-starter__head"><strong>文字起こし #1</strong> <span class="muted">未着手</span></p>
+      <%# 枠が1つだけなので番号・見出しは出さない（ゾーン見出し「文字起こし」と重複させない）。 %>
       <p class="muted">聞こえた・読めた範囲でOK。完璧でなくて大丈夫。改行はそのまま残ります。</p>
       <%= form_with model: [ @material, @material.transcriptions.build ], class: "stacked-form transcribe-starter__form" do |f| %>
         <%= f.text_area :body, rows: 10,

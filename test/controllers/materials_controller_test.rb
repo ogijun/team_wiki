@@ -270,8 +270,19 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".transcription-section .transcript-part", count: 2
     assert_select "a[href=?]", edit_material_transcription_path(m, t1)
     assert_select "a[href=?]", edit_material_transcription_path(m, t2)
+    assert_select ".transcript-part__head strong", text: "前半"   # 複数なのでパート見出しを出す
     assert_select ".transcription-section a[href=?]", new_material_transcription_path(m), text: /パート/
     assert_select ".transcription-section", text: /1\s*\/\s*2/  # 完了 1/2
+  end
+
+  test "a single transcription part hides the redundant パートN heading" do
+    m = Material.new(user: @user, title: "単一パート音声")
+    m.file.attach(io: StringIO.new("x"), filename: "s1.mp3", content_type: "audio/mpeg")
+    m.save!
+    m.transcriptions.create!(author: @user, body: "本文だけ", position: 1, status: "drafting")
+    get material_url(m)
+    assert_select ".transcript-part", count: 1
+    assert_select ".transcript-part__head strong", count: 0   # 1つだけなら「パート1」見出しは出さない
   end
 
   test "progress strip includes transcription state for every material, including links" do
