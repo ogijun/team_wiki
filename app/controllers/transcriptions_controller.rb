@@ -1,6 +1,7 @@
 class TranscriptionsController < ApplicationController
   before_action :set_material, only: %i[new create show edit update destroy assign]
   before_action :set_transcription, only: %i[show edit update destroy assign]
+  before_action :set_members, only: %i[new create edit update] # create/update は失敗時にフォーム再描画
 
   def new
     @transcription = @material.transcriptions.build
@@ -77,6 +78,11 @@ class TranscriptionsController < ApplicationController
 
   def set_transcription
     @transcription = @material.transcriptions.find(params[:id])
+  end
+
+  # 担当ピッカー用のメンバー一覧（アバター eager load・名前順）。フォーム内で直接クエリしない。
+  def set_members
+    @members = User.for_picker.to_a
   end
 
   def transcription_params

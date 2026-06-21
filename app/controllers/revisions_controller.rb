@@ -2,7 +2,7 @@ class RevisionsController < ApplicationController
   before_action :set_article
 
   def index
-    @revisions = @article.revisions.order(created_at: :desc).to_a
+    @revisions = @article.revisions.includes(:author).order(created_at: :desc).to_a
     # newest-first list: each revision's predecessor is the next (older) one
     @previous_of = @revisions.each_cons(2).to_h { |newer, older| [ newer.id, older ] }
   end
