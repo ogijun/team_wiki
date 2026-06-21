@@ -216,15 +216,9 @@ class MaterialTest < ActiveSupport::TestCase
     assert_nil img.preview_image_url
   end
 
-  test "default confidence is unconfirmed" do
+  test "default confidence is unconfirmed (dormant column; validation/UI retired)" do
     m = Material.create!(user: @user, url: "https://x.test/a")
     assert_equal "unconfirmed", m.confidence
-  end
-
-  test "confidence must be one of CONFIDENCE_LEVELS" do
-    m = Material.new(user: @user, url: "https://x.test/a", confidence: "bogus")
-    assert_not m.valid?
-    assert_predicate m.errors[:confidence], :any?
   end
 
   test "rights allows nil and valid values, rejects others" do

@@ -26,7 +26,6 @@ class Material < ApplicationRecord
   # これを 1GB 超にするなら deploy.yml の proxy.buffering.max_request_body も上げること。
   MAX_BYTES = 1.gigabyte
   THUMBNAIL_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
-  CONFIDENCE_LEVELS = { "confirmed" => "原本確認済", "unconfirmed" => "未確認" }.freeze
   RIGHTS_STATUSES = { "quotable" => "引用可", "private" => "全文非公開", "caution" => "要注意" }.freeze
   # 実物の所持状況（nil=未設定）。出典検証の confidence と違い、所持は事実なので編集は誰でも可。
   OWNERSHIP_STATUSES = { "original" => "原本所有", "partial" => "部分所有", "none" => "未所持（データのみ）" }.freeze
@@ -53,7 +52,6 @@ class Material < ApplicationRecord
   validates :url, format: { with: %r{\Ahttps?://\S+\z},
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
-  validates :confidence, inclusion: { in: CONFIDENCE_LEVELS.keys }
   # フォームの「未設定」(include_blank) は "" を送る。空文字は nil 扱いにして allow_nil を効かせる。
   normalizes :rights, with: ->(v) { v.presence }
   validates :rights, inclusion: { in: RIGHTS_STATUSES.keys }, allow_nil: true
@@ -113,9 +111,10 @@ class Material < ApplicationRecord
     when :audio then "audio"
     when :image then "image"
     when :link
-      if MaterialEmbed.spotify_embed(url) then "audio"      # Spotify=音声
-      elsif MaterialEmbed.embed_src(url)  then "video"      # YouTube/Vimeo/Dailymotion=動画
-      else "web"
+      case MaterialEmbed.provider_for(url)
+      when :spotify then "audio"                # Spotify=音声
+      when nil then "web"                       # 埋め込み非対応URL=Webページ
+      else "video"                              # YouTube/Vimeo/Dailymotion/ニコニコ=動画
       end
     end # :document（PDF等）は断定不能 → nil（未分類）
   end
@@ -196,8 +195,8 @@ class Material < ApplicationRecord
   # 現状: メタデータ編集・削除はログイン済みメンバーなら誰でも可（wiki 的）。将来絞るならここを変える。
   def editable_by?(user) = user.present?
   def deletable_by?(user) = user.present?
-  # NOTE: confidence（material 単位の信頼度）の UI/述語は撤去済み。カラム/validation は休眠で温存
-  #   し、将来は一級カラム毎の confirm 状況管理に置換する（UI は別途設計）。
+  # NOTE: confidence（material 単位の信頼度）の UI/述語/validation は撤去済み。カラムは休眠で温存
+  #   （DB default "unconfirmed"）。将来は一級カラム毎の confirm 状況管理に置換する（UI は別途設計）。
 
   # 「未完成資料」の単一の出所: 文字起こしが done でない資料（未着手＝パート0、または途中＝非done パートあり）。
   # transcription_status が done 以外、と同義。将来「主要項目が未確認」等へ広げるならここを広げる。
@@ -206,25 +205,26 @@ class Material < ApplicationRecord
           "OR EXISTS (SELECT 1 FROM transcriptions WHERE transcriptions.material_id = materials.id AND transcriptions.status != 'done')")
   }
 
-  # パート集約: 0件=todo / 全完了=done / それ以外=drafting。
-  def transcription_status
-    parts = transcriptions.to_a
-    return "todo" if parts.empty?
-    parts.all? { |t| t.status == "done" } ? "done" : "drafting"
-  end
-
-  # 表示用 [完了数, 総数]。
-  def transcription_progress
-    parts = transcriptions.to_a
-    [ parts.count { |t| t.status == "done" }, parts.size ]
-  end
-
   # 表示用カウント: 完了 / 担当中(担当あり・未完) / 未担当(担当なし・未完) と総数。
+  # transcription_status / transcription_progress もこの1フォールから導出する（集計の単一窓口）。
   # 既にロード済みの配列があれば渡して再クエリを避ける（show は parts を持っている）。
   def transcription_counts(parts = transcriptions.to_a)
     done = parts.count { |t| t.status == "done" }
     in_progress = parts.count { |t| t.status != "done" && t.assignee_id.present? }
     { total: parts.size, done: done, in_progress: in_progress, unassigned: parts.size - done - in_progress }
+  end
+
+  # パート集約: 0件=todo / 全完了=done / それ以外=drafting。
+  def transcription_status(parts = transcriptions.to_a)
+    c = transcription_counts(parts)
+    return "todo" if c[:total].zero?
+    c[:done] == c[:total] ? "done" : "drafting"
+  end
+
+  # 表示用 [完了数, 総数]。
+  def transcription_progress(parts = transcriptions.to_a)
+    c = transcription_counts(parts)
+    [ c[:done], c[:total] ]
   end
 
   private

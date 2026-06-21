@@ -14,13 +14,13 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
 
   test "index renders trend bar charts from snapshots" do
     StatSnapshot.create!(date: Date.current - 1, articles_count: 3, materials_count: 5,
-                         unconfirmed_materials_count: 2, transcribed_chars: 100)
+                         transcribed_chars: 100)
     StatSnapshot.create!(date: Date.current, articles_count: 4, materials_count: 6,
-                         unconfirmed_materials_count: 1, transcribed_chars: 1500)
+                         transcribed_chars: 1500)
     get stats_url
     assert_response :success
-    # 2スナップショット × 6指標 = 12本（0基準の縦棒）。x軸ラベル(.trend__xaxis)も出る。
-    assert_select ".stat-chart .trend__bar", minimum: 12
+    # 2スナップショット × 5指標 = 10本（0基準の縦棒）。x軸ラベル(.trend__xaxis)も出る。
+    assert_select ".stat-chart .trend__bar", minimum: 10
     assert_select ".stat-chart .trend__xaxis"
     assert_select ".stat-chart", text: /1,500/
   end
@@ -34,7 +34,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     StatSnapshot.capture!
     get stats_url
     assert_response :success
-    assert_select ".stat-chart", count: 6
+    assert_select ".stat-chart", count: 5
     assert_select ".stat-chart__head", text: /保存容量/
     assert_select ".stat-chart__head", text: /総ページ数/
   end

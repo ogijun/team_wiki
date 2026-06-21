@@ -22,6 +22,16 @@ module MaterialEmbed
     "https://open.spotify.com/embed/#{m[1]}/#{m[2]}"
   end
 
+  # URL がどの埋め込みプロバイダか（分類の自動推定などの判定に。embed URL の戻り形に依存させない）。
+  def provider_for(url)
+    return :youtube if youtube_id(url)
+    return :vimeo if vimeo_id(url)
+    return :dailymotion if dailymotion_id(url)
+    return :nicovideo if nicovideo_id(url)
+    return :spotify if url.to_s.match?(SPOTIFY)
+    nil
+  end
+
   def embed_src(url)
     if (id = youtube_id(url))
       "https://www.youtube.com/embed/#{id}"

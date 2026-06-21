@@ -49,6 +49,15 @@ class MaterialEmbedTest < ActiveSupport::TestCase
     assert_nil MaterialEmbed.embed_src("https://example.com/page")
   end
 
+  test "provider_for classifies the embeddable providers and returns nil otherwise" do
+    assert_equal :youtube, MaterialEmbed.provider_for("https://youtu.be/dQw4w9WgXcQ")
+    assert_equal :vimeo, MaterialEmbed.provider_for("https://vimeo.com/838983799")
+    assert_equal :dailymotion, MaterialEmbed.provider_for("https://dai.ly/xualzi")
+    assert_equal :nicovideo, MaterialEmbed.provider_for("https://www.nicovideo.jp/watch/sm26015113")
+    assert_equal :spotify, MaterialEmbed.provider_for("https://open.spotify.com/episode/abc123")
+    assert_nil MaterialEmbed.provider_for("https://example.com/page")
+  end
+
   test "blank returns nil" do
     assert_nil MaterialEmbed.embed_src(nil)
     assert_nil MaterialEmbed.embed_src("")
