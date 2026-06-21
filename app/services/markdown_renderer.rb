@@ -4,6 +4,16 @@ class MarkdownRenderer
 
   REF_PATTERN = /\[\[ref:([^\[\]]+?)\]\]/
 
+  # 記事/About 本文用の標準構成を組んだレンダラを返す（resolver 配線の単一窓口）。
+  # [[ref:slug]] は本文から一括解決（引用ごとの find_by N+1 を避ける）、[[title]] は WikiLinkResolver。
+  def self.for_wiki(text)
+    by_slug = Material.where(slug: RefExtractor.call(text)).index_by(&:slug)
+    new(
+      link_resolver: WikiLinkResolver.resolver_for(text),
+      ref_resolver: ->(handle) { by_slug[handle] }
+    )
+  end
+
   # link_resolver: callable(title) -> { href:, exists: }
   # ref_resolver:  callable(handle) -> Material or nil
   def initialize(link_resolver:, ref_resolver: ->(_) { nil })
