@@ -37,7 +37,8 @@ module MaterialsHelper
   # （書誌→文字起こし→引用）を「済み=チェック / 未=次の行動リンク」で1行に出す。
   # 原本確認(confidence)はカラム毎 confirm へ移行予定のため当面ストリップから外す。
   # 各要素: { text:, done:, path:(未完の行動先。nil ならプレーン表示) }
-  def material_progress_steps(material)
+  def material_progress_steps(material, parts = nil)
+    parts ||= material.transcriptions.to_a
     steps = []
     steps << if material.bibliography_present?
       { text: "書誌", done: true }
@@ -45,8 +46,8 @@ module MaterialsHelper
       { text: "書誌を追記", done: false, path: edit_material_path(material) }
     end
 
-    done, total = material.transcription_progress
-    steps << if total.positive? && material.transcription_status == "done"
+    done, total = material.transcription_progress(parts)
+    steps << if total.positive? && done == total
       { text: "文字起こし", done: true }
     else
       label = total.positive? ? "文字起こし #{done}/#{total}" : "文字起こし 未着手"

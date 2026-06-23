@@ -9,7 +9,7 @@
   </div>
   <div class="field">
     <%= f.label :assignee_id, "担当" %><%= optional_badge %>
-    <%= f.collection_select :assignee_id, User.order(:name), :id, ->(u) { display_name(u) }, include_blank: "未割当" %>
+    <%= f.collection_select :assignee_id, @members, :id, ->(u) { display_name(u) }, include_blank: "未割当" %>
   </div>
   <div class="field">
     <%= f.label :status, "状態" %><%= optional_badge %>

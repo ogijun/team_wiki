@@ -31,6 +31,8 @@ class MaterialsController < ApplicationController
 
   def show
     @members = User.for_picker.to_a # 担当(assignee)ピッカー用のメンバー一覧
+    # 文字起こしパートは1回だけロード（進行ストリップと一覧で共有・二重クエリを避ける）。
+    @parts = @material.transcriptions.includes(:author, :assignee).to_a
   end
 
   def new

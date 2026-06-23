@@ -3,7 +3,7 @@
   <% @revisions.each do |rev| %>
     <li>
       <%= link_to "##{rev.id} #{rev.created_at.to_fs(:jp)}", article_revision_path(@article, rev) %>
-      by <%= rev.author.name %> <%= rev.edit_summary %>
+      by <%= display_name(rev.author) %> <%= rev.edit_summary %>
       <% if (prev = @previous_of[rev.id]) %>
         <%= link_to "前の版との差分", article_revision_path(@article, rev, a: prev.id) %>
       <% end %>

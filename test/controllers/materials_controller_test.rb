@@ -245,12 +245,19 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".material-identity", text: /初出/
   end
 
-  test "a material without a transcription shows a clear 作成 CTA in the transcription zone" do
+  test "a material without a transcription shows an inline write area (白紙の壁対策)" do
     media = Material.new(user: @user, title: "未起こし音声")
     media.file.attach(io: StringIO.new("x"), filename: "c.mp3", content_type: "audio/mpeg")
     media.save!
     get material_url(media)
-    assert_select ".transcription-section a[role=button][href=?]", new_material_transcription_path(media), text: /パート|作成/
+    assert_response :success
+    # その場で書ける常設フォーム（本文 textarea が最初から開いている）
+    assert_select ".transcription-section form[action=?] textarea[name=?]",
+                  material_transcriptions_path(media), "transcription[body]"
+    # 安心メッセージ（白紙の壁対策）
+    assert_select ".transcription-section", text: /範囲でOK|完璧でなくて/
+    # 細かく設定したい人向けの従来フォームへの導線は残す
+    assert_select ".transcription-section a[href=?]", new_material_transcription_path(media)
   end
 
   test "material detail lists transcription parts with edit links and an add link" do
@@ -263,8 +270,19 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".transcription-section .transcript-part", count: 2
     assert_select "a[href=?]", edit_material_transcription_path(m, t1)
     assert_select "a[href=?]", edit_material_transcription_path(m, t2)
+    assert_select ".transcript-part__head strong", text: "前半"   # 複数なのでパート見出しを出す
     assert_select ".transcription-section a[href=?]", new_material_transcription_path(m), text: /パート/
     assert_select ".transcription-section", text: /1\s*\/\s*2/  # 完了 1/2
+  end
+
+  test "a single transcription part hides the redundant パートN heading" do
+    m = Material.new(user: @user, title: "単一パート音声")
+    m.file.attach(io: StringIO.new("x"), filename: "s1.mp3", content_type: "audio/mpeg")
+    m.save!
+    m.transcriptions.create!(author: @user, body: "本文だけ", position: 1, status: "drafting")
+    get material_url(m)
+    assert_select ".transcript-part", count: 1
+    assert_select ".transcript-part__head strong", count: 0   # 1つだけなら「パート1」見出しは出さない
   end
 
   test "progress strip includes transcription state for every material, including links" do

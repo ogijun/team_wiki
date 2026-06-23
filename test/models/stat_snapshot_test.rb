@@ -11,7 +11,6 @@ class StatSnapshotTest < ActiveSupport::TestCase
     assert_equal Date.current, snap.date
     assert_equal 1, snap.articles_count
     assert_equal 1, snap.materials_count
-    assert_equal 1, snap.unconfirmed_materials_count
     assert_equal 0, snap.transcribed_chars
   end
 

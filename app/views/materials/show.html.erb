@@ -12,7 +12,7 @@
 
 <%# 進行ストリップ: 状態の全体像と次の行動を1行で。済み=チェック / 未完=リンク %>
 <ul class="progress-strip">
-  <% material_progress_steps(@material).each do |step| %>
+  <% material_progress_steps(@material, @parts).each do |step| %>
     <li class="strip-step <%= step[:done] ? "strip-step--done" : "strip-step--todo" %>">
       <% if step[:done] %>
         <%= icon("check") %> <%= step[:text] %>
@@ -107,7 +107,7 @@
 
 <%# ── ② 文字起こし（一級と同格・本体直後に昇格）。全資料が対象。 ── %>
 <section class="transcription-section">
-  <% parts = @material.transcriptions.includes(:author, :assignee).to_a %>
+  <% parts = @parts # コントローラで eager load 済み（進行ストリップと共有） %>
   <% c = @material.transcription_counts(parts) %>
   <h2>文字起こし<% if c[:total].positive? %> <span class="pill"><%= c[:done] %> / <%= c[:total] %></span><% end %></h2>
 
@@ -116,12 +116,23 @@
       <%= c[:total] %> パート中 ・ 完了 <strong><%= c[:done] %></strong> ・ 担当中 <strong><%= c[:in_progress] %></strong> ・ 未担当 <strong><%= c[:unassigned] %></strong>
     </p>
     <% parts.each do |t| %>
-      <%= render "materials/transcription_part", material: @material, t: t, members: @members %>
+      <%= render "materials/transcription_part", material: @material, t: t, members: @members, numbered: parts.size > 1 %>
     <% end %>
     <p><%= link_to "パートを追加", new_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
   <% else %>
-    <p class="muted">このメディアはまだ文字起こしされていません。聞き取れた／読み取れた範囲でOKです。パートに分けて複数人で分担できます。</p>
-    <%= link_to "最初のパートを作成", new_material_transcription_path(@material), role: "button", class: "btn-sm" %>
+    <%# 初回ハードル低下: 最初から書ける常設欄。保存して初めて実レコード生成（空行を残さない）。 %>
+    <div class="transcribe-starter">
+      <%# 枠が1つだけなので番号・見出しは出さない（ゾーン見出し「文字起こし」と重複させない）。 %>
+      <p class="muted">聞こえた・読めた範囲でOK。完璧でなくて大丈夫。改行はそのまま残ります。</p>
+      <%= form_with model: [ @material, @material.transcriptions.build ], class: "stacked-form transcribe-starter__form" do |f| %>
+        <%= f.text_area :body, rows: 10,
+              placeholder: "ここに聞き取った／読み取った内容をそのまま入力します。\n（例）話者A: …／話者B: …  ページや時間のメモを添えてもOK。" %>
+        <div class="transcribe-starter__actions">
+          <%= f.submit "保存" %>
+          <%= link_to "詳しく設定して作成", new_material_transcription_path(@material), class: "muted" %>
+        </div>
+      <% end %>
+    </div>
   <% end %>
 </section>
 

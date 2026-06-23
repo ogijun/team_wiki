@@ -9,7 +9,7 @@ class StatSnapshot < ApplicationRecord
     {
       articles_count: Article.count,
       materials_count: Material.count,
-      unconfirmed_materials_count: Material.where(confidence: "unconfirmed").count,
+      # confidence は撤去済み（#133）。unconfirmed_materials_count はもう記録しない（カラムは休眠）。
       # SQLite の LENGTH(text) は文字数（バイト数ではない）を返す
       transcribed_chars: Transcription.sum("LENGTH(body)").to_i,
       total_file_bytes: library[:total_bytes],

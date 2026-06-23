@@ -9,16 +9,17 @@
   </div>
 <% else %>
 <%# 状態タブ（クライアント側で panel を切り替え）。JS無効時は全パネルが見えるだけで機能は損なわない %>
+<% statuses = [ [ "todo", "未着手" ], [ "drafting", "作業中" ], [ "done", "完了" ] ] %>
 <div data-controller="tabs">
   <nav class="tabs" role="tablist">
-    <% [["todo", "未着手"], ["drafting", "作業中"], ["done", "完了"]].each do |key, label| %>
+    <% statuses.each do |key, label| %>
       <button type="button" class="tab" role="tab" data-tabs-target="tab" data-key="<%= key %>" data-action="tabs#select">
         <%= label %> <span class="pill"><%= (@groups[key] || []).size %></span>
       </button>
     <% end %>
   </nav>
 
-  <% [["todo", "未着手"], ["drafting", "作業中"], ["done", "完了"]].each do |key, label| %>
+  <% statuses.each do |key, label| %>
     <% items = @groups[key] || [] %>
     <section class="tab-panel" role="tabpanel" data-tabs-target="panel" data-key="<%= key %>" aria-label="<%= label %>">
       <% if items.any? %>

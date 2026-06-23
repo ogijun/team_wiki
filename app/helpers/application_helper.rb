@@ -16,10 +16,7 @@ module ApplicationHelper
   def render_site_markdown(text)
     return if text.blank?
 
-    MarkdownRenderer.new(
-      link_resolver: WikiLinkResolver.resolver_for(text),
-      ref_resolver: ->(handle) { Material.find_by(slug: handle) }
-    ).render(text)
+    MarkdownRenderer.for_wiki(text).render(text)
   end
 
   # ── アイコン（vendored Lucide スプライト app/assets/images/icons.svg の symbol を参照）──

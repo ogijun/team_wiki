@@ -9,11 +9,7 @@ class ArticlesController < ApplicationController
 
   def show
     body = @article.current_revision&.body.to_s
-    @renderer = MarkdownRenderer.new(
-      link_resolver: WikiLinkResolver.resolver_for(body),
-      ref_resolver: ->(handle) { Material.find_by(slug: handle) }
-    )
-    @rendered = @renderer.render(body)
+    @rendered = MarkdownRenderer.for_wiki(body).render(body)
     @backlinks = @article.inbound_links.includes(:source_article)
   end
 

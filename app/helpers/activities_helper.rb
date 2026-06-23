@@ -66,23 +66,13 @@ module ActivitiesHelper
   Overflow = Struct.new(:user, :count, keyword_init: true)
 
   def collapse_consecutive_actors(groups, keep: 2)
-    list = groups.to_a
-    result = []
-    i = 0
-    while i < list.size
-      user_id = list[i].activities.first.user_id
-      j = i
-      j += 1 while j < list.size && list[j].activities.first.user_id == user_id
-      run = list[i...j]
-      if run.size > keep
-        result.concat(run.first(keep))
-        result << Overflow.new(user: run[keep].activities.first.user, count: run.size - keep)
-      else
-        result.concat(run)
-      end
-      i = j
-    end
-    result
+    groups.to_a
+          .chunk_while { |a, b| a.activities.first.user_id == b.activities.first.user_id }
+          .flat_map do |run|
+            next run if run.size <= keep
+            overflow = Overflow.new(user: run[keep].activities.first.user, count: run.size - keep)
+            run.first(keep) + [ overflow ]
+          end
   end
 
   def activity_group_icon(group)
