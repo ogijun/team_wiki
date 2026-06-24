@@ -1,7 +1,7 @@
 <h1>メンバー</h1>
 <p class="page-lead">このサイトのメンバー <%= @users.size %> 人。</p>
 <table>
-  <thead><tr><th></th><th>名前</th><th>ロール</th><th>参加日</th><th>最終活動</th></tr></thead>
+  <thead><tr><th></th><th>名前</th><th>ロール</th><th>参加日</th><th>最終ログイン</th><th>最終活動</th></tr></thead>
   <tbody>
     <% @users.each do |u| %>
       <tr>
@@ -9,6 +9,7 @@
         <td><%= link_to display_name(u), u %></td>
         <td><% if u.admin? %><%= render BadgeComponent.new(text: "管理者", variant: :status) %><% else %>編集<% end %></td>
         <td><%= u.created_at.to_date.to_fs(:jp) %></td>
+        <td><%= @last_login[u.id]&.to_fs(:jp) || "—" %></td>
         <td><%= @last_activity[u.id]&.to_date&.to_fs(:jp) %></td>
       </tr>
     <% end %>

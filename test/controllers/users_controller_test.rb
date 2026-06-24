@@ -60,4 +60,21 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "td", text: /プロフ太郎/
   end
+
+  test "members index shows last login time from the latest session" do
+    @user.update!(role: "admin")
+    member = User.create!(email_address: "m@example.com", name: "ログイン太郎", provider: "discord", uid: "m-u")
+    member.sessions.create!(created_at: Time.zone.local(2026, 6, 20, 14, 30))
+    get users_url
+    assert_response :success
+    assert_select "th", text: "最終ログイン"
+    assert_select "td", text: /2026年6月20日 14:30/   # 最新セッションの作成時刻＝最終ログイン
+  end
+
+  test "members index shows a dash for a user with no session" do
+    @user.update!(role: "admin")
+    User.create!(email_address: "nosession@example.com", name: "未ログイン", provider: "discord", uid: "no-u")
+    get users_url
+    assert_select "td", text: "—"
+  end
 end
