@@ -61,20 +61,31 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /プロフ太郎/
   end
 
-  test "members index shows last login time from the latest session" do
+  test "members index columns: 初回ログイン/最終ログイン/最終アクセス/最新活動 (simple datetime)" do
     @user.update!(role: "admin")
     member = User.create!(email_address: "m@example.com", name: "ログイン太郎", provider: "discord", uid: "m-u")
-    member.sessions.create!(created_at: Time.zone.local(2026, 6, 20, 14, 30))
+    member.sessions.create!(created_at: Time.zone.local(2026, 6, 20, 14, 30)) # 最終ログイン
+    member.update_column(:last_seen_at, Time.zone.local(2026, 6, 21, 9, 0))   # 最終アクセス
     get users_url
     assert_response :success
+    assert_select "th", text: "初回ログイン"
     assert_select "th", text: "最終ログイン"
-    assert_select "td", text: /2026年6月20日 14:30/   # 最新セッションの作成時刻＝最終ログイン
+    assert_select "th", text: "最終アクセス"
+    assert_select "th", text: "最新活動"
+    assert_select "td", text: /2026\/06\/20 14:30/   # 最終ログイン（シンプル表記）
+    assert_select "td", text: /2026\/06\/21 09:00/   # 最終アクセス（シンプル表記）
   end
 
-  test "members index shows a dash for a user with no session" do
+  test "members index shows a dash when last login/access are unknown" do
     @user.update!(role: "admin")
     User.create!(email_address: "nosession@example.com", name: "未ログイン", provider: "discord", uid: "no-u")
     get users_url
     assert_select "td", text: "—"
+  end
+
+  test "authenticated request records last_seen_at" do
+    assert_nil @user.last_seen_at
+    get root_url
+    assert_not_nil @user.reload.last_seen_at
   end
 end
