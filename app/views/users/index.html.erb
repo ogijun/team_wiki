@@ -8,10 +8,10 @@
         <td><%= avatar_tag(u, size: 28) %></td>
         <td><%= link_to display_name(u), u %></td>
         <td><% if u.admin? %><%= render BadgeComponent.new(text: "管理者", variant: :status) %><% else %>編集<% end %></td>
-        <td><%= u.created_at.to_fs(:simple) %></td>
-        <td><%= @last_login[u.id]&.to_fs(:simple) || "—" %></td>
-        <td><%= u.last_seen_at&.to_fs(:simple) || "—" %></td>
-        <td><%= @last_activity[u.id]&.to_fs(:simple) || "—" %></td>
+        <td><small><%= u.created_at.to_fs(:simple) %></small></td>
+        <td><small><%= @last_login[u.id]&.to_fs(:simple) || "—" %></small></td>
+        <td><small><%= u.last_seen_at&.to_fs(:simple) || "—" %></small></td>
+        <td><small><%= @last_activity[u.id]&.to_fs(:simple) || "—" %></small></td>
       </tr>
     <% end %>
   </tbody>
