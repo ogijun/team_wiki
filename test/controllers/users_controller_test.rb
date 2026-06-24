@@ -61,19 +61,24 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /プロフ太郎/
   end
 
-  test "members index columns: 初回ログイン/最終ログイン/最終アクセス/最新活動 (simple datetime)" do
+  test "members index columns: recent omits year+keeps time, >1yr shows date only, roles are badges" do
     @user.update!(role: "admin")
     member = User.create!(email_address: "m@example.com", name: "ログイン太郎", provider: "discord", uid: "m-u")
-    member.sessions.create!(created_at: Time.zone.local(2026, 6, 20, 14, 30)) # 最終ログイン
-    member.update_column(:last_seen_at, Time.zone.local(2026, 6, 21, 9, 0))   # 最終アクセス
+    old = 2.years.ago        # 1年以上前 → 年つき日付のみ
+    recent = 3.days.ago      # 1年以内 → 年省略＋時刻
+    member.sessions.create!(created_at: old)         # 最終ログイン
+    member.update_column(:last_seen_at, recent)      # 最終アクセス
     get users_url
     assert_response :success
     assert_select "th", text: "初回ログイン"
     assert_select "th", text: "最終ログイン"
     assert_select "th", text: "最終アクセス"
     assert_select "th", text: "最新活動"
-    assert_select "td", text: /2026\/06\/20 14:30/   # 最終ログイン（シンプル表記）
-    assert_select "td", text: /2026\/06\/21 09:00/   # 最終アクセス（シンプル表記）
+    assert_select "td", text: /#{Regexp.escape(old.in_time_zone.strftime("%Y/%m/%d"))}/      # 1年以上前→年つき日付のみ
+    assert_select "td", text: /#{Regexp.escape(recent.in_time_zone.strftime("%m/%d %H:%M"))}/ # 1年以内→年省略＋時刻
+    # ロールはバッジ装飾（管理者=accent / 編集=既定 とも .badge）
+    assert_select ".badge", text: "管理者"
+    assert_select ".badge", text: "編集"
   end
 
   test "members index shows a dash when last login/access are unknown" do

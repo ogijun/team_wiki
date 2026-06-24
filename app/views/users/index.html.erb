@@ -7,11 +7,11 @@
       <tr>
         <td><%= avatar_tag(u, size: 28) %></td>
         <td><%= link_to display_name(u), u %></td>
-        <td><% if u.admin? %><%= render BadgeComponent.new(text: "管理者", variant: :status) %><% else %>編集<% end %></td>
-        <td><small><%= u.created_at.to_fs(:simple) %></small></td>
-        <td><small><%= @last_login[u.id]&.to_fs(:simple) || "—" %></small></td>
-        <td><small><%= u.last_seen_at&.to_fs(:simple) || "—" %></small></td>
-        <td><small><%= @last_activity[u.id]&.to_fs(:simple) || "—" %></small></td>
+        <td><% if u.admin? %><%= render BadgeComponent.new(text: "管理者", variant: :status) %><% else %><%= render BadgeComponent.new(text: "編集") %><% end %></td>
+        <td><small><%= compact_time(u.created_at) %></small></td>
+        <td><small><%= compact_time(@last_login[u.id]) || "—" %></small></td>
+        <td><small><%= compact_time(u.last_seen_at) || "—" %></small></td>
+        <td><small><%= compact_time(@last_activity[u.id]) || "—" %></small></td>
       </tr>
     <% end %>
   </tbody>

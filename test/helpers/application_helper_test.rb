@@ -33,6 +33,14 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "2000/03/01", compact_date(Time.zone.local(2000, 3, 1))
   end
 
+  test "compact_time omits year+keeps time within a year, date-only beyond a year" do
+    recent = 2.days.ago
+    assert_equal recent.in_time_zone.strftime("%m/%d %H:%M"), compact_time(recent)   # 1年以内＝年省略＋時刻
+    old = 2.years.ago
+    assert_equal old.in_time_zone.strftime("%Y/%m/%d"), compact_time(old)            # 1年超＝年つき日付のみ
+    assert_nil compact_time(nil)
+  end
+
   test "brand_name falls back to default when setting blank" do
     SiteSetting.instance.update!(brand_name: nil)
     assert_equal "Team Wiki", brand_name
