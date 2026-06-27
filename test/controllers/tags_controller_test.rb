@@ -63,7 +63,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     # 整数で「タグ N 個」と出ること。
     get tags_url
     assert_response :success
-    assert_select "p.page-lead", text: /タグ\s+\d+\s+個/
+    assert_select "div.page-lead", text: /タグ\s+\d+\s+個/
   end
 
   test "index orders tags by usage count descending" do

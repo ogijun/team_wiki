@@ -210,7 +210,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   test "index shows a lead line under the h1 with the article count" do
     Article.create!(title: "リード記事", created_by: @user, status: "stub")
     get articles_url
-    assert_select "p.page-lead", text: /1 本/
+    assert_select "div.page-lead", text: /1 本/
   end
 
   test "index filters by kind" do

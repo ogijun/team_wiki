@@ -33,9 +33,9 @@
   </div>
   <div class="transcript-box">
     <div class="prewrap"><%= t.body.to_s.lines.first(3).join %></div>
-    <p class="transcript-box__more">
+    <div class="transcript-box__more">
       <%= link_to "全文", material_transcription_path(material, t) %>
       ・<%= link_to "編集", edit_material_transcription_path(material, t) %>
-    </p>
+    </div>
   </div>
 </div>

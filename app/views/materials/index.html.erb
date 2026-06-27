@@ -4,7 +4,7 @@
 </div>
 
 <% if params[:tag].present? %>
-  <p>タグ <code>#<%= params[:tag] %></code> で絞り込み中 — <%= link_to "解除", materials_path %></p>
+  <div class="filter-notice">タグ <code>#<%= params[:tag] %></code> で絞り込み中 — <%= link_to "解除", materials_path %></div>
 <% end %>
 
 <%= form_with url: materials_path, method: :get, class: "per-form", data: { turbo_action: "advance" } do %>

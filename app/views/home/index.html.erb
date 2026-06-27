@@ -6,7 +6,7 @@
     <h1 class="sr-only">ホーム</h1>
   <% end %>
   <% if site_setting.tagline.present? %>
-    <p class="home-hero__tagline"><%= site_setting.tagline %></p>
+    <div class="home-hero__tagline"><%= site_setting.tagline %></div>
   <% end %>
 
   <%# 資料主役の CTA（記事を書くは外す＝記事は降格） %>
@@ -30,13 +30,13 @@
     <h2><%= icon("activity") %> 報告します！</h2>
     <%# 連続同一ユーザを畳んでから 10 行に頭打ち（cap 後に畳むと行数が減るため、ホームのみ） %>
     <%= render "activities/timeline", groups: collapse_consecutive_actors(@recent_activity_groups).first(10) %>
-    <p><%= link_to "すべての動きを見る", activities_path %></p>
+    <div class="activity-more-link"><%= link_to "すべての動きを見る", activities_path %></div>
   </section>
 
   <section class="dashboard-card">
     <h2><%= icon("audio-lines") %> この続き、誰かお願い！</h2>
     <% if @incomplete_materials.any? %>
-      <p class="muted">文字起こしが必要な資料です。</p>
+      <div class="muted">文字起こしが必要な資料です。</div>
       <ul>
         <% @incomplete_materials.each do |m| %>
           <% done, total = m.transcription_progress %>
@@ -46,9 +46,9 @@
           </li>
         <% end %>
       </ul>
-      <p><%= link_to "すべての未完成資料を表示", transcriptions_path %></p>
+      <div class="incomplete-more-link"><%= link_to "すべての未完成資料を表示", transcriptions_path %></div>
     <% else %>
-      <p class="muted">未完成の資料はありません。よく整っています。</p>
+      <div class="muted">未完成の資料はありません。よく整っています。</div>
     <% end %>
   </section>
 </div>
@@ -56,5 +56,5 @@
 <section class="activity-block">
   <h2><%= icon("activity") %> サイトの動き</h2>
   <%= render "shared/activity_overview", daily: @daily[:total], hourly: @hourly[:total] %>
-  <p><%= link_to "統計をくわしく見る", stats_path %></p>
+  <div class="stats-more-link"><%= link_to "統計をくわしく見る", stats_path %></div>
 </section>

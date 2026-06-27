@@ -31,7 +31,7 @@ class AboutControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
     get about_url
     assert_response :success
-    assert_select "p.muted"
+    assert_select "div.muted"
   end
 
   test "renders the site footer markdown on every page when set" do

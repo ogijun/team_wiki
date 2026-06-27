@@ -1,14 +1,14 @@
 <%= link_to "← タグ一覧", tags_path, class: "back-link" %>
 <h1>#<%= @tag.name %></h1>
-<p class="page-lead">
+<div class="page-lead">
   このタグの資料 <%= @materials.size %> 件<% if @articles.any? %> ・ 記事 <%= @articles.size %> 件<% end %>
-</p>
+</div>
 
 <%# ヒット有無にかかわらず本文検索への導線を常に出す（まだ付いていない資料を見つけて付与する入口） %>
-<p class="tag-search-cta">
+<div class="tag-search-cta">
   <%= link_to search_path(q: @tag.name) do %><%= icon("search") %> 「<%= @tag.name %>」で本文を検索<% end %>
   <small class="muted">本文・書誌・文字起こしにこの語が出てくる資料を探して、タグを付けられます。</small>
-</p>
+</div>
 
 <% if @materials.any? %>
   <section class="tag-section">
@@ -28,7 +28,7 @@
         </li>
       <% end %>
     </ul>
-    <p><%= link_to "資料一覧でこのタグを絞り込む →", materials_path(tag: @tag.slug), class: "muted" %></p>
+    <div class="nav-link"><%= link_to "資料一覧でこのタグを絞り込む →", materials_path(tag: @tag.slug), class: "muted" %></div>
   </section>
 <% end %>
 

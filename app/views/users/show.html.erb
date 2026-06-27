@@ -4,7 +4,7 @@
   <%= avatar_tag(@user, size: 64) %>
   <div>
     <h1><%= display_name(@user) %><% if @user.admin? %> <%= render BadgeComponent.new(text: "管理者", variant: :status) %><% end %></h1>
-    <p class="page-meta">
+    <div class="page-meta">
       <span><%= icon("calendar") %> 参加: <%= @user.created_at.to_date.to_fs(:jp) %></span>
       <% stats = @user.activity_stats %>
       <% if stats[:active_days].positive? %>
@@ -13,13 +13,13 @@
           最長 <strong><%= stats[:longest_streak] %></strong>日 ・ 累計 <strong><%= stats[:active_days] %></strong>日活動
         </span>
       <% end %>
-    </p>
+    </div>
     <% c = @user.contribution_stats %>
-    <p class="page-meta">
+    <div class="page-meta">
       <span><%= icon("newspaper") %> 記事 <strong><%= c[:articles_created] %></strong>本作成</span>
       <span><%= icon("pencil-line") %> 編集 <strong><%= c[:revisions_authored] %></strong>回</span>
       <span><%= icon("audio-lines") %> 文字起こし <strong><%= c[:transcriptions_contributed] %></strong>件</span>
-    </p>
+    </div>
   </div>
 </header>
 

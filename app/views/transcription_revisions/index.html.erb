@@ -1,7 +1,7 @@
 <% content_for :title, "文字起こしの履歴 — #{@material.title}" %>
 <%= link_to "← 文字起こし", material_transcription_path(@material, @transcription), class: "back-link" %>
 <h1>文字起こしの履歴</h1>
-<p class="page-meta"><span><%= @material.title %> ・ <%= @transcription.display_label %></span></p>
+<div class="page-meta"><span><%= @material.title %> ・ <%= @transcription.display_label %></span></div>
 <ul>
   <% @revisions.each do |rev| %>
     <li>
