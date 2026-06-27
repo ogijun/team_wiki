@@ -40,6 +40,15 @@ module ApplicationHelper
     time.strftime(time.year == Date.current.year ? "%m/%d" : "%Y/%m/%d")
   end
 
+  # 一覧用のコンパクト日時。1年以内なら年を省いて時刻まで（例 06/20 14:30）、
+  # 1年以上前は曖昧回避で年つき日付のみ（例 2024/03/15）。nil は nil。
+  # 集計(maximum)由来の UTC Time も来るので in_time_zone で表示タイムゾーンに正規化する。
+  def compact_time(time)
+    return if time.nil?
+    t = time.in_time_zone
+    t > 1.year.ago ? t.strftime("%m/%d %H:%M") : t.strftime("%Y/%m/%d")
+  end
+
   # ── フォームの必須/任意バッジ（ラベル横に置く）──
   def required_badge = tag.span("必須", class: "field-badge field-badge--req")
   def optional_badge = tag.span("任意", class: "field-badge field-badge--opt")

@@ -3,6 +3,7 @@ module Authentication
 
   included do
     before_action :require_authentication
+    before_action :track_last_seen
     helper_method :authenticated?
   end
 
@@ -28,6 +29,14 @@ module Authentication
 
     def resume_session
       Current.session ||= find_session_by_cookie
+    end
+
+    # 最終アクセス(last_seen_at)を記録。毎リクエスト書き込みを避けるため約10分スロットル。
+    # update_column で validations/callbacks/updated_at を回避（弱いサインなので軽量に）。
+    def track_last_seen
+      user = Current.user
+      return if user.nil? || (user.last_seen_at && user.last_seen_at > 10.minutes.ago)
+      user.update_column(:last_seen_at, Time.current)
     end
 
     def find_session_by_cookie

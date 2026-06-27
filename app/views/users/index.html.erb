@@ -1,15 +1,17 @@
 <h1>メンバー</h1>
 <p class="page-lead">このサイトのメンバー <%= @users.size %> 人。</p>
 <table>
-  <thead><tr><th></th><th>名前</th><th>ロール</th><th>参加日</th><th>最終活動</th></tr></thead>
+  <thead><tr><th></th><th>名前</th><th>ロール</th><th>初回ログイン</th><th>最終ログイン</th><th>最終アクセス</th><th>最新活動</th></tr></thead>
   <tbody>
     <% @users.each do |u| %>
       <tr>
         <td><%= avatar_tag(u, size: 28) %></td>
         <td><%= link_to display_name(u), u %></td>
-        <td><% if u.admin? %><%= render BadgeComponent.new(text: "管理者", variant: :status) %><% else %>編集<% end %></td>
-        <td><%= u.created_at.to_date.to_fs(:jp) %></td>
-        <td><%= @last_activity[u.id]&.to_date&.to_fs(:jp) %></td>
+        <td><% if u.admin? %><%= render BadgeComponent.new(text: "管理者", variant: :status) %><% else %><%= render BadgeComponent.new(text: "編集") %><% end %></td>
+        <td><small><%= compact_time(u.created_at) %></small></td>
+        <td><small><%= compact_time(@last_login[u.id]) || "—" %></small></td>
+        <td><small><%= compact_time(u.last_seen_at) || "—" %></small></td>
+        <td><small><%= compact_time(@last_activity[u.id]) || "—" %></small></td>
       </tr>
     <% end %>
   </tbody>
