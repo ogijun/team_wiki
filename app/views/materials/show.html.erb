@@ -1,11 +1,11 @@
 <%= link_to "← 資料一覧", materials_path, class: "back-link" %>
 <h1><%= @material.title %></h1>
-<p class="page-meta">
+<div class="page-meta">
   <%# 分類・初出は本体近くの identity 行に出す。confidence バッジは撤去（将来はカラム毎 confirm へ）。 %>
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
   <% if @material.ownership %><%= render BadgeComponent.new(text: @material.ownership_label) %><% end %>
   <span>by <%= link_to display_name(@material.user), @material.user %> ・ <%= @material.created_at.to_fs(:jp) %></span>
-</p>
+</div>
 <div class="actions">
   <%= link_to "資料情報を編集", edit_material_path(@material), role: "button", class: "btn-sm secondary outline" %>
 </div>
@@ -33,7 +33,7 @@
         <iframe src="<%= src %>" width="640" height="360" frameborder="0" allowfullscreen></iframe>
       </div>
     <% end %>
-    <p><%= link_to @material.url, @material.url, target: "_blank", rel: "noopener" %></p>
+    <div><%= link_to @material.url, @material.url, target: "_blank", rel: "noopener" %></div>
   <% else %>
     <% if @material.thumbnailable_file? %>
       <%# サムネ/ファイル名クリックで原寸をオーバーレイ表示。DLは隣のアイコンから（PDF と同じ構成） %>
@@ -42,10 +42,10 @@
         <dialog class="lightbox" data-viewer-target="dialog" data-action="click->viewer#backdropClose">
           <%= image_tag rails_blob_path(@material.file), loading: "lazy" %>
         </dialog>
-        <p>
+        <div class="material-file-info">
           <a href="#" data-action="viewer#open"><%= icon("image") %> <%= @material.file.filename %></a>
           <%= icon_link "download", rails_blob_path(@material.file), label: "ダウンロード", css: "muted" %>
-        </p>
+        </div>
       </div>
     <% elsif @material.pdf? %>
       <%# ファイル名クリックでオーバーレイのページビューア（PDF.js は初回オープン時に遅延ロード）。DLは隣のアイコンから %>
@@ -77,28 +77,28 @@
             <div class="pdf-viewer__stage" data-pdf-target="stage">
               <canvas data-pdf-target="canvas"></canvas>
             </div>
-            <p class="muted" data-pdf-target="status"></p>
+            <div class="pdf-viewer__status muted" data-pdf-target="status"></div>
             <%# リサイズグリップはグレーのダイアログ右下角に置く（ドラッグでステージを変え、ダイアログが追従）。 %>
             <span class="pdf-viewer__resizer" aria-hidden="true" title="ドラッグでビューアの大きさを変える"></span>
           </div>
         </dialog>
-        <p>
+        <div class="material-file-info">
           <a href="#" data-action="pdf#open"><%= icon("file-text") %> <%= @material.file.filename %></a>
           <%= icon_link "download", rails_blob_path(@material.file), label: "ダウンロード", css: "muted" %>
-        </p>
+        </div>
       </div>
     <% else %>
       <div class="placeholder">プレビューは準備中です（この形式のプレビュー表示は今後対応）</div>
-      <p><%= link_to rails_blob_path(@material.file) do %><%= icon("download") %> <%= @material.file.filename %><% end %></p>
+      <div class="material-file-info"><%= link_to rails_blob_path(@material.file) do %><%= icon("download") %> <%= @material.file.filename %><% end %></div>
     <% end %>
   <% end %>
 
   <%# 一級市民の分類・初出・出典元を本体近くに明示（書誌の奥に埋もれさせない）。分類は常に出す。 %>
-  <p class="material-identity">
+  <div class="material-identity">
     <span class="material-identity__item"><span class="material-identity__label">分類</span><%= material_kind_label(@material) %></span>
     <% if @material.published %><span class="material-identity__item"><span class="material-identity__label">初出</span><%= @material.published.label %></span><% end %>
     <% if @material.source.present? %><span class="material-identity__item"><span class="material-identity__label">出典元</span><%= @material.source %></span><% end %>
-  </p>
+  </div>
 
   <% if @material.description.present? %>
     <%= simple_format @material.description %>
@@ -112,18 +112,18 @@
   <h2>文字起こし<% if c[:total].positive? %> <span class="pill"><%= c[:done] %> / <%= c[:total] %></span><% end %></h2>
 
   <% if parts.any? %>
-    <p class="muted transcription-summary">
+    <div class="muted transcription-summary">
       <%= c[:total] %> パート中 ・ 完了 <strong><%= c[:done] %></strong> ・ 担当中 <strong><%= c[:in_progress] %></strong> ・ 未担当 <strong><%= c[:unassigned] %></strong>
-    </p>
+    </div>
     <% parts.each do |t| %>
       <%= render "materials/transcription_part", material: @material, t: t, members: @members, numbered: parts.size > 1 %>
     <% end %>
-    <p><%= link_to "パートを追加", new_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></p>
+    <div class="transcription-actions"><%= link_to "パートを追加", new_material_transcription_path(@material), role: "button", class: "btn-sm secondary outline" %></div>
   <% else %>
     <%# 初回ハードル低下: 最初から書ける常設欄。保存して初めて実レコード生成（空行を残さない）。 %>
     <div class="transcribe-starter">
       <%# 枠が1つだけなので番号・見出しは出さない（ゾーン見出し「文字起こし」と重複させない）。 %>
-      <p class="muted">聞こえた・読めた範囲でOK。完璧でなくて大丈夫。改行はそのまま残ります。</p>
+      <div class="muted">聞こえた・読めた範囲でOK。完璧でなくて大丈夫。改行はそのまま残ります。</div>
       <%= form_with model: [ @material, @material.transcriptions.build ], class: "stacked-form transcribe-starter__form" do |f| %>
         <%= f.text_area :body, rows: 10,
               placeholder: "ここに聞き取った／読み取った内容をそのまま入力します。\n（例）話者A: …／話者B: …  ページや時間のメモを添えてもOK。" %>
@@ -141,9 +141,9 @@
 <section class="tags-section">
   <h2><%= icon("tags") %> タグ</h2>
   <% if tags.any? %>
-    <p class="material-tags"><% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></p>
+    <div class="material-tags"><% tags.each do |t| %><%= link_to "##{t.name}", materials_path(tag: t.slug) %> <% end %></div>
   <% else %>
-    <p class="muted">まだタグがありません。</p>
+    <div class="muted">まだタグがありません。</div>
   <% end %>
   <%= render "shared/tag_suggestions", taggable: @material %>
 </section>
@@ -168,10 +168,10 @@
 <%# ── ⑤ 記事で使う（引用・控えめ・下位）。当面は記事生産が少なく使われないかも。 ── %>
 <section class="usage" id="usage">
   <h2>記事で使う</h2>
-  <p class="cite-row" data-controller="clipboard" data-clipboard-text-value="[[ref:<%= @material.slug %>]]">
+  <div class="cite-row" data-controller="clipboard" data-clipboard-text-value="[[ref:<%= @material.slug %>]]">
     引用タグ <code>[[ref:<%= @material.slug %>]]</code>
     <%= button_tag "引用タグをコピー", type: "button", class: "btn-sm secondary outline", data: { action: "clipboard#copy" } %>
-  </p>
+  </div>
   <small class="muted">記事本文に貼ると、この資料が出典として脚注に表示されます。</small>
 
   <% citing = @material.citing_articles.order(:title).to_a %>

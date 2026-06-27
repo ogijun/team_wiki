@@ -1,5 +1,5 @@
 <h1>タグ一覧</h1>
-<p class="page-lead">記事・資料に付けるタグ <%= @tags.length %> 個。クリックで関連をまとめて見られます。</p>
+<div class="page-lead">記事・資料に付けるタグ <%= @tags.length %> 個。クリックで関連をまとめて見られます。</div>
 
 <%= form_with model: @tag, url: tags_path do |f| %>
   <%= render "shared/error_messages", record: @tag %>

@@ -13,11 +13,11 @@
       </div>
     </fieldset>
   <% else %>
-    <p class="muted">
+    <div class="muted">
       <% if material.link? %>URL: <%= link_to material.url, material.url, target: "_blank", rel: "noopener" %>
       <% else %>ファイル: <%= material.file.filename %><% end %>
       <small>（実体は登録後変更できません。差し替えは新規登録してください）</small>
-    </p>
+    </div>
   <% end %>
 
   <div class="field">

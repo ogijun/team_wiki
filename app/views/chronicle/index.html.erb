@@ -1,7 +1,7 @@
 <div class="page-header"><h1>年表 <small class="wip">(検討中)</small></h1></div>
-<p class="page-lead">
+<div class="page-lead">
   発行日のある資料と日付のある記事を時系列に並べます。現在はフラット表示で、絞り込みや表示倍率（レンズ）の変更は今後対応予定です。
-</p>
+</div>
 
 <% if @entries.any? %>
   <ul class="chronicle-list">
@@ -14,5 +14,5 @@
     <% end %>
   </ul>
 <% else %>
-  <p class="muted">日付のある記事・資料がまだありません。記事に「日時」、資料に「発行日」を設定すると年表に並びます。</p>
+  <div class="muted">日付のある記事・資料がまだありません。記事に「日時」、資料に「発行日」を設定すると年表に並びます。</div>
 <% end %>

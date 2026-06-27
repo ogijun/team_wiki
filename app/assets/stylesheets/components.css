@@ -38,6 +38,20 @@
 /* Muted text utility (Pico classless has no .muted class of its own) */
 .muted { color: var(--muted); }
 
+/* 段落から <div> へ移したブロック群の縦リズム復元（Pico は <p> にだけ既定 margin を付ける）。
+   いずれも単一リンク/操作行・補助行で、本文段落より控えめな間隔にそろえる。 */
+.nav-link { margin: 0.5rem 0; }                                  /* 「← 資料へ戻る」等の戻り導線 */
+.profile-link { margin: 0.6rem 0; }
+.material-file-info { margin: 0.5rem 0 0; }                      /* プレビュー下のファイル名＋DL行 */
+.transcription-actions { margin-top: 0.6rem; }                  /* 「パートを追加」操作行 */
+.activity-more-link, .incomplete-more-link, .stats-more-link { margin-top: 0.7rem; } /* カード下の「すべて見る」 */
+.filters { margin: 0.7rem 0; }                                  /* 記事一覧の絞り込みバー */
+.filter-notice { margin: 0.5rem 0; }                            /* 「#タグ で絞り込み中」通知行 */
+.search-note { margin: 0.5rem 0; }
+.pdf-viewer__status { margin: 0.3rem 0 0; }
+/* 引用タグ行: <p> 内に置けなかった button_to(<form>) を含むため div 化。要素を横並びに保つ。 */
+.cite-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.6rem 0 0.2rem; }
+
 /* SVG アイコン（Lucide スプライト）: 文字サイズ追従・currentColor で着色 */
 .icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
 

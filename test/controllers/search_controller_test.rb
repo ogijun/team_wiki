@@ -76,11 +76,11 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
 
   test "shows the full-text-not-enabled note when a query is present" do
     get search_url, params: { q: "Ruby" }
-    assert_select "p.search-note"
+    assert_select "div.search-note"
   end
 
   test "omits the note when no query" do
     get search_url, params: { q: "" }
-    assert_select "p.search-note", count: 0
+    assert_select "div.search-note", count: 0
   end
 end

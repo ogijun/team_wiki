@@ -19,7 +19,7 @@
       <% end %>
     </ul>
   <% else %>
-    <p class="muted">まだコメントはありません。</p>
+    <div class="muted">まだコメントはありません。</div>
   <% end %>
 
   <%= form_with model: [ commentable, Comment.new ], class: "comment-form" do |f| %>

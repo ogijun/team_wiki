@@ -1,7 +1,7 @@
 <article>
   <%= link_to "← 記事一覧", articles_path, class: "back-link" %>
   <h1><%= @article.title %></h1>
-  <p class="page-meta">
+  <div class="page-meta">
     <%= render BadgeComponent.new(text: @article.status_label, variant: :status) %>
     <% if @article.kind %><%= render BadgeComponent.new(text: @article.kind_label, variant: :kind) %><% end %>
     <%= render FuzzyDateComponent.new(starts: @article.starts, ends: @article.ends, icon: true) %>
@@ -13,7 +13,7 @@
     <% if contributors.any? %>
       <span class="contributors"><% contributors.each do |u| %><%= avatar_link(u, size: 20) %><% end %></span>
     <% end %>
-  </p>
+  </div>
   <div class="actions">
     <%= link_to "本文を編集", edit_article_path(@article), role: "button", class: "btn-sm secondary outline" %>
     <%= link_to "履歴", article_revisions_path(@article), role: "button", class: "btn-sm secondary outline" %>

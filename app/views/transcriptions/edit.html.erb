@@ -1,5 +1,5 @@
 <% content_for :title, "文字起こし編集 — #{@material.title}" %>
-<p><%= link_to "← 資料へ戻る", @material %></p>
+<div class="nav-link"><%= link_to "← 資料へ戻る", @material %></div>
 <div class="page-header"><h1>文字起こしを編集</h1></div>
-<p class="muted"><%= @material.title %> ・ <%= @transcription.display_label %></p>
+<div class="muted"><%= @material.title %> ・ <%= @transcription.display_label %></div>
 <%= render "form" %>

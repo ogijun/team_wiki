@@ -1,6 +1,6 @@
 <% content_for :title, "文字起こし進捗" %>
 <div class="page-header"><h1>文字起こし進捗</h1></div>
-<p class="page-lead">資料の文字起こしの進み具合。未着手のものから気軽に拾っていけます。</p>
+<div class="page-lead">資料の文字起こしの進み具合。未着手のものから気軽に拾っていけます。</div>
 
 <% if @groups.empty? %>
   <div class="empty-state">
@@ -34,7 +34,7 @@
           <% end %>
         </ul>
       <% else %>
-        <p class="muted">なし</p>
+        <div class="muted">なし</div>
       <% end %>
     </section>
   <% end %>
