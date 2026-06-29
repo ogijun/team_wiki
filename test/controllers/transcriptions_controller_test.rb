@@ -83,6 +83,30 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to material_url(@media)
   end
 
+  # 両方空で保存→削除確認は client(Stimulus)。サーバ側は「削除を許す配線」の有無だけ検証する。
+  test "edit form enables blank-delete only when another part exists" do
+    only = part
+    get edit_material_transcription_url(@media, only)
+    assert_select "form[data-transcription-form-can-delete-value=?]", "false" # 唯一のパート→削除しない
+
+    second = part
+    get edit_material_transcription_url(@media, second)
+    assert_select "form[data-transcription-form-can-delete-value=?]", "true"  # 他にパートあり→削除可
+  end
+
+  test "new form does not enable blank-delete (nothing to delete yet)" do
+    get new_material_transcription_url(@media)
+    assert_select "form[data-transcription-form-can-delete-value=?]", "false"
+  end
+
+  test "emptying body on the only part is rejected (not saved), never silently blanked" do
+    only = part(label: "唯一", body: "中身")
+    patch material_transcription_url(@media, only),
+          params: { transcription: { label: "", body: "", lock_version: only.lock_version } }
+    assert_response :unprocessable_entity     # 本文必須でバリデーションエラー
+    assert_equal "中身", only.reload.body     # 空保存されない
+  end
+
   test "assign sets the assignee (to anyone) and records activity" do
     other = User.create!(email_address: "o@example.com", name: "O", provider: "discord", uid: "tc-other")
     t = part
