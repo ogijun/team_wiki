@@ -1,11 +1,15 @@
-<%= form_with model: [ @material, @transcription ], class: "stacked-form" do |f| %>
+<%# 編集中かつ他にもパートがあるときだけ、両方空での保存→削除確認を許す（唯一のパートは削除しない）。 %>
+<% can_delete = @transcription.persisted? && @material.transcriptions.where.not(id: @transcription.id).exists? %>
+<%= form_with model: [ @material, @transcription ], class: "stacked-form",
+      data: { controller: "transcription-form", action: "submit->transcription-form#guard",
+              "transcription-form-can-delete-value": can_delete } do |f| %>
   <%= render "shared/error_messages", record: @transcription %>
   <%= f.hidden_field :lock_version %>
 
   <div class="field">
     <%= f.label :label, "パート見出し" %><%= optional_badge %>
-    <small class="field__hint">例: 「0:00–10:00」「p.1–20」「前半」「話者A」。空なら「パート{番号}」。</small>
-    <%= f.text_field :label, placeholder: "例: 0:00–10:00" %>
+    <small class="field__hint">例: 「0:00–10:00」「p.1–20」「前半」「話者A」。空なら「パート{番号}」。見出しも本文も空にして保存すると、このパートを削除できます（唯一のパートを除く）。</small>
+    <%= f.text_field :label, placeholder: "例: 0:00–10:00", data: { "transcription-form-target": "label" } %>
   </div>
   <div class="field">
     <%= f.label :assignee_id, "担当" %><%= optional_badge %>
@@ -30,7 +34,7 @@
   <div class="field">
     <%= f.label :body, "本文" %><%= required_badge %>
     <small class="field__hint">改行はそのまま保持されます。</small>
-    <%= f.text_area :body, rows: 18 %>
+    <%= f.text_area :body, rows: 18, data: { "transcription-form-target": "body" } %>
   </div>
 
   <%= f.submit "保存" %>
