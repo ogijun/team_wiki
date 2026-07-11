@@ -141,6 +141,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
     t.index ["user_id"], name: "index_materials_on_user_id"
   end
 
+  create_table "publications", force: :cascade do |t|
+    t.integer "article_id"
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.integer "registered_by_id", null: false
+    t.datetime "released_at"
+    t.string "released_precision"
+    t.string "sales_status", default: "on_sale", null: false
+    t.string "store_url"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id"], name: "index_publications_on_article_id"
+    t.index ["registered_by_id"], name: "index_publications_on_registered_by_id"
+    t.index ["released_at"], name: "index_publications_on_released_at"
+  end
+
   create_table "revisions", force: :cascade do |t|
     t.integer "article_id", null: false
     t.integer "author_id", null: false
@@ -264,6 +280,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
   add_foreign_key "comments", "users", column: "author_id"
   add_foreign_key "links", "articles", column: "source_article_id"
   add_foreign_key "materials", "users"
+  add_foreign_key "publications", "articles"
+  add_foreign_key "publications", "users", column: "registered_by_id"
   add_foreign_key "revisions", "articles"
   add_foreign_key "revisions", "users", column: "author_id"
   add_foreign_key "sessions", "users"
