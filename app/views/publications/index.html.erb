@@ -1,6 +1,29 @@
-<div class="page-header"><h1>発売物</h1></div>
-<ul class="rows">
-  <% @publications.each do |pub| %>
-    <li><%= link_to pub.title, pub %></li>
-  <% end %>
-</ul>
+<div class="page-header">
+  <h1>発売物</h1>
+  <%= link_to "発売物を登録", new_publication_path, role: "button" %>
+</div>
+<div class="page-lead">著書・映像・音楽などの発売を記録します。発売日を入れると年表にも並びます。</div>
+
+<% if @publications.any? %>
+  <ul class="rows">
+    <% @publications.each do |pub| %>
+      <li class="row">
+        <span class="row__main"><%= icon("package") %> <%= link_to pub.title, pub %></span>
+        <span class="meta">
+          <%= render BadgeComponent.new(text: pub.kind_label, variant: :kind) %>
+          <%= render FuzzyDateComponent.new(starts: pub.released) %>
+          <span><%= pub.sales_status_label %></span>
+          <% if pub.article %>・<%= link_to pub.article.title, pub.article %><% end %>
+        </span>
+        <% if pub.purchasable? %>
+          <%= link_to "購入", pub.store_url, role: "button", class: "btn-sm secondary outline", target: "_blank", rel: "noopener" %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="empty-state">
+    著書・映像・音楽など「発売されたもの」をここに記録します。発売日が分かる範囲で入っていれば、年表にも並びます。
+    <div class="empty-state__cta"><%= link_to "最初の発売物を登録", new_publication_path, role: "button", class: "btn-sm" %></div>
+  </div>
+<% end %>

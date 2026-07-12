@@ -65,6 +65,47 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "消える本", Activity.last.subject_label
   end
 
+  test "show leads with a product card and puts delete in the danger zone" do
+    pub = create_publication(store_url: "https://example.com/item", released_year: "1995")
+    get publication_url(pub)
+    assert_response :success
+    assert_select ".product-card"
+    assert_select ".product-card a[href='https://example.com/item'][target='_blank'][rel='noopener']", text: /購入/
+    assert_select ".danger-zone" do
+      assert_select "a,button", text: /削除/
+    end
+    assert_select ".actions a", text: "発売物を編集"
+  end
+
+  test "show hides the buy link when not purchasable" do
+    pub = create_publication(sales_status: "out_of_print", store_url: "https://example.com/item")
+    get publication_url(pub)
+    assert_select ".product-card a[href='https://example.com/item']", count: 0
+    assert_select ".product-card", /絶版/
+  end
+
+  test "show links to the related article when present" do
+    article = Article.create!(title: "作品記事", created_by: @user, kind: "work")
+    pub = create_publication(article: article)
+    get publication_url(pub)
+    assert_select "a[href=?]", article_path(article), text: "作品記事"
+  end
+
+  test "form marks required and optional fields with badges" do
+    get new_publication_url
+    assert_select ".field-badge--req"
+    assert_select ".field-badge--opt"
+  end
+
+  test "update with invalid input re-renders the form and records no activity" do
+    pub = create_publication
+    assert_no_difference "Activity.count" do
+      patch publication_url(pub), params: { publication: { title: "" } }
+    end
+    assert_response :unprocessable_entity
+    assert_equal "サンプル 文庫版", pub.reload.title
+  end
+
   test "guests are redirected to sign in" do
     pub = create_publication
     # 他のコントローラテストと同じ作法でログアウトする（sign_out ヘルパは無い）。

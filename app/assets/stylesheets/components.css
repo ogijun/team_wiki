@@ -389,6 +389,19 @@ button.tag-chip:hover, button.tag-chip:focus {
 .strip-step--todo a { color: var(--accent); text-decoration: none; }
 .strip-step--todo a:hover { text-decoration: underline; }
 
+/* ── 発売物 ────────────────────────────────── */
+
+/* 発売物の詳細は本体（本文・ファイル）を持たないので、商品情報カードがゾーン①＝主役になる。
+   カードは他のカード群（.dashboard-card 等）と同じ surface + hairline + 8px の語彙で揃える。 */
+.product-card {
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+  padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+}
+.product-card dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1.25rem; margin: 0 0 1rem; }
+.product-card dt { color: var(--muted); font-size: 0.9rem; }
+.product-card dd { margin: 0; }
+.product-card dd .when { margin: 0; }
+
 /* ── 人・コメント ──────────────────────────── */
 
 /* Avatars & profile */

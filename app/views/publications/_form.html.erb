@@ -1,12 +1,47 @@
 <%= form_with model: publication, class: "stacked-form" do |f| %>
-  <div class="field"><%= f.label :title, "商品名" %><%= f.text_field :title %></div>
-  <div class="field"><%= f.select :kind, Publication::KINDS.map { |value, label| [ label, value ] } %></div>
-  <div class="field"><%= f.select :sales_status, Publication::SALES_STATUSES.map { |value, label| [ label, value ] } %></div>
-  <div class="field"><%= f.url_field :store_url %></div>
+  <%= render "shared/error_messages", record: publication %>
+
   <div class="field">
-    <%= f.number_field :released_year, value: fuzzy_part(publication.released, :year), placeholder: "年" %>
-    <%= f.number_field :released_month, value: fuzzy_part(publication.released, :month), placeholder: "月" %>
-    <%= f.number_field :released_day, value: fuzzy_part(publication.released, :day), placeholder: "日" %>
+    <%= f.label :title, "商品名" %><%= required_badge %>
+    <small class="field__hint">版が分かる名前を（例「○○○ 文庫版」「○○○ Blu-ray BOX」）。</small>
+    <%= f.text_field :title %>
   </div>
-  <%= f.submit "保存" %>
+
+  <div class="field">
+    <%= f.label :kind, "種別" %><%= required_badge %>
+    <%= f.select :kind, Publication::KINDS.map { |value, label| [ label, value ] } %>
+  </div>
+
+  <div class="field" data-controller="time-disclosure">
+    <%= f.label :released_year, "発売日" %><%= optional_badge %>
+    <small class="field__hint">わかる粒度だけでOK（年だけ・年月だけでも可）。年表にも使われます。</small>
+    <span class="date-row">
+      <%= f.number_field :released_year, value: fuzzy_part(publication.released, :year), placeholder: "年" %>
+      <%= f.number_field :released_month, in: 1..12, value: fuzzy_part(publication.released, :month), placeholder: "月" %>
+      <%= f.number_field :released_day, in: 1..31, value: fuzzy_part(publication.released, :day), placeholder: "日" %>
+      <button type="button" class="btn-inline-add" data-time-disclosure-target="toggle" data-action="time-disclosure#open" title="時刻を追加">＋時刻</button>
+      <span class="date-row__time" data-time-disclosure-target="times" hidden>
+        <%= f.number_field :released_hour, in: 0..23, value: fuzzy_part(publication.released, :hour), placeholder: "時" %>:<%= f.number_field :released_minute, in: 0..59, value: fuzzy_part(publication.released, :minute), placeholder: "分" %>
+      </span>
+    </span>
+  </div>
+
+  <div class="field">
+    <%= f.label :sales_status, "販売状況" %><%= required_badge %>
+    <%= f.select :sales_status, Publication::SALES_STATUSES.map { |value, label| [ label, value ] } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :store_url, "販売ページの URL" %><%= optional_badge %>
+    <small class="field__hint">販売中のときだけ「購入する」ボタンが出ます。</small>
+    <%= f.url_field :store_url %>
+  </div>
+
+  <div class="field">
+    <%= f.label :article_id, "作品（記事）" %><%= optional_badge %>
+    <small class="field__hint">この発売物が何の作品のものかを記事に紐付けられます。</small>
+    <%= f.collection_select :article_id, Article.where(kind: "work").order(:title), :id, :title, include_blank: "紐付けない" %>
+  </div>
+
+  <%= f.submit publication.persisted? ? "保存する" : "登録する" %>
 <% end %>
