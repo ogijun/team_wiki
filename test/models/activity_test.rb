@@ -50,4 +50,10 @@ class ActivityTest < ActiveSupport::TestCase
     assert_predicate a, :persisted?
     assert_equal "transcription.assigned", a.action
   end
+
+  test "publication actions are part of the vocabulary" do
+    assert_includes Activity::ACTIONS, "publication.registered"
+    assert_includes Activity::ACTIONS, "publication.edited"
+    assert_includes Activity::ACTIONS, "publication.deleted"
+  end
 end

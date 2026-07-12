@@ -5,6 +5,7 @@ class Activity < ApplicationRecord
     comment.posted
     transcription.created transcription.edited transcription.assigned
     tag.created tag.deleted
+    publication.registered publication.edited publication.deleted
     user.joined
   ].freeze
 
