@@ -34,14 +34,6 @@
   <% end %>
 </section>
 
-<%# ── ② メタデータ（作品との関係） ── %>
-<% if @publication.article %>
-  <section>
-    <h2>作品</h2>
-    <div><%= link_to @publication.article.title, @publication.article %></div>
-  </section>
-<% end %>
-
 <%# ── 危険な操作（最下部に隔離） ── %>
 <div class="danger-zone">
   <span class="danger-zone__label">危険な操作</span>

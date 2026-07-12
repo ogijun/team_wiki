@@ -7,7 +7,6 @@ class CreatePublications < ActiveRecord::Migration[8.1]
       t.string :released_precision
       t.string :sales_status, null: false, default: "on_sale"
       t.string :store_url
-      t.references :article, foreign_key: true          # 任意（null 可）
       t.references :registered_by, null: false, foreign_key: { to_table: :users }
       t.timestamps
     end

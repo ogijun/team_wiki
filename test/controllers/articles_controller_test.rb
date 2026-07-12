@@ -246,6 +246,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "li .meta svg use[href*=?]", "message-circle"
   end
 
+
   test "concurrent edit is rejected instead of silently overwriting (optimistic lock)" do
     article = Article.create!(title: "元タイトル", created_by: @user)
     article.revise!(body: "初版本文", author: @user)
@@ -280,17 +281,5 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     } }
     assert_redirected_to article
     assert_equal "更新後", article.reload.title
-  end
-
-  test "destroy unlinks a publication that points at the article" do
-    article = Article.create!(title: "発売物から参照される記事", created_by: @user, kind: "work")
-    article.revise!(body: "本文", author: @user)
-    pub = Publication.create!(title: "参照している発売物", kind: "book", registered_by: @user, article: article)
-
-    delete article_url(article)
-
-    assert_redirected_to articles_url
-    assert_not Article.exists?(article.id)
-    assert_nil pub.reload.article_id
   end
 end

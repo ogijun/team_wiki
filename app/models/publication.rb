@@ -4,7 +4,6 @@ class Publication < ApplicationRecord
   KINDS = { "book" => "著書", "video" => "映像", "audio" => "音楽", "other" => "その他" }.freeze
   SALES_STATUSES = { "on_sale" => "販売中", "out_of_print" => "絶版", "unreleased" => "未発売" }.freeze
 
-  belongs_to :article, optional: true
   belongs_to :registered_by, class_name: "User"
   # 削除後もタイムラインは subject_label のスナップショットで表示する（参照だけ外す）。
   has_many :activities, as: :subject, dependent: :nullify

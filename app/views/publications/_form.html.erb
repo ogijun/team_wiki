@@ -37,11 +37,5 @@
     <%= f.url_field :store_url %>
   </div>
 
-  <div class="field">
-    <%= f.label :article_id, "作品（記事）" %><%= optional_badge %>
-    <small class="field__hint">この発売物が何の作品のものかを記事に紐付けられます。</small>
-    <%= f.collection_select :article_id, Article.where(kind: "work").order(:title), :id, :title, include_blank: "紐付けない" %>
-  </div>
-
   <%= f.submit publication.persisted? ? "保存する" : "登録する" %>
 <% end %>

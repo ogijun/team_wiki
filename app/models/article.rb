@@ -13,8 +13,6 @@ class Article < ApplicationRecord
   has_many :citations, dependent: :destroy
   has_many :cited_materials, -> { distinct }, through: :citations, source: :material
   has_many :comments, as: :commentable, dependent: :destroy
-  # 発売物は記事と独立に存在する（記事が消えても発売物は残し、紐付けだけ外す）。
-  has_many :publications, dependent: :nullify
   # 削除後もタイムラインは subject_label のスナップショットで表示する（参照だけ外す）。
   has_many :activities, as: :subject, dependent: :nullify
 

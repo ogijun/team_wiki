@@ -13,7 +13,6 @@
           <%= render BadgeComponent.new(text: pub.kind_label, variant: :kind) %>
           <%= render FuzzyDateComponent.new(starts: pub.released) %>
           <span><%= pub.sales_status_label %></span>
-          <% if pub.article %>・<%= link_to pub.article.title, pub.article %><% end %>
         </span>
         <% if pub.purchasable? %>
           <%= link_to "購入", pub.store_url, role: "button", class: "btn-sm secondary outline", target: "_blank", rel: "noopener" %>

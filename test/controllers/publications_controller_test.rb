@@ -38,12 +38,6 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "create can link an article" do
-    article = Article.create!(title: "作品記事", created_by: @user, kind: "work")
-    post publications_url, params: { publication: { title: "紐付く本", kind: "book", article_id: article.id } }
-    assert_equal article, Publication.last.article
-  end
-
   test "update edits and records an activity" do
     pub = create_publication
     assert_difference "Activity.count", 1 do
@@ -82,13 +76,6 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     get publication_url(pub)
     assert_select ".product-card a[href='https://example.com/item']", count: 0
     assert_select ".product-card", /絶版/
-  end
-
-  test "show links to the related article when present" do
-    article = Article.create!(title: "作品記事", created_by: @user, kind: "work")
-    pub = create_publication(article: article)
-    get publication_url(pub)
-    assert_select "a[href=?]", article_path(article), text: "作品記事"
   end
 
   test "form marks required and optional fields with badges" do
