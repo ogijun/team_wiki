@@ -31,7 +31,7 @@ module ActivitiesHelper
     "transcription.assigned" => "user",
     "tag.created"      => "tags",
     "tag.deleted"      => "trash-2",
-    "publication.registered" => "book",
+    "publication.registered" => "package",
     "publication.edited"     => "pencil-line",
     "publication.deleted"    => "trash-2",
     "user.joined"      => "users"
