@@ -115,4 +115,9 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     delete publication_url(pub)
     assert_redirected_to new_session_url
   end
+
+  test "sidebar links to publications" do
+    get root_url
+    assert_select "nav a[href=?]", publications_path, text: /発売物/
+  end
 end
