@@ -204,6 +204,8 @@ button.tag-chip:hover, button.tag-chip:focus {
 .stacked-form .field > :where(input, textarea, select) { margin-bottom: 0; }
 .field__hint { display: block; margin: -0.1rem 0 0.55rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted); }
 .field__hint code { font-size: 0.85em; }
+/* 既存の添付（書影など）を編集フォームで見せる小プレビュー。「入っている」ことを可視化して差し替え事故を防ぐ。 */
+.field__preview { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; font-size: 0.8rem; }
 /* 副次メタデータの折りたたみ（資料フォーム下段「詳しい情報」）。
    「押せる／押すと広がる」が一目で分かるよう、枠＋地色＋回転シェブロン＋ヒントで明示。 */
 .stacked-form .secondary-meta { margin: 0 0 1.6rem; border: 1px solid var(--border); border-radius: 8px; }
@@ -396,7 +398,25 @@ button.tag-chip:hover, button.tag-chip:focus {
 .product-card {
   background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
   padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+  /* 書影（左）＋ 商品情報（右）。狭い画面では wrap して書影が上、情報が下に積まれる。 */
+  display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1.25rem;
 }
+.product-card__info { flex: 1 1 16rem; min-width: 0; }
+/* 書影は「対象そのもの」なのでカード内で一番大きい要素。縦長・横長どちらの版面でも枠は崩さない。 */
+.product-card__cover {
+  flex: 0 0 auto; width: 10rem; max-width: 100%; height: auto;
+  border: 1px solid var(--hairline); border-radius: 4px; object-fit: contain; background: var(--code-bg);
+}
+/* 書影なし: 資料サムネ（.material-thumb--icon）と同じ地色でアイコンを置き、穴を空けない。 */
+.product-card__cover--icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 10rem; height: 10rem; color: var(--muted);
+}
+.product-card__cover--icon .icon { width: 2.5rem; height: 2.5rem; }
+/* 一覧行: 書影サムネ（資料と同じ .material-thumb）＋商品名を1行に揃える。
+   .row__main は既定で inline+ellipsis 前提なので、サムネを置く行だけ flex にする。 */
+.publication-row .row__main { display: flex; align-items: center; gap: 0.6rem; }
+.publication-row .row__main a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .product-card dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1.25rem; margin: 0 0 1rem; }
 .product-card dt { color: var(--muted); font-size: 0.9rem; }
 .product-card dd { margin: 0; }

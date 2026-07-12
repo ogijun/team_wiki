@@ -2,7 +2,8 @@ class PublicationsController < ApplicationController
   before_action :set_publication, only: %i[show edit update destroy]
 
   def index
-    @publications = Publication.order(released_at: :desc, created_at: :desc)
+    # 一覧は書影サムネを出すので blob を先読みする（N+1 回避）。
+    @publications = Publication.with_attached_cover.order(released_at: :desc, created_at: :desc)
   end
 
   def show
@@ -50,7 +51,7 @@ class PublicationsController < ApplicationController
   end
 
   def publication_params
-    params.require(:publication).permit(:title, :kind, :sales_status, :store_url,
+    params.require(:publication).permit(:title, :kind, :sales_status, :store_url, :cover,
                                         :released_year, :released_month, :released_day,
                                         :released_hour, :released_minute)
   end

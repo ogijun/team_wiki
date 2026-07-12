@@ -107,4 +107,51 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_select "nav a[href=?]", publications_path, text: /発売物/
   end
+
+  # ── 書影（カバー画像）──
+  def create_publication_with_cover(**attrs)
+    pub = create_publication(**attrs)
+    pub.cover.attach(io: StringIO.new("x"), filename: "cover.png", content_type: "image/png")
+    pub
+  end
+
+  test "create accepts an attached cover" do
+    file = fixture_file_upload("example-photo.png", "image/png")
+    assert_difference "Publication.count", 1 do
+      post publications_url, params: { publication: {
+        title: "書影つきの本", kind: "book", sales_status: "on_sale", cover: file
+      } }
+    end
+    assert_predicate Publication.last.cover, :attached?
+  end
+
+  test "show renders the cover image in the product card when attached" do
+    pub = create_publication_with_cover(title: "書影あり")
+    get publication_url(pub)
+    assert_response :success
+    assert_select ".product-card img[alt=?]", "書影あり"
+  end
+
+  test "show falls back to the package icon when no cover is attached" do
+    pub = create_publication(title: "書影なし")
+    get publication_url(pub)
+    assert_response :success
+    assert_select ".product-card img", count: 0
+    assert_select ".product-card svg use[href*=?]", "package"
+  end
+
+  test "index shows a cover thumbnail when attached and the package icon otherwise" do
+    create_publication_with_cover(title: "書影あり一覧")
+    create_publication(title: "書影なし一覧")
+    get publications_url
+    assert_select ".row img.material-thumb"
+    assert_select ".row .material-thumb--icon svg use[href*=?]", "package"
+  end
+
+  test "edit form shows the current cover as a preview" do
+    pub = create_publication_with_cover
+    get edit_publication_url(pub)
+    assert_response :success
+    assert_select "form img"
+  end
 end

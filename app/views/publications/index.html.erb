@@ -7,8 +7,16 @@
 <% if @publications.any? %>
   <ul class="rows">
     <% @publications.each do |pub| %>
-      <li class="row">
-        <span class="row__main"><%= icon("package") %> <%= link_to pub.title, pub %></span>
+      <li class="row publication-row">
+        <%# 書影があればサムネ、なければ package アイコン（資料サムネと同じ語彙・同じフォールバック）。 %>
+        <span class="row__main">
+          <% if pub.cover.attached? %>
+            <%= image_tag pub.cover_thumbnail(48), class: "material-thumb", loading: "lazy", alt: pub.title %>
+          <% else %>
+            <span class="material-thumb material-thumb--icon"><%= icon("package") %></span>
+          <% end %>
+          <%= link_to pub.title, pub %>
+        </span>
         <span class="meta">
           <%= render BadgeComponent.new(text: pub.kind_label, variant: :kind) %>
           <%= render FuzzyDateComponent.new(starts: pub.released) %>

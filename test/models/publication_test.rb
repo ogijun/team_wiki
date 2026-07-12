@@ -71,4 +71,47 @@ class PublicationTest < ActiveSupport::TestCase
     assert pub.deletable_by?(@user)
     assert_not pub.editable_by?(nil)
   end
+
+  # ── 書影（カバー画像）──
+  def attach_cover(pub, io: StringIO.new("x"), filename: "cover.png", content_type: "image/png")
+    pub.cover.attach(io: io, filename: filename, content_type: content_type)
+    pub
+  end
+
+  test "cover: an image attaches and cover_thumbnail returns a representation" do
+    pub = attach_cover(build)
+    assert_predicate pub, :valid?, pub.errors.full_messages.join(", ")
+    pub.save!
+    assert_not_nil pub.cover_thumbnail(100)
+  end
+
+  test "cover_thumbnail is nil when no cover is attached" do
+    pub = build
+    pub.save!
+    assert_nil pub.cover_thumbnail(100)
+  end
+
+  test "cover rejects a non-image content type" do
+    pub = attach_cover(build, io: StringIO.new("%PDF-1.4"), filename: "doc.pdf", content_type: "application/pdf")
+    assert_not pub.valid?
+    assert_includes pub.errors[:cover], "は画像ファイル（PNG/JPEG/GIF/WebP）にしてください"
+
+    txt = attach_cover(build, io: StringIO.new("hello"), filename: "a.txt", content_type: "text/plain")
+    assert_not txt.valid?
+    assert_predicate txt.errors[:cover], :any?
+  end
+
+  test "cover rejects a file larger than COVER_MAX_BYTES" do
+    pub = attach_cover(build)
+    # 実サイズのファイルは載せられないので byte_size をスタブして境界だけ検証する（material_test と同じ作法）。
+    pub.cover.blob.define_singleton_method(:byte_size) { Publication::COVER_MAX_BYTES + 1 }
+    assert_not pub.valid?
+    assert pub.errors[:cover].any? { |msg| msg.include?("大きすぎ") }
+  end
+
+  test "cover accepts a file at exactly COVER_MAX_BYTES" do
+    pub = attach_cover(build)
+    pub.cover.blob.define_singleton_method(:byte_size) { Publication::COVER_MAX_BYTES }
+    assert_predicate pub, :valid?, pub.errors.full_messages.join(", ")
+  end
 end
