@@ -75,4 +75,14 @@ class PublicationTest < ActiveSupport::TestCase
   test "article link is optional" do
     assert_predicate build(article: nil), :valid?
   end
+
+  test "destroying a linked article nullifies the link instead of blowing up" do
+    article = Article.create!(title: "消える作品記事", created_by: @user, kind: "work")
+    pub = Publication.create!(title: "残る発売物", kind: "book", registered_by: @user, article: article)
+
+    assert_nothing_raised { article.destroy }
+
+    assert Publication.exists?(pub.id), "記事を消しても発売物は残る"
+    assert_nil pub.reload.article_id, "紐付けだけが外れる"
+  end
 end
