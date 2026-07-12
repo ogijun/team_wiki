@@ -1,0 +1,6 @@
+<div class="page-header"><h1>発売物</h1></div>
+<ul class="rows">
+  <% @publications.each do |pub| %>
+    <li><%= link_to pub.title, pub %></li>
+  <% end %>
+</ul>

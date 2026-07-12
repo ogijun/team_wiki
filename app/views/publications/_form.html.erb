@@ -1,0 +1,12 @@
+<%= form_with model: publication, class: "stacked-form" do |f| %>
+  <div class="field"><%= f.label :title, "商品名" %><%= f.text_field :title %></div>
+  <div class="field"><%= f.select :kind, Publication::KINDS.map { |value, label| [ label, value ] } %></div>
+  <div class="field"><%= f.select :sales_status, Publication::SALES_STATUSES.map { |value, label| [ label, value ] } %></div>
+  <div class="field"><%= f.url_field :store_url %></div>
+  <div class="field">
+    <%= f.number_field :released_year, value: fuzzy_part(publication.released, :year), placeholder: "年" %>
+    <%= f.number_field :released_month, value: fuzzy_part(publication.released, :month), placeholder: "月" %>
+    <%= f.number_field :released_day, value: fuzzy_part(publication.released, :day), placeholder: "日" %>
+  </div>
+  <%= f.submit "保存" %>
+<% end %>
