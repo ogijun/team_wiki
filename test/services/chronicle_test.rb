@@ -47,4 +47,13 @@ class ChronicleTest < ActiveSupport::TestCase
     kinds = Chronicle.entries.map(&:kind)
     assert_equal [ :article, :publication ], kinds
   end
+
+  test "same-day entries put material between article and publication" do
+    Publication.create!(title: "同日の発売", kind: "book", registered_by: @user, released_year: "2000")
+    Material.create!(user: @user, title: "同日の資料", url: "https://x.test/same", published_year: "2000")
+    Article.create!(title: "同日の記事", created_by: @user, start_year: "2000")
+
+    kinds = Chronicle.entries.map(&:kind)
+    assert_equal [ :article, :material, :publication ], kinds
+  end
 end
