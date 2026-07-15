@@ -245,4 +245,40 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "li .meta", text: /・1/
     assert_select "li .meta svg use[href*=?]", "message-circle"
   end
+
+  test "concurrent edit is rejected instead of silently overwriting (optimistic lock)" do
+    article = Article.create!(title: "元タイトル", created_by: @user)
+    article.revise!(body: "初版本文", author: @user)
+    stale_version = article.reload.lock_version # B が編集画面を開いた時点の版
+
+    # A が先に保存して lock_version を上げる
+    article.update!(title: "Aが変えたタイトル")
+    assert_operator article.reload.lock_version, :>, stale_version
+
+    # B は古い版をもとに保存しようとする → 後勝ちで上書きさせない
+    patch article_url(article), params: { article: {
+      title: "Bが変えたタイトル", body: "Bの本文", lock_version: stale_version
+    } }
+
+    assert_response :conflict
+    assert_equal "Aが変えたタイトル", article.reload.title, "Bの後勝ちで上書きされない"
+    assert_equal "初版本文", article.current_revision.body, "本文もBに上書きされない"
+  end
+
+  test "edit form carries lock_version so conflicts can be detected" do
+    article = Article.create!(title: "版付き記事", created_by: @user)
+    article.revise!(body: "本文", author: @user)
+    get edit_article_url(article)
+    assert_select "input[type=hidden][name='article[lock_version]']"
+  end
+
+  test "non-conflicting edit still saves normally" do
+    article = Article.create!(title: "普通の編集", created_by: @user)
+    article.revise!(body: "初版", author: @user)
+    patch article_url(article), params: { article: {
+      title: "更新後", body: "二版", lock_version: article.reload.lock_version
+    } }
+    assert_redirected_to article
+    assert_equal "更新後", article.reload.title
+  end
 end
