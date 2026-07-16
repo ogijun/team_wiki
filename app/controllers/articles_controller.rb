@@ -38,6 +38,8 @@ class ArticlesController < ApplicationController
   end
 
   def update
+    # 楽観ロック: 編集画面を開いた時点の版をフォームから受け取り、save 時に比較する。
+    @article.lock_version = article_params[:lock_version] if article_params[:lock_version].present?
     @article.assign_attributes(article_attributes)
     if article_params[:body].blank?
       @article.errors.add(:body, "を入力してください")
@@ -48,6 +50,11 @@ class ArticlesController < ApplicationController
     redirect_to @article, notice: "記事を保存しました。"
   rescue ActiveRecord::RecordInvalid
     rerender_edit
+  rescue ActiveRecord::StaleObjectError
+    # 他の人が先に保存済み。後勝ちの上書きはさせず、入力を保持したまま知らせる。
+    @article = Article.find_by!(slug: params[:id]) # 破棄された変更で汚れた実体を読み直す
+    @article.errors.add(:base, "他の編集者が先に保存しました。最新の内容を確認して、もう一度編集してください。")
+    rerender_edit(status: :conflict)
   end
 
   def destroy
@@ -75,10 +82,10 @@ class ArticlesController < ApplicationController
     }
   end
 
-  def rerender_edit
+  def rerender_edit(status: :unprocessable_entity)
     @body = article_params[:body]
     @tag_names = article_params[:tag_names]
-    render :edit, status: :unprocessable_entity
+    render :edit, status: status
   end
 
   def set_article
@@ -87,6 +94,7 @@ class ArticlesController < ApplicationController
 
   def article_params
     params.require(:article).permit(:title, :body, :tag_names, :edit_summary, :kind, :status,
+                                    :lock_version,
                                     :start_year, :start_month, :start_day, :start_hour, :start_minute,
                                     :end_year, :end_month, :end_day, :end_hour, :end_minute)
   end

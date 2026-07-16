@@ -1,5 +1,7 @@
 <%= form_with model: article, url: form_url, class: "stacked-form", data: { controller: "editor", action: "submit->editor#writeBack" } do |f| %>
   <%= render "shared/error_messages", record: article %>
+  <%# 楽観ロック: 編集画面を開いた時点の版。同時編集の後勝ち上書きを防ぐ。 %>
+  <%= f.hidden_field :lock_version if article.persisted? %>
 
   <fieldset data-controller="chronicle-date">
     <legend>日時（年表に表示）<%= optional_badge %></legend>
