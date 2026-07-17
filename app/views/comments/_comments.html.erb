@@ -2,6 +2,7 @@
   <h2>コメント<% if commentable.comments_count > 0 %> <span class="muted">(<%= commentable.comments_count %>)</span><% end %></h2>
 
   <% comments = commentable.comments.includes(author: { avatar_attachment: :blob }).order(:created_at) %>
+  <% liked_keys = liked_reactable_keys(comments) %>
   <% if comments.any? %>
     <ul class="comment-list">
       <% comments.each do |c| %>
@@ -10,6 +11,7 @@
             <%= avatar_link(c.author, size: 24) %>
             <%= link_to display_name(c.author), c.author, class: "comment__author" %>
             <span class="muted"><%= local_time_ago(c.created_at) %></span>
+            <%= render "likes/button", reactable: c, liked: liked_keys.include?([ "Comment", c.id ]) %>
             <% if c.deletable_by?(Current.user) %>
               <%= button_to "削除", comment_path(c), method: :delete, class: "btn-sm btn-danger comment__delete", form_class: "comment__delete-form", data: { turbo_confirm: "このコメントを削除しますか?" } %>
             <% end %>

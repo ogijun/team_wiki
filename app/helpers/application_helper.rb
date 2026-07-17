@@ -1,4 +1,13 @@
 module ApplicationHelper
+  # 異種 reactable 群の「自分が Like 済み」を型ごとに一括取得する（タイムラインの N+1 回避）。
+  def liked_reactable_keys(reactables, user = Current.user)
+    return Set.new unless user
+
+    reactables.compact.group_by { |reactable| reactable.class.name }.flat_map do |type, records|
+      Like.where(reactor: user, reactable_type: type, reactable_id: records.map(&:id))
+          .pluck(:reactable_type, :reactable_id)
+    end.to_set
+  end
   include Pagy::Frontend
 
   PRECISION_RANK = { "year" => 0, "month" => 1, "day" => 2, "time" => 3 }.freeze

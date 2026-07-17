@@ -13,6 +13,7 @@
     <% if contributors.any? %>
       <span class="contributors"><% contributors.each do |u| %><%= avatar_link(u, size: 20) %><% end %></span>
     <% end %>
+    <%= render "likes/button", reactable: @article %>
   </div>
   <div class="actions">
     <%= link_to "本文を編集", edit_article_path(@article), role: "button", class: "btn-sm secondary outline" %>
