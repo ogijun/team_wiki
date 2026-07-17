@@ -1,0 +1,6 @@
+<% liked = local_assigns.fetch(:liked, reactable.liked_by?(Current.user)) %>
+<div id="<%= dom_id(reactable, :like) %>">
+  <%= button_to like_path, params: { reactable_type: reactable.class.name, reactable_id: reactable.id }, class: "btn-sm#{' secondary' unless liked}", aria: { label: "いいね" } do %>
+    <%= icon("heart") %> <%= reactable.likes_count %>
+  <% end %>
+</div>

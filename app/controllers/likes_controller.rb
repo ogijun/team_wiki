@@ -1,0 +1,24 @@
+class LikesController < ApplicationController
+  # トグル1本: 未Likeなら作成、Like済みなら削除。
+  def create
+    @reactable = find_reactable
+    like = Like.find_by(reactor: Current.user, reactable: @reactable)
+    like ? like.destroy! : Like.create!(reactor: Current.user, reactable: @reactable)
+    # NOTE(A2): Like 作成時はここから所有者への通知を emit する（自分宛は抑制）。
+    @reactable.reload
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back fallback_location: root_path }
+    end
+  end
+
+  private
+
+  def find_reactable
+    type = params.require(:reactable_type)
+    raise ActionController::BadRequest unless Like::REACTABLE_TYPES.include?(type)
+
+    type.constantize.find(params.require(:reactable_id))
+  end
+end
