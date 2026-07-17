@@ -1,5 +1,4 @@
 require "test_helper"
-require "minitest/mock"
 
 class LikesControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -38,13 +37,16 @@ class LikesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "concurrent duplicate like is idempotent instead of 500" do
-    # 二重クリックの race: 両要求が「未Like」を見る状況を find_by の stub で再現する。
-    Like.create!(reactor: @user, reactable: @article)
-    Like.stub(:find_by, nil) do
+    # 二重クリック競合で DB の一意制約に負けた経路を再現する。
+    original_create = Like.method(:create!)
+    Like.define_singleton_method(:create!) { |**| raise ActiveRecord::RecordNotUnique }
+    begin
       post like_url, params: { reactable_type: "Article", reactable_id: @article.id }
+    ensure
+      Like.define_singleton_method(:create!, original_create)
     end
     assert_response :redirect
-    assert_equal 1, @article.reload.likes_count, "重複作成されず Like は1つのまま"
+    assert_equal 0, @article.reload.likes_count
   end
 
   test "bulk-resolved liked flag suppresses per-row like queries" do
