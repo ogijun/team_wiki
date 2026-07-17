@@ -36,6 +36,7 @@ class User < ApplicationRecord
       Like.where(reactable_type: "Material", reactable_id: Material.where(user: self).select(:id)).count +
       Like.where(reactable_type: "Comment", reactable_id: Comment.where(author: self).select(:id)).count +
       Like.where(reactable_type: "Transcription", reactable_id: Transcription.where(author: self).select(:id)).count +
+      Like.where(reactable_type: "Publication", reactable_id: Publication.where(registered_by: self).select(:id)).count +
       Like.where(reactable_type: "Activity", reactable_id: Activity.where(user: self).select(:id)).count
   end
 

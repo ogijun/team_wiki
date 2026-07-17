@@ -40,5 +40,8 @@ class LikeTest < ActiveSupport::TestCase
     registered = Activity.record(actor: user, action: "publication.registered", subject: publication)
 
     assert_equal publication, registered.like_target
+
+    Like.create!(reactor: create(:user), reactable: registered.like_target)
+    assert_equal 1, publication.reload.likes_count
   end
 end

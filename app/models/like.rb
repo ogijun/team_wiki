@@ -1,5 +1,5 @@
 class Like < ApplicationRecord
-  REACTABLE_TYPES = %w[Article Material Comment Transcription Activity].freeze
+  REACTABLE_TYPES = %w[Article Material Comment Transcription Publication Activity].freeze
 
   belongs_to :reactor, class_name: "User"
   belongs_to :reactable, polymorphic: true, counter_cache: true
