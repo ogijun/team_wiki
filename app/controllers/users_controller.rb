@@ -15,5 +15,6 @@ class UsersController < ApplicationController
     @activity_groups = ActivityGrouper.call(
       Activity.where(user: @user).includes(:user, :subject).order(created_at: :desc).limit(60)
     ).first(15)
+    @favorites = Like.where(reactor: @user).includes(:reactable).order(created_at: :desc).limit(20) if @user == Current.user
   end
 end

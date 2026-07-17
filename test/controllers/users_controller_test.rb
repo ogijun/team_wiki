@@ -38,6 +38,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select ".page-meta", text: /文字起こし.*0.*件/m
   end
 
+  test "profile shows received likes and own favorites" do
+    article = Article.create!(title: "いいね記事", created_by: @user)
+    Like.create!(reactor: User.create!(email_address: "fan@example.com", provider: "discord", uid: "fan"), reactable: article)
+    Like.create!(reactor: @user, reactable: article)
+
+    get user_url(@user)
+    assert_match /いいね\s*<strong>2<\/strong>/, response.body
+    assert_select "section", text: /いいねした一覧.*いいね記事/m
+  end
+
   test "own profile links to account settings; top user menu links to profile and settings" do
     get user_url(@user)
     assert_select ".actions a[href=?]", edit_account_path
