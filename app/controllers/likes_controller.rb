@@ -3,7 +3,15 @@ class LikesController < ApplicationController
   def create
     @reactable = find_reactable
     like = Like.find_by(reactor: Current.user, reactable: @reactable)
-    like ? like.destroy! : Like.create!(reactor: Current.user, reactable: @reactable)
+    if like
+      like.destroy!
+    else
+      begin
+        Like.create!(reactor: Current.user, reactable: @reactable)
+      rescue ActiveRecord::RecordNotUnique
+        # 二重クリック等の同時要求で両方が「未Like」を見た場合。既に付いているので冪等に成功扱い。
+      end
+    end
     # NOTE(A2): Like 作成時はここから所有者への通知を emit する（自分宛は抑制）。
     @reactable.reload
 
