@@ -13,6 +13,11 @@
     <%= f.text_field :name %>
   </div>
   <div class="field">
+    <%= f.label :bio, "ひとこと（1行プロフィール）" %><%= optional_badge %>
+    <small class="field__hint">メンバー一覧とプロフィールに表示されます（100文字まで）。</small>
+    <%= f.text_field :bio, maxlength: 100 %>
+  </div>
+  <div class="field">
     <%= f.label :email_address, "メール" %><%= required_badge %>
     <%= f.email_field :email_address %>
   </div>

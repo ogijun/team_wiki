@@ -18,6 +18,7 @@
 .page-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.6rem; margin: 0.25rem 0 0.4rem; font-size: 0.9rem; color: var(--ink-soft); }
 .page-meta .avatar { vertical-align: middle; }
 .page-meta .when { margin: 0; }
+.profile__bio { color: var(--muted); }
 
 /* 破壊的操作の隔離ゾーン（show の最下部） */
 .danger-zone { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--hairline); }

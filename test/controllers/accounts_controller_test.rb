@@ -28,4 +28,18 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_equal "me@example.com", @user.reload.email_address
   end
+
+  test "bio can be edited and appears on the profile" do
+    patch account_url, params: { user: { bio: "富野作品の書誌を担当" } }
+    assert_redirected_to edit_account_url
+    assert_equal "富野作品の書誌を担当", @user.reload.bio
+
+    get user_url(@user)
+    assert_select ".profile", /富野作品の書誌を担当/
+  end
+
+  test "bio is capped at 100 characters" do
+    patch account_url, params: { user: { bio: "あ" * 101 } }
+    assert_response :unprocessable_entity
+  end
 end

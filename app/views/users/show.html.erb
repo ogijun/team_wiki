@@ -4,6 +4,7 @@
   <%= avatar_tag(@user, size: 64) %>
   <div>
     <h1><%= display_name(@user) %><% if @user.admin? %> <%= render BadgeComponent.new(text: "管理者", variant: :status) %><% end %></h1>
+    <% if @user.bio.present? %><div class="profile__bio"><%= @user.bio %></div><% end %>
     <div class="page-meta">
       <span><%= icon("calendar") %> 参加: <%= @user.created_at.to_date.to_fs(:jp) %></span>
       <% stats = @user.activity_stats %>
