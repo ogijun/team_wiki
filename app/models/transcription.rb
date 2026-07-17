@@ -13,6 +13,7 @@ class Transcription < ApplicationRecord
   belongs_to :assignee, class_name: "User", optional: true
   belongs_to :author, class_name: "User"
   has_many :revisions, class_name: "TranscriptionRevision", dependent: :destroy
+  has_many :likes, as: :reactable, dependent: :destroy
 
   normalizes :creation_method, :ai_service, :ai_model, with: ->(v) { v.presence }
 
@@ -41,6 +42,7 @@ class Transcription < ApplicationRecord
   # 認可述語（自作。詳細は [[project-authorization-approach]]）。現状はメンバーなら誰でも編集可。
   # 将来は割り当てワークフロー（assignee 中心＋admin）に絞る想定＝ここを変える唯一の窓口。
   def editable_by?(user) = user.present?
+  def liked_by?(user) = user.present? && likes.exists?(reactor: user)
 
   # 担当(assignee)の設定/変更/解除は誰でも自由（GitHub の assignee と同じ。編集ゲートにはしない）。
   def assignable_by?(user) = user.present?
