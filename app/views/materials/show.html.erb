@@ -5,6 +5,7 @@
   <% if @material.rights %><%= render BadgeComponent.new(text: @material.rights_label) %><% end %>
   <% if @material.ownership %><%= render BadgeComponent.new(text: @material.ownership_label) %><% end %>
   <span>by <%= link_to display_name(@material.user), @material.user %> ・ <%= @material.created_at.to_fs(:jp) %></span>
+  <%= render "likes/button", reactable: @material %>
 </div>
 <div class="actions">
   <%= link_to "資料情報を編集", edit_material_path(@material), role: "button", class: "btn-sm secondary outline" %>

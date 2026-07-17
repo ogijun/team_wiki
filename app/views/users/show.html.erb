@@ -20,6 +20,7 @@
       <span><%= icon("newspaper") %> 記事 <strong><%= c[:articles_created] %></strong>本作成</span>
       <span><%= icon("pencil-line") %> 編集 <strong><%= c[:revisions_authored] %></strong>回</span>
       <span><%= icon("audio-lines") %> 文字起こし <strong><%= c[:transcriptions_contributed] %></strong>件</span>
+      <span><%= icon("heart") %> いいね <strong><%= @user.received_likes_count %></strong></span>
     </div>
   </div>
 </header>
@@ -28,6 +29,17 @@
   <div class="actions">
     <%= link_to edit_account_path, role: "button", class: "btn-sm secondary outline" do %><%= icon("settings") %> アカウント設定<% end %>
   </div>
+<% end %>
+
+<% if @favorites.present? %>
+  <section>
+    <h2><%= icon("heart") %> いいねした一覧</h2>
+    <ul class="rows">
+      <% @favorites.each do |favorite| %>
+        <li class="row"><span class="row__main"><%= favorite_link_for(favorite.reactable) %></span></li>
+      <% end %>
+    </ul>
+  </section>
 <% end %>
 
 <section class="recent-activity">

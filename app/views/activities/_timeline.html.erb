@@ -1,4 +1,6 @@
 <ul class="timeline">
+  <% reps = groups.filter_map { |item| item.activities.first if item.respond_to?(:activities) } %>
+  <% liked_keys = liked_reactable_keys(reps.map(&:like_target)) %>
   <% groups.each do |item| %>
     <% if item.respond_to?(:activities) %>
       <% rep = item.activities.first %>
@@ -8,6 +10,8 @@
         <span class="timeline__body">
           <%= activity_group_icon(item) %><% if show_actor %><strong><%= link_to display_name(rep.user), rep.user %></strong><% end %><%= activity_group_phrase(item, actor: show_actor) %>
           <span class="muted"><%= local_time_ago(rep.created_at) %></span>
+          <% target = rep.like_target %>
+          <%= render "likes/button", reactable: target, liked: liked_keys.include?([ target.class.name, target.id ]) %>
         </span>
       </li>
     <% else %>

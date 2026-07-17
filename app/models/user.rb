@@ -30,6 +30,16 @@ class User < ApplicationRecord
     }
   end
 
+  # 自分が作成・投稿した成果物と自身の活動行に付いた Like の合計。
+  def received_likes_count
+    Like.where(reactable_type: "Article", reactable_id: Article.where(created_by: self).select(:id)).count +
+      Like.where(reactable_type: "Material", reactable_id: Material.where(user: self).select(:id)).count +
+      Like.where(reactable_type: "Comment", reactable_id: Comment.where(author: self).select(:id)).count +
+      Like.where(reactable_type: "Transcription", reactable_id: Transcription.where(author: self).select(:id)).count +
+      Like.where(reactable_type: "Publication", reactable_id: Publication.where(registered_by: self).select(:id)).count +
+      Like.where(reactable_type: "Activity", reactable_id: Activity.where(user: self).select(:id)).count
+  end
+
   # 活動日（JST）から { current_streak:, longest_streak:, active_days: } を算出する。
   # current_streak は「今日 or 昨日まで連続」している日数（今日まだ活動が無くても昨日までの連続は生存）。
   def activity_stats(today: Date.current)

@@ -10,6 +10,7 @@ class Publication < ApplicationRecord
   has_one_attached :cover
   # 削除後もタイムラインは subject_label のスナップショットで表示する（参照だけ外す）。
   has_many :activities, as: :subject, dependent: :nullify
+  has_many :likes, as: :reactable, dependent: :destroy
 
   # 書影は画像のみ（資料と違い PDF/動画/音声は受け付けない）。Material::THUMBNAIL_TYPES と同じ4形式。
   COVER_CONTENT_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
@@ -45,6 +46,7 @@ class Publication < ApplicationRecord
   # 認可述語（自作。モデルに `*_able_by?(user)` を置く方針）。現状はログイン済みメンバーなら可。
   def editable_by?(user) = user.present?
   def deletable_by?(user) = user.present?
+  def liked_by?(user) = user.present? && likes.exists?(reactor: user)
 
   private
 

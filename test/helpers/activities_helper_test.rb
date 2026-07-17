@@ -84,6 +84,11 @@ class ActivitiesHelperTest < ActionView::TestCase
     end
   end
 
+  test "Like icon exists in the sprite" do
+    sprite = Rails.root.join("app/assets/images/icons.svg").read
+    assert_includes sprite, 'id="heart"'
+  end
+
   test "subject group merges verbs into 作成・編集 with a single linked title" do
     article = Article.create!(title: "まとめ記事", created_by: @user)
     a1 = Activity.new(user: @user, action: "article.created", subject: article, subject_label: article.title)

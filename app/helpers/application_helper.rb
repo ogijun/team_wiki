@@ -1,4 +1,30 @@
 module ApplicationHelper
+  # 異種 reactable 群の「自分が Like 済み」を型ごとに一括取得する（タイムラインの N+1 回避）。
+  def liked_reactable_keys(reactables, user = Current.user)
+    return Set.new unless user
+
+    reactables.compact.group_by { |reactable| reactable.class.name }.flat_map do |type, records|
+      Like.where(reactor: user, reactable_type: type, reactable_id: records.map(&:id))
+          .pluck(:reactable_type, :reactable_id)
+    end.to_set
+  end
+
+  # 型が混在するお気に入り一覧の表示先を、各リソースの実在ルートへ解決する。
+  def favorite_link_for(reactable)
+    case reactable
+    when Article, Material, Publication
+      link_to(reactable.title, reactable)
+    when Comment
+      label = "#{reactable.commentable.try(:title) || '対象'}へのコメント"
+      link_to(label, reactable.commentable, anchor: dom_id(reactable))
+    when Transcription
+      link_to("#{reactable.material.title}（#{reactable.display_label}）", reactable.material)
+    when Activity
+      reactable.subject_label || "アクティビティ"
+    else
+      reactable.class.model_name.human
+    end
+  end
   include Pagy::Frontend
 
   PRECISION_RANK = { "year" => 0, "month" => 1, "day" => 2, "time" => 3 }.freeze

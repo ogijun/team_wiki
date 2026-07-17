@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_000002) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -42,6 +42,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
   create_table "activities", force: :cascade do |t|
     t.string "action", null: false
     t.datetime "created_at", null: false
+    t.integer "likes_count", default: 0, null: false
     t.integer "subject_id"
     t.string "subject_label"
     t.string "subject_type"
@@ -60,6 +61,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
     t.datetime "ends_at"
     t.string "ends_precision"
     t.string "kind"
+    t.integer "likes_count", default: 0, null: false
     t.integer "lock_version", default: 0, null: false
     t.string "slug", null: false
     t.datetime "starts_at"
@@ -93,9 +95,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
     t.integer "commentable_id", null: false
     t.string "commentable_type", null: false
     t.datetime "created_at", null: false
+    t.integer "likes_count", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_comments_on_author_id"
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable"
+  end
+
+  create_table "likes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "reactable_id", null: false
+    t.string "reactable_type", null: false
+    t.integer "reactor_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reactable_type", "reactable_id"], name: "index_likes_on_reactable"
+    t.index ["reactor_id", "reactable_type", "reactable_id"], name: "index_likes_uniqueness", unique: true
+    t.index ["reactor_id"], name: "index_likes_on_reactor_id"
   end
 
   create_table "links", force: :cascade do |t|
@@ -119,6 +133,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
     t.datetime "file_created_at"
     t.string "isbn"
     t.string "kind"
+    t.integer "likes_count", default: 0, null: false
     t.string "ownership"
     t.integer "page_count"
     t.string "pages"
@@ -144,6 +159,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
   create_table "publications", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "kind", null: false
+    t.integer "likes_count", default: 0, null: false
     t.integer "registered_by_id", null: false
     t.datetime "released_at"
     t.string "released_precision"
@@ -236,6 +252,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
     t.datetime "created_at", null: false
     t.string "creation_method"
     t.string "label"
+    t.integer "likes_count", default: 0, null: false
     t.integer "lock_version", default: 0, null: false
     t.integer "material_id", null: false
     t.integer "position", default: 1, null: false
@@ -276,6 +293,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000000) do
   add_foreign_key "citations", "articles"
   add_foreign_key "citations", "materials"
   add_foreign_key "comments", "users", column: "author_id"
+  add_foreign_key "likes", "users", column: "reactor_id"
   add_foreign_key "links", "articles", column: "source_article_id"
   add_foreign_key "materials", "users"
   add_foreign_key "publications", "users", column: "registered_by_id"

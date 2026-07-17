@@ -4,6 +4,7 @@
     <%# パート番号/見出しは複数パートのときだけ（1つだけなら不要・ゾーン見出しと重複）。 %>
     <% if local_assigns.fetch(:numbered, true) %><strong><%= t.display_label %></strong><% end %>
     <%= render BadgeComponent.new(text: t.assignment_state_label, variant: :status) %>
+    <%= render "likes/button", reactable: t %>
 
     <% if t.assignable_by?(Current.user) %>
       <details class="assignee-menu" data-controller="menu">

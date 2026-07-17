@@ -6,6 +6,7 @@
   <%= render BadgeComponent.new(text: @publication.sales_status_label, variant: :status) %>
   <%= render FuzzyDateComponent.new(starts: @publication.released, icon: true) %>
   <span>登録: <%= link_to display_name(@publication.registered_by), @publication.registered_by %></span>
+  <%= render "likes/button", reactable: @publication %>
 </div>
 <div class="actions">
   <%= link_to "発売物を編集", edit_publication_path(@publication), role: "button", class: "btn-sm secondary outline" %>
