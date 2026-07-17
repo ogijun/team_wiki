@@ -36,8 +36,7 @@
     <h2><%= icon("heart") %> いいねした一覧</h2>
     <ul class="rows">
       <% @favorites.each do |favorite| %>
-        <% reactable = favorite.reactable %>
-        <li class="row"><span class="row__main"><%= reactable.respond_to?(:to_param) && !reactable.is_a?(Activity) ? link_to(reactable.try(:title) || reactable.try(:name) || reactable.class.model_name.human, reactable) : reactable.try(:subject_label) || reactable.class.model_name.human %></span></li>
+        <li class="row"><span class="row__main"><%= favorite_link_for(favorite.reactable) %></span></li>
       <% end %>
     </ul>
   </section>

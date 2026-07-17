@@ -48,6 +48,16 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select "section", text: /いいねした一覧.*いいね記事/m
   end
 
+  test "favorites link nested transcriptions through their material" do
+    material = Material.create!(user: @user, url: "https://example.com/favorite", title: "お気に入り資料")
+    transcription = Transcription.create!(material: material, author: @user, body: "本文", label: "冒頭")
+    Like.create!(reactor: @user, reactable: transcription)
+
+    get user_url(@user)
+    assert_response :success
+    assert_select "a[href=?]", material_path(material), text: /お気に入り資料.*冒頭/
+  end
+
   test "own profile links to account settings; top user menu links to profile and settings" do
     get user_url(@user)
     assert_select ".actions a[href=?]", edit_account_path
