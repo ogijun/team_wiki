@@ -103,9 +103,9 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
-  test "sidebar links to publications" do
+  test "sidebar does not expose publications yet (URL 直アクセスのみの限定公開)" do
     get root_url
-    assert_select "nav a[href=?]", publications_path, text: /発売物/
+    assert_select "nav a[href=?]", publications_path, count: 0
   end
 
   # ── 書影（カバー画像）──
