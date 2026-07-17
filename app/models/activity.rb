@@ -8,7 +8,7 @@ class Activity < ApplicationRecord
     publication.registered publication.edited publication.deleted
     user.joined
   ].freeze
-  CREATION_ACTIONS = %w[article.created material.added comment.posted transcription.created].freeze
+  CREATION_ACTIONS = %w[article.created material.added comment.posted transcription.created publication.registered].freeze
 
   belongs_to :user
   belongs_to :subject, polymorphic: true, optional: true

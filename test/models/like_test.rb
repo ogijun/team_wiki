@@ -33,4 +33,12 @@ class LikeTest < ActiveSupport::TestCase
 
     assert_equal activity, activity.like_target
   end
+
+  test "publication registration is a creation action whose like flows to the publication" do
+    user = create(:user)
+    publication = Publication.create!(title: "Like対象の本", kind: "book", registered_by: user)
+    registered = Activity.record(actor: user, action: "publication.registered", subject: publication)
+
+    assert_equal publication, registered.like_target
+  end
 end
