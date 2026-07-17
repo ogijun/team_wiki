@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resources :activities, only: :index
   get "chronicle", to: "chronicle#index"
   get "about", to: "about#show"
+  get "members", to: "members#index"
   resources :users, only: %i[show index]
   resource :account, only: %i[edit update]
   get "search", to: "search#index"

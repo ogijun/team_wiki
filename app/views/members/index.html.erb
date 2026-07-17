@@ -1,0 +1,18 @@
+<div class="page-header">
+  <h1>メンバー</h1>
+  <% if Current.user.admin? %><%= link_to "管理用一覧", users_path, class: "btn-sm secondary outline" %><% end %>
+</div>
+<div class="page-lead">このサイトのメンバー <%= @members.size %> 人。</div>
+
+<ul class="rows">
+  <% @members.each do |member| %>
+    <li class="row">
+      <span><%= avatar_tag(member, size: 32) %></span>
+      <span class="row__main">
+        <%= link_to display_name(member), member %>
+        <% if member.bio.present? %><span class="muted"> — <%= member.bio %></span><% end %>
+      </span>
+      <span class="meta">参加: <%= member.created_at.to_date.to_fs(:jp) %></span>
+    </li>
+  <% end %>
+</ul>

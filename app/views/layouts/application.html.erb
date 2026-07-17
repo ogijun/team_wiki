@@ -75,13 +75,13 @@
           <%= link_to transcriptions_path do %><%= icon("audio-lines") %> 文字起こし<% end %>
           <%= link_to tags_path do %><%= icon("tags") %> タグ<% end %>
           <%= link_to chronicle_path do %><%= icon("calendar-days") %> 年表 <small class="wip">(検討中)</small><% end %>
+          <%= link_to members_path do %><%= icon("users") %> メンバー<% end %>
           <hr class="nav-sep">
           <%= link_to articles_path do %><%= icon("newspaper") %> 記事 <small class="wip">(見直し中)</small><% end %>
         </div>
         <% if Current.user&.admin? %>
           <div class="nav-group">
             <span class="nav-group__label">管理</span>
-            <%= link_to users_path do %><%= icon("users") %> メンバー<% end %>
             <%= link_to edit_settings_path do %><%= icon("settings") %> 設定<% end %>
           </div>
         <% end %>
