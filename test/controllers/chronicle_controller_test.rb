@@ -48,8 +48,17 @@ class ChronicleControllerTest < ActionDispatch::IntegrationTest
     assert_select ".chronicle-list svg use[href*=newspaper]" # 記事アイコン
   end
 
+  test "shows publications with a buy link when purchasable" do
+    Publication.create!(title: "年表に出る本", kind: "book", registered_by: @user,
+                        released_year: "1995", store_url: "https://example.com/item")
+    get chronicle_url
+    assert_response :success
+    assert_select "body", /年表に出る本/
+    assert_select ".chronicle-list a[href='https://example.com/item'][target='_blank'][rel='noopener']"
+  end
+
   test "shows an empty-state message when nothing is dated" do
     get chronicle_url
-    assert_select ".muted", text: /日付のある記事・資料がまだありません/
+    assert_select ".muted", text: /日付のある記事・資料・発売物がまだありません/
   end
 end

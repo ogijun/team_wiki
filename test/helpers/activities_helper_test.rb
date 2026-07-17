@@ -75,6 +75,15 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_includes activity_icon(a), "timeline__icon"
   end
 
+  # アイコン名の typo や未 vendor の symbol は画面上「何も出ない」形で壊れるため
+  # （<use href="…#name"> が実体のない参照になる）、スプライトに実体があることを保証する。
+  test "every icon referenced by ICONS exists in the sprite" do
+    sprite = Rails.root.join("app/assets/images/icons.svg").read
+    ActivitiesHelper::ICONS.each_value do |name|
+      assert_includes sprite, %(id="#{name}"), "icons.svg に symbol '#{name}' がありません"
+    end
+  end
+
   test "subject group merges verbs into 作成・編集 with a single linked title" do
     article = Article.create!(title: "まとめ記事", created_by: @user)
     a1 = Activity.new(user: @user, action: "article.created", subject: article, subject_label: article.title)

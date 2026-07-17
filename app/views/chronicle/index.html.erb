@@ -1,6 +1,7 @@
+<% entry_icons = { article: "newspaper", material: "landmark", publication: "package" } %>
 <div class="page-header"><h1>年表 <small class="wip">(検討中)</small></h1></div>
 <div class="page-lead">
-  発行日のある資料と日付のある記事を時系列に並べます。現在はフラット表示で、絞り込みや表示倍率（レンズ）の変更は今後対応予定です。
+  発行日のある資料・日付のある記事・発売日のある発売物を時系列に並べます。現在はフラット表示で、絞り込みや表示倍率（レンズ）の変更は今後対応予定です。
 </div>
 
 <% if @entries.any? %>
@@ -8,11 +9,14 @@
     <% @entries.each do |e| %>
       <li>
         <%= render FuzzyDateComponent.new(starts: e.starts, ends: e.ends) %>
-        <%= icon(e.kind == :article ? "newspaper" : "landmark") %>
+        <%= icon(entry_icons.fetch(e.kind)) %>
         <%= link_to e.title, e.record %>
+        <% if e.kind == :publication && e.record.purchasable? %>
+          <%= link_to "購入", e.record.store_url, role: "button", class: "btn-sm secondary outline", target: "_blank", rel: "noopener" %>
+        <% end %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <div class="muted">日付のある記事・資料がまだありません。記事に「日時」、資料に「発行日」を設定すると年表に並びます。</div>
+  <div class="muted">日付のある記事・資料・発売物がまだありません。記事に「日時」、資料に「発行日」、発売物に「発売日」を設定すると年表に並びます。</div>
 <% end %>

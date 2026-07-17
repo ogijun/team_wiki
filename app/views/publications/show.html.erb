@@ -1,0 +1,51 @@
+<%= link_to "← 発売物一覧", publications_path, class: "back-link" %>
+<h1><%= @publication.title %></h1>
+<%# ヘッダ文法: メタは1行に集約する（縦に積まない） %>
+<div class="page-meta">
+  <%= render BadgeComponent.new(text: @publication.kind_label, variant: :kind) %>
+  <%= render BadgeComponent.new(text: @publication.sales_status_label, variant: :status) %>
+  <%= render FuzzyDateComponent.new(starts: @publication.released, icon: true) %>
+  <span>登録: <%= link_to display_name(@publication.registered_by), @publication.registered_by %></span>
+</div>
+<div class="actions">
+  <%= link_to "発売物を編集", edit_publication_path(@publication), role: "button", class: "btn-sm secondary outline" %>
+</div>
+
+<%# ── ① 対象そのもの＝商品情報カード（本体を持たないので、ここが主役）。書影＋商品情報の2カラム ── %>
+<section class="product-card">
+  <% if @publication.cover.attached? %>
+    <%= image_tag @publication.cover_thumbnail(400), class: "product-card__cover", loading: "lazy", alt: @publication.title %>
+  <% else %>
+    <%# 書影なしでも穴を空けない。資料サムネと同じくアイコンにフォールバックする。 %>
+    <span class="product-card__cover product-card__cover--icon" title="<%= @publication.title %>"><%= icon("package") %></span>
+  <% end %>
+
+  <div class="product-card__info">
+    <dl>
+      <dt>種別</dt><dd><%= @publication.kind_label %></dd>
+      <dt>発売日</dt>
+      <dd>
+        <% if @publication.released.present? %>
+          <%= render FuzzyDateComponent.new(starts: @publication.released) %>
+        <% else %>
+          <span class="muted">未設定</span>
+        <% end %>
+      </dd>
+      <dt>販売状況</dt><dd><%= @publication.sales_status_label %></dd>
+    </dl>
+    <% if @publication.purchasable? %>
+      <%= link_to @publication.store_url, role: "button", target: "_blank", rel: "noopener" do %>
+        購入する <%= icon("link") %>
+      <% end %>
+    <% elsif @publication.store_url.present? %>
+      <div class="muted"><%= @publication.sales_status_label %>のため購入リンクは表示していません。</div>
+    <% end %>
+  </div>
+</section>
+
+<%# ── 危険な操作（最下部に隔離） ── %>
+<div class="danger-zone">
+  <span class="danger-zone__label">危険な操作</span>
+  <%= button_to "この発売物を削除", @publication, method: :delete, class: "btn-sm btn-danger",
+        data: { turbo_confirm: "「#{@publication.title}」を削除します。よろしいですか?" } %>
+</div>

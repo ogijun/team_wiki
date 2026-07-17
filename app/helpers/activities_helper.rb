@@ -12,6 +12,9 @@ module ActivitiesHelper
     "transcription.assigned" => [ "が", "の文字起こし担当になりました" ],
     "tag.created"      => [ "がタグ", "を作成しました" ],
     "tag.deleted"      => [ "がタグ", "を削除しました" ],
+    "publication.registered" => [ "が発売物", "を登録しました" ],
+    "publication.edited"     => [ "が発売物", "を編集しました" ],
+    "publication.deleted"    => [ "が発売物", "を削除しました" ],
     "user.joined"      => [ "", "が参加しました" ]
   }.freeze
 
@@ -28,6 +31,9 @@ module ActivitiesHelper
     "transcription.assigned" => "user",
     "tag.created"      => "tags",
     "tag.deleted"      => "trash-2",
+    "publication.registered" => "package",
+    "publication.edited"     => "pencil-line",
+    "publication.deleted"    => "trash-2",
     "user.joined"      => "users"
   }.freeze
 

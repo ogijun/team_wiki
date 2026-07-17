@@ -24,4 +24,36 @@ class ChronicleTest < ActiveSupport::TestCase
     assert_equal [ :material, :article, :material ], entries.map(&:kind)
     assert_equal [ older_material, article, newer_material ], entries.map(&:record)
   end
+
+  test "publications with a release date join the timeline in date order" do
+    article = Article.create!(title: "1990年の記事", created_by: @user, start_year: "1990")
+    pub = Publication.create!(title: "1995年の本", kind: "book", registered_by: @user, released_year: "1995")
+
+    entries = Chronicle.entries
+    assert_equal [ article, pub ], entries.map(&:record)
+    assert_equal :publication, entries.last.kind
+    assert_equal "1995年の本", entries.last.title
+  end
+
+  test "publications without a release date are excluded" do
+    Publication.create!(title: "日付なし", kind: "book", registered_by: @user)
+    assert_empty Chronicle.entries
+  end
+
+  test "same-day entries are ordered article, material, publication" do
+    Publication.create!(title: "同日の発売", kind: "book", registered_by: @user, released_year: "2000")
+    Article.create!(title: "同日の記事", created_by: @user, start_year: "2000")
+
+    kinds = Chronicle.entries.map(&:kind)
+    assert_equal [ :article, :publication ], kinds
+  end
+
+  test "same-day entries put material between article and publication" do
+    Publication.create!(title: "同日の発売", kind: "book", registered_by: @user, released_year: "2000")
+    Material.create!(user: @user, title: "同日の資料", url: "https://x.test/same", published_year: "2000")
+    Article.create!(title: "同日の記事", created_by: @user, start_year: "2000")
+
+    kinds = Chronicle.entries.map(&:kind)
+    assert_equal [ :article, :material, :publication ], kinds
+  end
 end

@@ -246,6 +246,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "li .meta svg use[href*=?]", "message-circle"
   end
 
+
   test "concurrent edit is rejected instead of silently overwriting (optimistic lock)" do
     article = Article.create!(title: "元タイトル", created_by: @user)
     article.revise!(body: "初版本文", author: @user)
