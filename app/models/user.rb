@@ -14,6 +14,8 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: true
+  # 1行プロフィール。任意で、公開プロフィールとメンバー一覧に表示する。
+  validates :bio, length: { maximum: 100 }
   validates :role, inclusion: { in: %w[editor admin] }
   validate :acceptable_avatar, if: -> { avatar.attached? }
 
