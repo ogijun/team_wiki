@@ -132,6 +132,26 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_nil t.reload.assignee
   end
 
+  test "self-assigning notifies the material owner" do
+    owner = create(:user)
+    material = create(:material, user: owner)
+    t = part(material)
+
+    assert_difference "Notification.count", 1 do
+      patch assign_material_transcription_url(material, t), params: { assignee_id: @user.id }
+    end
+    assert_equal owner, Notification.last.recipient
+    assert_equal @user, t.reload.assignee
+  end
+
+  test "self-assigning the current user's material does not notify oneself" do
+    t = part
+
+    assert_no_difference "Notification.count" do
+      patch assign_material_transcription_url(@media, t), params: { assignee_id: @user.id }
+    end
+  end
+
   test "assign requires login" do
     t = part
     delete session_url
@@ -152,5 +172,13 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
           params: { assignee_id: @user.id }, as: :turbo_stream
     assert_response :success
     assert_match %r{turbo-stream action="replace" target="transcription_#{t.id}"}, response.body
+  end
+
+  test "unassigned part shows a self-assign button" do
+    t = part
+
+    get material_url(@media)
+
+    assert_select "form[action=?] button", assign_material_transcription_path(@media, t), text: "やります！"
   end
 end

@@ -4,6 +4,9 @@
 class TranscriptionProgressController < ApplicationController
   def index
     materials = Material.includes(:transcriptions, file_attachment: :blob)
+    if params[:recruiting] == "1"
+      materials = materials.where(id: Transcription.where(assignee_id: nil).select(:material_id))
+    end
     @groups = materials.group_by(&:transcription_status)
   end
 end

@@ -7,6 +7,10 @@
     <%= render "likes/button", reactable: t %>
 
     <% if t.assignable_by?(Current.user) %>
+      <% if t.assignee.nil? %>
+        <%= button_to "やります！", assign_material_transcription_path(material, t), method: :patch,
+              params: { assignee_id: Current.user.id }, class: "btn-sm", form: { data: { turbo_stream: true } } %>
+      <% end %>
       <details class="assignee-menu" data-controller="menu">
         <summary class="assignee-menu__summary" role="button" title="担当者を割り当て">
           <% if t.assignee %>

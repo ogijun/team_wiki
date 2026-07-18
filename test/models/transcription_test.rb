@@ -117,10 +117,10 @@ class TranscriptionTest < ActiveSupport::TestCase
     @material.transcriptions.create!({ author: @user, body: "本文", position: 1 }.merge(attrs))
   end
 
-  test "assignment_state: 未担当 when no assignee and not done" do
+  test "assignment_state: 担当者募集中 when no assignee and not done" do
     t = build_part(status: "drafting", assignee: nil)
     assert_equal :unassigned, t.assignment_state
-    assert_equal "未担当", t.assignment_state_label
+    assert_equal "担当者募集中", t.assignment_state_label
   end
 
   test "assignment_state: 担当中 when assignee present and drafting" do

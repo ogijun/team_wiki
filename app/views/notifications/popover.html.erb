@@ -6,7 +6,7 @@
         <% @notifications.each do |notification| %>
           <li>
             <%= avatar_tag(notification.actor, size: 24) %>
-            <span class="timeline__body"><strong><%= link_to display_name(notification.actor), notification.actor %></strong>が <%= notification_subject_link(notification) %>に<%= notification_icon(notification) %><%= notification_phrase(notification) %></span>
+            <span class="timeline__body"><%= notification_message(notification) %></span>
           </li>
         <% end %>
       </ul>
