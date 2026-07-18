@@ -53,12 +53,15 @@
         </div>
       </div>
       <% if Current.user %>
-        <%= link_to notifications_path, class: "topbar__notifications", aria: { label: "通知" } do %>
-          <%= icon("bell") %>
-          <% if (count = Current.user.unread_notifications_count).positive? %>
-            <span class="badge"><%= count %></span>
-          <% end %>
-        <% end %>
+        <details class="topbar__notifications" data-controller="menu notification-popover" data-action="toggle->notification-popover#markRead">
+          <summary aria-label="お知らせを開く">
+            <%= icon("bell") %>
+            <% if (count = Current.user.unread_notifications_count).positive? %>
+              <span class="badge" data-notification-popover-target="badge"><%= count %></span>
+            <% end %>
+          </summary>
+          <%= turbo_frame_tag "notifications_popover", src: notifications_path, loading: :lazy, target: "_top" %>
+        </details>
         <details class="topbar__user-menu" data-controller="menu">
           <summary aria-label="ユーザーメニューを開く">
             <%= avatar_tag(Current.user, size: 32) %>

@@ -42,4 +42,27 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "ul.timeline > li", count: 50
     assert_select "a[href*='before=']", text: "もっと見る"
   end
+
+  test "popover lazily renders seven recent notices and marks them as seen" do
+    @recipient.update_column(:notifications_seen_at, 1.hour.ago)
+    8.times do |i|
+      Notification.create!(recipient: @recipient, actor: @actor, kind: "like", subject: @article, created_at: i.minutes.ago)
+    end
+
+    get notifications_url, headers: { "Turbo-Frame" => "notifications_popover" }
+
+    assert_response :success
+    assert_select "turbo-frame#notifications_popover .topbar__notifications-menu"
+    assert_select "turbo-frame#notifications_popover .timeline > li", count: 7
+    assert_select "turbo-frame#notifications_popover a", text: "もっと見る"
+    assert_operator @recipient.reload.notifications_seen_at, :>, 1.minute.ago
+  end
+
+  test "topbar opens the notice popover with a lazy turbo frame" do
+    get root_url
+
+    assert_select ".topbar__notifications[data-controller~='menu'][data-controller~='notification-popover']"
+    assert_select ".topbar__notifications summary[aria-label='お知らせを開く']"
+    assert_select "turbo-frame#notifications_popover[src=?][loading=lazy]", notifications_path
+  end
 end
