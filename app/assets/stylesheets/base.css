@@ -60,6 +60,8 @@ body > header.topbar {
 .topbar__notifications > summary { list-style: none; display: inline-flex; align-items: center; justify-content: center; align-self: stretch; height: 100%; padding: 0 0.35rem; cursor: pointer; }
 .topbar__notifications > summary::-webkit-details-marker { display: none; }
 .topbar__notifications > summary::marker { content: ""; }
+/* Pico は summary の ::after にシェブロンを描くため、marker と別にこちらも消す必要がある */
+.topbar__notifications > summary::before, .topbar__notifications > summary::after { content: none; display: none; }
 .topbar__notifications > summary:hover, .topbar__notifications > summary:focus-visible { color: var(--accent); }
 .topbar__notifications .badge { position: absolute; top: -0.45rem; right: -0.55rem; min-width: 1.15rem; padding: 0 0.25rem; border-radius: 1rem; background: var(--accent); color: white; font-size: 0.65rem; line-height: 1.15rem; text-align: center; }
 .topbar__notifications-menu { width: min(24rem, calc(100vw - 1rem)); max-height: min(32rem, calc(100vh - var(--topbar-height) - 1rem)); overflow-y: auto; }
