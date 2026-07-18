@@ -424,6 +424,10 @@ button.tag-chip:hover, button.tag-chip:focus {
 
 /* ── 人・コメント ──────────────────────────── */
 
+/* Like ボタン: ラッパー div と button_to の form はブロック要素なので、
+   タイムライン等の文中に置いても改行しないようインライン化する。 */
+.like-toggle, .like-toggle form { display: inline-flex; vertical-align: middle; }
+
 /* Avatars & profile */
 .avatar { border-radius: 50%; object-fit: cover; vertical-align: middle; display: inline-block; }
 .avatar-initial { color: #fff; text-align: center; font-weight: 600; }
