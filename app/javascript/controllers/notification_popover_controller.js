@@ -5,6 +5,6 @@ export default class extends Controller {
   static targets = ["badge"]
 
   markRead() {
-    this.badgeTarget?.remove()
+    if (this.hasBadgeTarget) this.badgeTarget.remove()
   }
 }
