@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_18_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -156,6 +156,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_000002) do
     t.index ["user_id"], name: "index_materials_on_user_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.integer "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.integer "recipient_id", null: false
+    t.integer "subject_id", null: false
+    t.string "subject_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_notifications_on_actor_id"
+    t.index ["recipient_id", "created_at"], name: "index_notifications_on_recipient_id_and_created_at"
+    t.index ["recipient_id"], name: "index_notifications_on_recipient_id"
+    t.index ["subject_type", "subject_id"], name: "index_notifications_on_subject"
+  end
+
   create_table "publications", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "kind", null: false
@@ -277,6 +291,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_000002) do
     t.string "email_address", null: false
     t.datetime "last_seen_at"
     t.string "name"
+    t.datetime "notifications_seen_at"
     t.string "password_digest"
     t.string "provider"
     t.string "role", default: "editor", null: false
@@ -296,6 +311,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_000002) do
   add_foreign_key "likes", "users", column: "reactor_id"
   add_foreign_key "links", "articles", column: "source_article_id"
   add_foreign_key "materials", "users"
+  add_foreign_key "notifications", "users", column: "actor_id"
+  add_foreign_key "notifications", "users", column: "recipient_id"
   add_foreign_key "publications", "users", column: "registered_by_id"
   add_foreign_key "revisions", "articles"
   add_foreign_key "revisions", "users", column: "author_id"

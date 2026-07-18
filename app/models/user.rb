@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_secure_password validations: false
   has_many :sessions, dependent: :destroy
+  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
   has_one_attached :avatar
 
   AVATAR_CONTENT_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze

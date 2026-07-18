@@ -14,6 +14,7 @@ class Transcription < ApplicationRecord
   belongs_to :author, class_name: "User"
   has_many :revisions, class_name: "TranscriptionRevision", dependent: :destroy
   has_many :likes, as: :reactable, dependent: :destroy
+  has_many :notifications, as: :subject, dependent: :destroy
 
   normalizes :creation_method, :ai_service, :ai_model, with: ->(v) { v.presence }
 
