@@ -1,4 +1,4 @@
-<h1>通知</h1>
+<h1>お知らせ</h1>
 <ul class="timeline">
   <% @notifications.each do |notification| %>
     <li class="<%= "notification--unread" if notification.created_at > @seen_boundary %>">

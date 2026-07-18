@@ -56,9 +56,17 @@ body > header.topbar {
 }
 .topbar__toggle { display: none; align-self: stretch; background: none; border: 0; line-height: 1; padding: 0 0.9rem; margin: 0; cursor: pointer; color: var(--ink); width: auto; }
 .topbar__toggle:hover, .topbar__toggle:focus { color: var(--accent); background: var(--accent-weak); }
-.topbar__notifications { position: relative; display: inline-flex; align-items: center; justify-content: center; color: var(--ink-soft); text-decoration: none; }
-.topbar__notifications:hover, .topbar__notifications:focus-visible { color: var(--accent); }
+.topbar__notifications { position: relative; align-self: stretch; display: flex; align-items: center; margin: 0; padding: 0; color: var(--ink-soft); }
+.topbar__notifications > summary { list-style: none; display: inline-flex; align-items: center; justify-content: center; align-self: stretch; height: 100%; padding: 0 0.35rem; cursor: pointer; }
+.topbar__notifications > summary::-webkit-details-marker { display: none; }
+.topbar__notifications > summary::marker { content: ""; }
+.topbar__notifications > summary:hover, .topbar__notifications > summary:focus-visible { color: var(--accent); }
 .topbar__notifications .badge { position: absolute; top: -0.45rem; right: -0.55rem; min-width: 1.15rem; padding: 0 0.25rem; border-radius: 1rem; background: var(--accent); color: white; font-size: 0.65rem; line-height: 1.15rem; text-align: center; }
+.topbar__notifications-menu { width: min(24rem, calc(100vw - 1rem)); max-height: min(32rem, calc(100vh - var(--topbar-height) - 1rem)); overflow-y: auto; }
+.topbar__notifications-menu .timeline { margin: 0.35rem 0; }
+.topbar__notifications-menu .timeline li { font-size: 0.85rem; }
+.topbar__notifications-menu .timeline .avatar { width: 24px; height: 24px; }
+.topbar__notifications-heading { padding: 0.45rem 0.6rem; }
 .topbar__user-menu { position: relative; align-self: stretch; display: flex; align-items: center; height: 100%; margin: 0; padding: 0; }
 .topbar__user-menu[open] { margin: 0; padding: 0; }
 .topbar__user-menu > summary {
