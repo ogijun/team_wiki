@@ -1,7 +1,8 @@
 <%# fetch のブロック形式で遅延評価（位置引数のデフォルトは liked: を渡しても評価されてしまい N+1 になる） %>
 <% liked = local_assigns.fetch(:liked) { reactable.liked_by?(Current.user) } %>
 <div id="<%= dom_id(reactable, :like) %>" class="like-toggle">
-  <%= button_to like_path, params: { reactable_type: reactable.class.name, reactable_id: reactable.id }, class: "btn-sm#{' secondary' unless liked}", aria: { label: "いいね" } do %>
+  <%# 塗り潰しは使わない（2026-07-18 ユーザ判断: フィード内で ♡ が主役化していた）。ゴースト＋Like済みは文字色のみ。 %>
+  <%= button_to like_path, params: { reactable_type: reactable.class.name, reactable_id: reactable.id }, class: "like-btn#{' like-btn--on' if liked}", aria: { label: "いいね" } do %>
     <%= icon("heart") %> <%= reactable.likes_count %>
   <% end %>
 </div>
