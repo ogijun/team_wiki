@@ -13,6 +13,7 @@ class Activity < ApplicationRecord
   belongs_to :user
   belongs_to :subject, polymorphic: true, optional: true
   has_many :likes, as: :reactable, dependent: :destroy
+  has_many :notifications, as: :subject, dependent: :destroy
 
   validates :action, presence: true, inclusion: { in: ACTIONS }
 

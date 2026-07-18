@@ -36,6 +36,16 @@ class LikesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_url
   end
 
+  test "creating a like notifies the reactable owner" do
+    owner = create(:user)
+    article = create(:article, created_by: owner)
+    assert_difference("Notification.count", 1) do
+      post like_url, params: { reactable_type: "Article", reactable_id: article.id }
+    end
+    assert_equal owner, Notification.last.recipient
+    assert_equal "like", Notification.last.kind
+  end
+
   test "concurrent duplicate like is idempotent instead of 500" do
     # 二重クリック競合で DB の一意制約に負けた経路を再現する。
     original_create = Like.method(:create!)

@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_secure_password validations: false
   has_many :sessions, dependent: :destroy
+  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
   has_one_attached :avatar
 
   AVATAR_CONTENT_TYPES = %w[image/png image/jpeg image/gif image/webp].freeze
@@ -38,6 +39,10 @@ class User < ApplicationRecord
       Like.where(reactable_type: "Transcription", reactable_id: Transcription.where(author: self).select(:id)).count +
       Like.where(reactable_type: "Publication", reactable_id: Publication.where(registered_by: self).select(:id)).count +
       Like.where(reactable_type: "Activity", reactable_id: Activity.where(user: self).select(:id)).count
+  end
+
+  def unread_notifications_count
+    notifications.where("created_at > ?", notifications_seen_at || created_at).count
   end
 
   # 活動日（JST）から { current_streak:, longest_streak:, active_days: } を算出する。

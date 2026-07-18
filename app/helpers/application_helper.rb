@@ -25,6 +25,10 @@ module ApplicationHelper
       reactable.class.model_name.human
     end
   end
+
+  def notification_subject_link(notification)
+    favorite_link_for(notification.subject)
+  end
   include Pagy::Frontend
 
   PRECISION_RANK = { "year" => 0, "month" => 1, "day" => 2, "time" => 3 }.freeze

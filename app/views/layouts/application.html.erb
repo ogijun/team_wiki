@@ -53,6 +53,12 @@
         </div>
       </div>
       <% if Current.user %>
+        <%= link_to notifications_path, class: "topbar__notifications", aria: { label: "通知" } do %>
+          <%= icon("bell") %>
+          <% if (count = Current.user.unread_notifications_count).positive? %>
+            <span class="badge"><%= count %></span>
+          <% end %>
+        <% end %>
         <details class="topbar__user-menu" data-controller="menu">
           <summary aria-label="ユーザーメニューを開く">
             <%= avatar_tag(Current.user, size: 32) %>

@@ -14,6 +14,7 @@ class Article < ApplicationRecord
   has_many :cited_materials, -> { distinct }, through: :citations, source: :material
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :likes, as: :reactable, dependent: :destroy
+  has_many :notifications, as: :subject, dependent: :destroy
   # 削除後もタイムラインは subject_label のスナップショットで表示する（参照だけ外す）。
   has_many :activities, as: :subject, dependent: :nullify
 

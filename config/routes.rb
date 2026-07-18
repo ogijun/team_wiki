@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   resource :session, only: %i[new destroy]
   resource :like, only: :create
+  resources :notifications, only: :index
   get "/auth/discord/callback", to: "sessions#create"
   get "/auth/failure", to: "sessions#failure"
   resources :articles do

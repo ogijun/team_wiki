@@ -4,6 +4,7 @@ class Comment < ApplicationRecord
   belongs_to :commentable, polymorphic: true, counter_cache: true
   belongs_to :author, class_name: "User"
   has_many :likes, as: :reactable, dependent: :destroy
+  has_many :notifications, as: :subject, dependent: :destroy
 
   validates :body, presence: true
 

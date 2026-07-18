@@ -65,6 +65,7 @@
 .timeline li .avatar { flex: 0 0 auto; margin-top: 2px; } /* 視覚補正で少し下げる */
 .timeline__body { flex: 1; min-width: 0; } /* テキストはアバターの右から始まり、折り返しても潜り込まない */
 .timeline__icon { color: var(--muted); margin-right: 0.35rem; }
+.timeline .notification--unread { padding: 0.35rem; margin-left: -0.35rem; margin-right: -0.35rem; border-radius: 6px; background: var(--accent-weak); }
 /* 「ほかN件」はアバター幅(32px)＋gap ぶん右に寄せて本文と揃える */
 .timeline__overflow { font-size: 0.85rem; padding-left: calc(32px + 0.45rem); }
 

@@ -111,12 +111,16 @@ class TranscriptionsControllerTest < ActionDispatch::IntegrationTest
     other = User.create!(email_address: "o@example.com", name: "O", provider: "discord", uid: "tc-other")
     t = part
     assert_difference -> { Activity.where(action: "transcription.assigned").count }, 1 do
-      patch assign_material_transcription_url(@media, t), params: { assignee_id: other.id }
+      assert_difference "Notification.count", 1 do
+        patch assign_material_transcription_url(@media, t), params: { assignee_id: other.id }
+      end
     end
     assert_redirected_to @media
     assert_equal other, t.reload.assignee
     # 活動は「担当にされた人」が actor（タイムラインに本人として出る）
     assert_equal other, Activity.where(action: "transcription.assigned").last.user
+    assert_equal other, Notification.last.recipient
+    assert_equal "assignment", Notification.last.kind
   end
 
   test "assign with blank assignee_id clears the assignee (and does not log)" do
