@@ -27,4 +27,12 @@ class NotificationTest < ActiveSupport::TestCase
     notification = Notification.new(recipient: create(:user), actor: create(:user), kind: "unknown", subject: create(:article))
     assert_not notification.valid?
   end
+
+  test "destroying a subject removes its notifications" do
+    recipient = create(:user)
+    comment = create(:comment)
+    Notification.create!(recipient: recipient, actor: comment.author, kind: "comment", subject: comment)
+
+    assert_difference("Notification.count", -1) { comment.destroy! }
+  end
 end

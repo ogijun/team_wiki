@@ -41,6 +41,10 @@ class User < ApplicationRecord
       Like.where(reactable_type: "Activity", reactable_id: Activity.where(user: self).select(:id)).count
   end
 
+  def unread_notifications_count
+    notifications.where("created_at > ?", notifications_seen_at || created_at).count
+  end
+
   # 活動日（JST）から { current_streak:, longest_streak:, active_days: } を算出する。
   # current_streak は「今日 or 昨日まで連続」している日数（今日まだ活動が無くても昨日までの連続は生存）。
   def activity_stats(today: Date.current)

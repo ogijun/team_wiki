@@ -1,0 +1,12 @@
+<h1>通知</h1>
+<ul class="timeline">
+  <% @notifications.each do |notification| %>
+    <li class="<%= "notification--unread" if notification.created_at > @seen_boundary %>">
+      <%= avatar_tag(notification.actor, size: 32) %>
+      <span class="timeline__body"><strong><%= link_to display_name(notification.actor), notification.actor %></strong>が <%= notification_subject_link(notification) %>に<%= notification_icon(notification) %><%= notification_phrase(notification) %> <span class="muted"><%= local_time_ago(notification.created_at) %></span></span>
+    </li>
+  <% end %>
+</ul>
+<% if @next_before %>
+  <p><%= link_to "もっと見る", notifications_path(before: @next_before), class: "button secondary" %></p>
+<% end %>
