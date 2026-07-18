@@ -8,6 +8,16 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     @material = Material.create!(user: @user, url: "https://example.com/c", title: "コメント資料")
   end
 
+  test "creating a comment notifies the commentable owner" do
+    owner = create(:user)
+    article = create(:article, created_by: owner)
+    assert_difference("Notification.count", 1) do
+      post article_comments_url(article), params: { comment: { body: "通知コメント" } }
+    end
+    assert_equal owner, Notification.last.recipient
+    assert_equal "comment", Notification.last.kind
+  end
+
   test "posts a comment on an article and records a comment.posted activity" do
     assert_difference [ "Comment.count", "Activity.where(action: 'comment.posted').count" ], 1 do
       post article_comments_url(@article), params: { comment: { body: "記事コメント" } }

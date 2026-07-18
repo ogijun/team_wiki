@@ -13,4 +13,15 @@ class Notification < ApplicationRecord
 
     create!(recipient: recipient, actor: actor, kind: kind, subject: subject)
   end
+
+  def self.owner_for(subject)
+    case subject
+    when Article then subject.created_by
+    when Material then subject.user
+    when Comment then subject.author
+    when Transcription then subject.author
+    when Publication then subject.registered_by
+    when Activity then subject.user
+    end
+  end
 end

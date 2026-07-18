@@ -6,11 +6,15 @@ class LikesController < ApplicationController
     if like
       like.destroy!
     else
+      created = false
       begin
         Like.create!(reactor: Current.user, reactable: @reactable)
+        created = true
       rescue ActiveRecord::RecordNotUnique
         # 二重クリック等の同時要求で両方が「未Like」を見た場合。既に付いているので冪等に成功扱い。
       end
+      Notification.emit(recipient: Notification.owner_for(@reactable), actor: Current.user,
+                        kind: "like", subject: @reactable) if created
     end
     # NOTE(A2): Like 作成時はここから所有者への通知を emit する（自分宛は抑制）。
     @reactable.reload
