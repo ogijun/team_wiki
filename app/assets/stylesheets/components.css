@@ -29,6 +29,22 @@
 /* Compact inline action button (delete / logout) — sits beside text links. */
 .btn-sm { padding: 0.18rem 0.6rem; font-size: 0.8rem; line-height: 1.4; }
 
+/* Pico classless は variants を提供しないため、Rails が出力するボタン要素にだけ副次操作の語彙を定義する。 */
+a[role="button"].secondary, a.button.secondary, button.secondary, input[type="submit"].secondary {
+  background: var(--accent-weak); border-color: var(--hairline); color: var(--ink-soft);
+}
+a[role="button"].secondary:hover, a.button.secondary:hover, button.secondary:hover, input[type="submit"].secondary:hover,
+a[role="button"].secondary:focus-visible, a.button.secondary:focus-visible, button.secondary:focus-visible, input[type="submit"].secondary:focus-visible {
+  background: var(--surface); border-color: var(--accent); color: var(--accent);
+}
+a[role="button"].outline, a.button.outline, button.outline, input[type="submit"].outline {
+  background: transparent; border: 1px solid currentColor; color: var(--ink-soft);
+}
+a[role="button"].outline:hover, a.button.outline:hover, button.outline:hover, input[type="submit"].outline:hover,
+a[role="button"].outline:focus-visible, a.button.outline:focus-visible, button.outline:focus-visible, input[type="submit"].outline:focus-visible {
+  background: var(--accent-weak); color: var(--accent);
+}
+
 /* 管理者専用操作を上部で強調するブロック */
 .admin-box { border: 1px solid var(--accent); border-left-width: 3px; background: var(--accent-weak); border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0 0 1.3rem; }
 .admin-box__label { display: inline-block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 0.35rem; }

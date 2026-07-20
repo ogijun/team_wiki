@@ -650,6 +650,13 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_material_transcription_path(link)
   end
 
+  test "material secondary actions retain the outline button vocabulary" do
+    material = Material.create!(user: @user, title: "副次操作の資料", url: "https://example.com/secondary")
+    get material_url(material)
+
+    assert_select "a[role=button].secondary.outline[href=?]", edit_material_path(material)
+  end
+
   test "transcription parts show assignment-state badge, assignee picker, and progress summary" do
     media = Material.new(user: @user, title: "担当UI音声")
     media.file.attach(io: StringIO.new("x"), filename: "ui.mp3", content_type: "audio/mpeg")
