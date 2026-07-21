@@ -1,12 +1,35 @@
 /*
- * base.css — ページの骨格と Pico classless の上書き。
+ * base.css — ページの骨格と、Picoから独立した基礎スタイル。
  * 方眼背景・中央パネル・サイドバー/トップバー（ドロワー）・フッタ・フォーム既定の補正。
  * アプリ固有の部品クラスは components.css へ。
  */
 
-/* Headings share the body sans font (per design). */
-body { font-family: var(--pico-font-family-sans-serif); color: var(--ink); }
-h1, h2, h3, h4, h5, h6 { font-family: var(--pico-font-family-sans-serif); letter-spacing: 0.01em; }
+/* Pico卒業後も必要な light 固定の基礎タイポグラフィ。 */
+:root { color-scheme: light; }
+body { font-family: var(--font-sans); font-size: var(--font-size); line-height: var(--line-height); color: var(--ink); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-sans); letter-spacing: 0.01em; line-height: 1.25; }
+h1 { font-size: 2rem; } h2 { font-size: 1.5rem; } h3 { font-size: 1.25rem; }
+a { color: var(--accent); }
+a:hover { color: var(--accent-dark); }
+code { padding: 0.1rem 0.3rem; border-radius: 4px; background: var(--code-bg); }
+blockquote { margin-inline: 0; padding-left: 1rem; border-left: 3px solid var(--hairline); color: var(--ink-soft); }
+:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Form controls: text/select/textarea/file/radio/checkbox and validation states. */
+:where(input:not([type="checkbox" i], [type="radio" i]), select, textarea) {
+  box-sizing: border-box; width: 100%; margin: 0 0 var(--space); padding: var(--control-padding-y) var(--control-padding-x);
+  border: 1px solid var(--hairline); border-radius: 6px; background: var(--surface); color: var(--ink); font: inherit;
+}
+:where(input, select, textarea)::placeholder { color: var(--muted); }
+:where(input, select, textarea):focus { border-color: var(--accent); outline: none; box-shadow: var(--focus-ring); }
+:where(input, select, textarea):user-invalid { border-color: var(--danger); }
+input[type="checkbox" i], input[type="radio" i] { accent-color: var(--accent); }
+input[type="file" i] { padding: 0.25rem; }
+label { display: block; font-weight: 600; }
+fieldset { margin: 0 0 var(--space); padding: var(--space); border: 1px solid var(--hairline); }
+table { width: 100%; border-collapse: collapse; margin: var(--space) 0; }
+th, td { padding: 0.5rem; border-bottom: 1px solid var(--hairline); text-align: left; }
+th { color: var(--ink-soft); }
 
 /* Outer ground: flat surface matching the sidebars/panel so everything reads as one seamless plane
    (no grid, no visible side margins around main). */
