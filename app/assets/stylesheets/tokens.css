@@ -24,21 +24,12 @@
   --sidebar-right-width: 20rem; /* 右サイドバー（用途未定の足場。十分広い画面でのみ表示） */
   --topbar-height: 3.25rem;
 
-  /* Map PicoCSS to our palette/typography */
-  --pico-font-family-sans-serif: "IBM Plex Sans JP", system-ui, sans-serif;
-  --pico-font-family: "IBM Plex Sans JP", system-ui, sans-serif;
-  --pico-font-size: 95%;
-  --pico-line-height: 1.75;
-  --pico-spacing: 0.9rem;
-  --pico-form-element-spacing-vertical: 0.45rem;
-  --pico-form-element-spacing-horizontal: 0.7rem;
-  --pico-color: var(--ink);
-  --pico-muted-color: var(--muted);
-  --pico-muted-border-color: var(--hairline);
-  --pico-primary: var(--accent);
-  --pico-primary-background: var(--accent);
-  --pico-primary-hover-background: var(--accent-dark);
-  --pico-primary-underline: rgba(47, 75, 124, 0.3);
-  --pico-card-background-color: var(--surface);
-  --pico-card-border-color: var(--hairline);
+  /* Foundation */
+  --font-sans: "IBM Plex Sans JP", system-ui, sans-serif;
+  --font-size: 95%;
+  --line-height: 1.75;
+  --space: 0.9rem;
+  --control-padding-y: 0.45rem;
+  --control-padding-x: 0.7rem;
+  --focus-ring: 0 0 0 0.2rem rgba(47, 75, 124, 0.24);
 }
