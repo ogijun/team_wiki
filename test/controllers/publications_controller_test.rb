@@ -69,6 +69,7 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
       assert_select "a,button", text: /削除/
     end
     assert_select ".actions a", text: "発売物を編集"
+    assert_select ".actions a[role=button].secondary.outline[href=?]", edit_publication_path(pub)
   end
 
   test "show hides the buy link when not purchasable" do

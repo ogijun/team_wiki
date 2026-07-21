@@ -198,5 +198,5 @@ body > header.topbar {
 button[type="submit"], input[type="submit"], select { width: auto; }
 
 /* button_to renders a <form>; keep it inline so action buttons sit beside links/text.
-   Button styling now uses Pico variants (.secondary / .outline). */
+   副次操作の .secondary / .outline は components.css で自前定義する。 */
 form.button_to { display: inline; }
