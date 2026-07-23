@@ -92,6 +92,17 @@ body > header.topbar {
 .topbar__notifications-menu .timeline li { font-size: 0.85rem; }
 .topbar__notifications-menu .timeline .avatar { width: 24px; height: 24px; }
 .topbar__notifications-heading { padding: 0.45rem 0.6rem; }
+/* ベルはアバターメニューの手前にあるため、狭い画面で絶対配置すると左へはみ出す。
+   画面幅では viewport 基準にして、左右の余白を常に確保する。 */
+@media (max-width: 480px) {
+  .topbar__notifications-menu {
+    position: fixed;
+    top: calc(var(--topbar-height) + 0.45rem);
+    right: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+  }
+}
 .topbar__user-menu { position: relative; align-self: stretch; display: flex; align-items: center; height: 100%; margin: 0; padding: 0; }
 .topbar__user-menu[open] { margin: 0; padding: 0; }
 .topbar__user-menu > summary {
