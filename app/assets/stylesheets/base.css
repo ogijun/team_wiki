@@ -95,7 +95,7 @@ body > header.topbar {
 /* ベルはアバターメニューの手前にあるため、狭い画面で絶対配置すると左へはみ出す。
    画面幅では viewport 基準にして、左右の余白を常に確保する。 */
 @media (max-width: 480px) {
-  .topbar__notifications-menu {
+  .topbar__menu.topbar__notifications-menu {
     position: fixed;
     top: calc(var(--topbar-height) + 0.45rem);
     right: 0.5rem;
