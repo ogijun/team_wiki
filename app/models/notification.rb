@@ -22,8 +22,7 @@ class Notification < ApplicationRecord
 
   # デプロイ後にコンソールから手動実行する、未読通知の既存重複整理。
   def self.dedupe_unread!
-    recipients = User.where.not(notifications_seen_at: nil).or(User.where.not(created_at: nil))
-    recipients.find_each do |recipient|
+    User.find_each do |recipient|
       threshold = recipient.notifications_seen_at || recipient.created_at
       where(recipient: recipient).where("created_at > ?", threshold)
         .group(:actor_id, :kind, :subject_type, :subject_id).having("COUNT(*) > 1")
