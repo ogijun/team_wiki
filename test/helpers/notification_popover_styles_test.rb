@@ -10,4 +10,10 @@ class NotificationPopoverStylesTest < ActiveSupport::TestCase
     assert_includes css, "left: 0.5rem;"
     assert_includes css, "right: 0.5rem;"
   end
+
+  test "notice popover does not clamp notification text" do
+    css = Rails.root.join("app/assets/stylesheets/base.css").read
+
+    refute_includes css, "-webkit-line-clamp"
+  end
 end

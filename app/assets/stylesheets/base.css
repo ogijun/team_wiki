@@ -91,13 +91,6 @@ body > header.topbar {
 .topbar__notifications-menu .timeline { margin: 0.35rem 0; }
 .topbar__notifications-menu .timeline li { font-size: 0.85rem; }
 .topbar__notifications-menu .timeline .avatar { width: 24px; height: 24px; }
-/* 資料タイトル等が長いと1件あたり数行に折り返され冗長になるため、2行で省略する */
-.topbar__notifications-menu .timeline__body {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 .topbar__notifications-heading { padding: 0.45rem 0.6rem; }
 /* ベルはアバターメニューの手前にあるため、狭い画面で絶対配置すると左へはみ出す。
    画面幅では viewport 基準にして、左右の余白を常に確保する。 */
