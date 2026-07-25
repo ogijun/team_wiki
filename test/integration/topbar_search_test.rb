@@ -6,18 +6,12 @@ class TopbarSearchTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
   end
 
-  test "topbar shows a search toggle that opens an overlay search form" do
+  test "topbar search uses the shared details menu pattern" do
     get root_url
     assert_response :success
-    # アイコンのトグル（押すとトップバーを覆うオーバーレイで検索窓が出る）
-    assert_select "[data-controller='search'] button[data-action~='search#open'][aria-label=?]", "検索を開く"
-    # オーバーレイ内に検索フォーム（/search へ GET、q パラメータ）。挙動は全画面共通。
-    assert_select "[data-controller='search'] form[role='search'][action=?]", search_path
-    assert_select "[data-controller='search'] form[role='search'] input[type='search'][name='q']"
-    # 閉じるボタン
-    assert_select "[data-controller='search'] button[aria-label=?]", "検索を閉じる"
-    # トグルは aria-controls でオーバーレイ(id)を指す（開示パターンの関連付け）
-    assert_select "button[data-search-target='toggle'][aria-controls='search-overlay']"
-    assert_select "#search-overlay[data-search-target='overlay']"
+    assert_select "details.topbar__search[data-controller=menu]"
+    assert_select ".topbar__search summary[aria-label=?]", "検索を開く"
+    assert_select ".topbar__search .topbar__menu form[role=search][action=?][method=get]", search_path
+    assert_select ".topbar__search input[type=search][name=q]"
   end
 end
