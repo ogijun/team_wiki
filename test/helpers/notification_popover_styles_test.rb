@@ -16,4 +16,10 @@ class NotificationPopoverStylesTest < ActiveSupport::TestCase
 
     refute_includes css, "-webkit-line-clamp"
   end
+
+  test "notice links remain inline inside notification text" do
+    css = Rails.root.join("app/assets/stylesheets/base.css").read
+
+    assert_includes css, ".topbar__notifications-menu .timeline__body a { display: inline; width: auto; }"
+  end
 end

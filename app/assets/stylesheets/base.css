@@ -91,6 +91,8 @@ body > header.topbar {
 .topbar__notifications-menu .timeline { margin: 0.35rem 0; }
 .topbar__notifications-menu .timeline li { font-size: 0.85rem; }
 .topbar__notifications-menu .timeline .avatar { width: 24px; height: 24px; }
+/* .topbar__menu のメニュー項目用 flex 指定を、通知文中のリンクには継承させない。 */
+.topbar__notifications-menu .timeline__body a { display: inline; width: auto; }
 .topbar__notifications-heading { padding: 0.45rem 0.6rem; }
 /* ベルはアバターメニューの手前にあるため、狭い画面で絶対配置すると左へはみ出す。
    画面幅では viewport 基準にして、左右の余白を常に確保する。 */
