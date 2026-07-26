@@ -4,6 +4,12 @@ require "rails/test_help"
 require "support/auth_test_helper"
 OmniAuth.config.test_mode = true
 
+# test-prof: 環境変数を付けたときだけ計測が走る（普段の実行には影響しない）。
+#   FPROF=1 bin/rails test              # factory 呼び出し回数
+#   EVENT_PROF=sql.active_record ...    # SQL に費やした時間の多いテスト
+#   TEST_PROF_REPORT=... など詳細は https://test-prof.evilmartians.io/
+require "test-prof" if ENV["FPROF"] || ENV["EVENT_PROF"] || ENV["TEST_PROF_REPORT"]
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers
