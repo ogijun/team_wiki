@@ -11,7 +11,7 @@ class Materials::PdfController < ApplicationController
   def show
     return head(:not_found) unless @material.pdf?
 
-    blob = @material.file.blob
+    blob = (@material.web_file.attached? ? @material.web_file : @material.file).blob
 
     # gzip 圧縮を抑止する。Thruster 等の gzip は Content-Length と Accept-Ranges を落とし、
     # Content-Encoding を identity 以外にするため、PDF.js が Range 取得を無効化して全体DLしてしまう。

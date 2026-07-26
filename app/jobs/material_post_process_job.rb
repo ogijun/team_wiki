@@ -12,6 +12,7 @@ class MaterialPostProcessJob < ApplicationJob
     if material.file.attached?
       extract_metadata(material)
       material.linearize_file!
+      material.generate_web_file!
     elsif material.url.present?
       autofill_link_metadata(material)
     end
