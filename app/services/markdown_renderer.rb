@@ -26,7 +26,18 @@ class MarkdownRenderer
     source = markdown.to_s
     source = source.encode(Encoding::UTF_8) unless source.encoding == Encoding::UTF_8
     # 1. GFM をレンダリング（既定で raw HTML はエスケープ = 安全）
-    html = Commonmarker.to_html(source, options: { extension: { table: true, strikethrough: true, autolink: true } })
+    #
+    # header_ids: nil で見出しの自動アンカーを無効化する。commonmarker 2.9.0 から
+    # 見出しに id と <a class="anchor"> が付き、その aria-label / data-heading-content に
+    # 見出しテキストが**そのまま**入るようになった。この段階では [[記事]] はまだ未置換なので、
+    # 後続の gsub が属性値の中の [[記事]] まで <a href="..."> に置換してしまい、
+    # 属性のクォートが閉じて HTML 構造が壊れる（例: `## [[ガンダム]]について`）。
+    # アンカーを使いたくなったら、gsub による後処理をやめて HTML パーサでテキストノードだけを
+    # 置換する形に作り直すこと。
+    html = Commonmarker.to_html(
+      source,
+      options: { extension: { table: true, strikethrough: true, autolink: true, header_ids: nil } }
+    )
 
     references = []
     numbers = {}
