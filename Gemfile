@@ -82,11 +82,24 @@ group :development, :test do
 
   # スレッド安全 cop（単一 Puma の複数スレッド運用向け・可変クラス状態の検出）
   gem "rubocop-thread_safety", require: false
+
+  # DB スキーマの健康診断（欠けた/使われないインデックス・NOT NULL 漏れ・孤児レコード）。
+  # 常駐せず rake タスクで走らせて終わる（rake タスク登録のため require は必要）。
+  gem "active_record_doctor"
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # ページ左上に表示時間と SQL を常時出す。体感の議論を数字にするため。
+  # （railtie でミドルウェアを差し込むので require: false にしない）
+  gem "rack-mini-profiler"
+end
+
+group :test do
+  # 遅いテストと factory 呼び出し回数の可視化（TEST_PROF_REPORT / FPROF=1 等で起動）。
+  gem "test-prof", require: false
 end
 
 group :test do
