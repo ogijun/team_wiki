@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -50,7 +50,7 @@ jobs:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -58,7 +58,7 @@ jobs:
           bundler-cache: true
 
       - name: Prepare RuboCop cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         env:
           DEPENDENCIES_HASH: ${{ hashFiles('.ruby-version', '**/.rubocop.yml', '**/.rubocop_todo.yml', 'Gemfile.lock') }}
         with:
@@ -83,7 +83,7 @@ jobs:
       # libvips/qpdf の .deb をキャッシュし、毎回のフルダウンロードを避ける（third-party action は使わない）。
       # apt は /var/cache/apt/archives に既存の .deb があれば再ダウンロードしないので、そこへ復元する。
       - name: Restore apt package cache (libvips, qpdf)
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/apt-debs
           key: apt-debs-${{ runner.os }}-libvips-qpdf-v1
@@ -102,7 +102,7 @@ jobs:
           cp /var/cache/apt/archives/*.deb "$HOME/apt-debs/" 2>/dev/null || true
 
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
