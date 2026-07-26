@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_26_080655) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -70,6 +70,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["created_by_id"], name: "index_articles_on_created_by_id"
+    t.index ["current_revision_id"], name: "index_articles_on_current_revision_id"
     t.index ["kind"], name: "index_articles_on_kind"
     t.index ["slug"], name: "index_articles_on_slug", unique: true
     t.index ["starts_at"], name: "index_articles_on_starts_at"
@@ -85,7 +86,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
     t.integer "material_id"
     t.datetime "updated_at", null: false
     t.index ["article_id", "material_handle"], name: "index_citations_on_article_id_and_material_handle", unique: true
-    t.index ["article_id"], name: "index_citations_on_article_id"
     t.index ["material_id"], name: "index_citations_on_material_id"
   end
 
@@ -109,7 +109,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
     t.datetime "updated_at", null: false
     t.index ["reactable_type", "reactable_id"], name: "index_likes_on_reactable"
     t.index ["reactor_id", "reactable_type", "reactable_id"], name: "index_likes_uniqueness", unique: true
-    t.index ["reactor_id"], name: "index_likes_on_reactor_id"
   end
 
   create_table "links", force: :cascade do |t|
@@ -119,7 +118,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
     t.string "target_title", null: false
     t.datetime "updated_at", null: false
     t.index ["source_article_id", "target_title"], name: "index_links_on_source_article_id_and_target_title", unique: true
-    t.index ["source_article_id"], name: "index_links_on_source_article_id"
     t.index ["target_article_id"], name: "index_links_on_target_article_id"
     t.index ["target_title"], name: "index_links_on_target_title"
   end
@@ -166,7 +164,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_notifications_on_actor_id"
     t.index ["recipient_id", "created_at"], name: "index_notifications_on_recipient_id_and_created_at"
-    t.index ["recipient_id"], name: "index_notifications_on_recipient_id"
     t.index ["subject_type", "subject_id"], name: "index_notifications_on_subject"
   end
 
@@ -235,7 +232,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_18_010000) do
     t.string "taggable_type", null: false
     t.datetime "updated_at", null: false
     t.index ["tag_id", "taggable_type", "taggable_id"], name: "index_taggings_uniqueness", unique: true
-    t.index ["tag_id"], name: "index_taggings_on_tag_id"
     t.index ["taggable_type", "taggable_id"], name: "index_taggings_on_taggable"
   end
 
