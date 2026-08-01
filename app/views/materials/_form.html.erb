@@ -38,19 +38,7 @@
     <%= f.text_field :source, placeholder: "例: 月刊サンプル誌 / 『サンプル作品』劇場パンフレット" %>
   </div>
 
-  <div class="field" data-controller="time-disclosure">
-    <%= f.label :published_year, "初出" %><%= optional_badge %>
-    <small class="field__hint">わかる粒度だけでOK（年だけ・年月だけでも可）。年表にも使われます。</small>
-    <span class="date-row">
-      <%= f.number_field :published_year, value: fuzzy_part(material.published, :year), placeholder: "年" %>
-      <%= f.number_field :published_month, in: 1..12, value: fuzzy_part(material.published, :month), placeholder: "月" %>
-      <%= f.number_field :published_day, in: 1..31, value: fuzzy_part(material.published, :day), placeholder: "日" %>
-      <button type="button" class="btn-inline-add" data-time-disclosure-target="toggle" data-action="time-disclosure#open" title="時刻を追加">＋時刻</button>
-      <span class="date-row__time" data-time-disclosure-target="times" hidden>
-        <%= f.number_field :published_hour, in: 0..23, value: fuzzy_part(material.published, :hour), placeholder: "時" %>:<%= f.number_field :published_minute, in: 0..59, value: fuzzy_part(material.published, :minute), placeholder: "分" %>
-      </span>
-    </span>
-  </div>
+  <%= render "shared/fuzzy_date_fields", f: f, accessor: :published, fuzzy: material.published, label: "初出", hint: "わかる粒度だけでOK（年だけ・年月だけでも可）。年表にも使われます。" %>
 
   <%# ── タグ（中段・可視） ── %>
   <div class="field">

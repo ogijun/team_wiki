@@ -85,6 +85,21 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".field-badge--opt"
   end
 
+  test "発売日 fields share the hidden time input and retain its value on edit" do
+    publication = create_publication(released_year: 1995, released_month: 3, released_day: 1,
+                                     released_hour: 14, released_minute: 30)
+
+    get new_publication_url
+    assert_response :success
+    assert_select "[data-time-disclosure-target='times'][hidden] input[name=?]", "publication[released_hour]"
+    assert_select "button[data-action=?]", "time-disclosure#open"
+
+    get edit_publication_url(publication)
+    assert_response :success
+    assert_select "[data-controller='time-disclosure'] input[name=?][value=?]", "publication[released_hour]", "14"
+    assert_select "[data-controller='time-disclosure'] input[name=?][value=?]", "publication[released_minute]", "30"
+  end
+
   test "update with invalid input re-renders the form and records no activity" do
     pub = create_publication
     assert_no_difference "Activity.count" do
