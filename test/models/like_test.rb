@@ -2,10 +2,10 @@ require "test_helper"
 
 class LikeTest < ActiveSupport::TestCase
   test "reactable types and concern includes stay in sync" do
-    reactable_models = [ Article, Material, Comment, Transcription, Publication, Activity ]
+    Rails.application.eager_load!
+    included = ApplicationRecord.descendants.select { |model| model.include?(Reactable) }.map(&:name)
 
-    assert_equal Like::REACTABLE_TYPES.sort, reactable_models.map(&:name).sort
-    reactable_models.each { |model| assert_includes model.included_modules, Reactable }
+    assert_equal Like::REACTABLE_TYPES.sort, included.sort
     assert_not_includes Tag.included_modules, Reactable
   end
 
