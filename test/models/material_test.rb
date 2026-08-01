@@ -293,6 +293,19 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal before, m.reload.file.blob.id
   end
 
+  test "generate_web_file! attaches a compressed PDF without replacing the original" do
+    m = Material.new(user: @user, title: "PDF")
+    m.file.attach(io: one_page_pdf, filename: "doc.pdf", content_type: "application/pdf")
+    m.save!
+    original_blob_id = m.file.blob.id
+
+    m.generate_web_file!
+
+    assert_predicate m.web_file, :attached?
+    assert_equal "application/pdf", m.web_file.content_type
+    assert_equal original_blob_id, m.file.blob.id
+  end
+
   test "bibliography_present? includes page_count" do
     assert_predicate Material.new(user: @user, url: "https://x.test/pc", page_count: 100), :bibliography_present?
   end

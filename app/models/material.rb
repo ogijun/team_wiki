@@ -4,6 +4,7 @@ class Material < ApplicationRecord
 
   belongs_to :user
   has_one_attached :file
+  has_one_attached :web_file
   # パート分割: 1資料に複数の文字起こしパート。position 昇順。
   has_many :transcriptions, -> { order(:position) }, dependent: :destroy
   has_many :citations, dependent: :nullify
@@ -167,6 +168,16 @@ class Material < ApplicationRecord
     updated
   end
 
+  def self.backfill_web_files!
+    updated = 0
+    with_attached_file.find_each do |material|
+      next unless material.pdf? && !material.web_file.attached?
+      material.generate_web_file!
+      updated += 1 if material.web_file.attached?
+    end
+    updated
+  end
+
   # PDF を linearize（Web表示用に最適化・可逆）して blob を最適化版へ差し替える。冪等。
   # has_one_attached の再 attach は旧 blob を purge_later で削除する（オーファンは出ない）。
   # 失敗（暗号化・破損・qpdf不在）は原本据え置き＋ログ。アップロードは既に成功しているので raise しない。
@@ -182,6 +193,23 @@ class Material < ApplicationRecord
     Rails.logger.warn("linearize_file! failed for Material##{id}: #{e.class}: #{e.message}")
   ensure
     File.unlink(out) if out && File.exist?(out)
+  end
+
+  def generate_web_file!
+    return unless pdf?
+
+    compressed = final = nil
+    file.open do |tmp|
+      compressed = PdfCompressor.compress(tmp.path)
+      return unless compressed
+      final = PdfLinearizer.linearize(compressed) || compressed
+    end
+    File.open(final) { |f| web_file.attach(io: f, filename: file.filename.to_s, content_type: "application/pdf") }
+  rescue StandardError => e
+    Rails.logger.warn("generate_web_file! failed for Material##{id}: #{e.class}: #{e.message}")
+  ensure
+    File.unlink(compressed) if compressed && File.exist?(compressed) && compressed != final
+    File.unlink(final) if final && File.exist?(final)
   end
 
   # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。

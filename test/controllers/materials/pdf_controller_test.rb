@@ -41,6 +41,15 @@ class Materials::PdfControllerTest < ActionDispatch::IntegrationTest
     assert_equal "10", response.headers["Content-Length"]
   end
 
+  test "uses web_file when it is available" do
+    @material.web_file.attach(io: StringIO.new("web pdf"), filename: "web.pdf", content_type: "application/pdf")
+
+    get pdf_material_url(@material)
+
+    assert_response :success
+    assert_equal "7", response.headers["Content-Length"]
+  end
+
   test "non-pdf material is not found" do
     img = Material.new(user: @user, title: "img")
     img.file.attach(io: StringIO.new("x"), filename: "a.png", content_type: "image/png")
