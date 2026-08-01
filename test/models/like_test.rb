@@ -1,6 +1,31 @@
 require "test_helper"
 
 class LikeTest < ActiveSupport::TestCase
+  test "reactable types and concern includes stay in sync" do
+    reactable_models = [ Article, Material, Comment, Transcription, Publication, Activity ]
+
+    assert_equal Like::REACTABLE_TYPES.sort, reactable_models.map(&:name).sort
+    reactable_models.each { |model| assert_includes model.included_modules, Reactable }
+    assert_not_includes Tag.included_modules, Reactable
+  end
+
+  test "reactable models retain like counter caches" do
+    user = create(:user)
+    reactables = [
+      create(:article),
+      create(:material),
+      create(:comment),
+      create(:transcription),
+      Publication.create!(title: "Like対象の本", kind: "book", registered_by: create(:user)),
+      Activity.record(actor: create(:user), action: "article.created", subject: create(:article))
+    ]
+
+    reactables.each do |reactable|
+      Like.create!(reactor: user, reactable: reactable)
+      assert_equal 1, reactable.reload.likes_count
+    end
+  end
+
   test "a user can like a reactable only once and the counter is maintained" do
     reactor = create(:user)
     article = create(:article)

@@ -1,5 +1,6 @@
 class Article < ApplicationRecord
   include FuzzyDateAttributable
+  include Reactable
   include Taggable
 
   KINDS = { "work" => "作品", "person" => "人物", "event" => "出来事" }.freeze
@@ -13,8 +14,6 @@ class Article < ApplicationRecord
   has_many :citations, dependent: :destroy
   has_many :cited_materials, -> { distinct }, through: :citations, source: :material
   has_many :comments, as: :commentable, dependent: :destroy
-  has_many :likes, as: :reactable, dependent: :destroy
-  has_many :notifications, as: :subject, dependent: :destroy
   # 削除後もタイムラインは subject_label のスナップショットで表示する（参照だけ外す）。
   has_many :activities, as: :subject, dependent: :nullify
 
@@ -46,7 +45,6 @@ class Article < ApplicationRecord
   # メンバーなら可（wiki 的）。将来 author/admin 等に絞るならここを変える＝唯一の窓口。
   def editable_by?(user) = user.present?
   def deletable_by?(user) = user.present?
-  def liked_by?(user) = user.present? && likes.exists?(reactor: user)
 
   # リビジョンの author を初参加順（最初に貢献した順）で重複除去して返す。
   def contributors
