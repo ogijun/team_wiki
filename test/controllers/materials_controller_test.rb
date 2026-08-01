@@ -679,12 +679,12 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
 
     get material_url(media)
     assert_response :success
-    # 状態バッジ（未担当/担当中）
+    # 状態バッジ（担当者募集中/担当中）
     assert_select ".transcript-part", text: /担当中/
-    assert_select ".transcript-part", text: /未担当/
-    # 進捗要約（担当中/未担当のカウント）
+    assert_select ".transcript-part", text: /担当者募集中/
+    # 進捗要約（担当中/担当者募集中のカウント）
     assert_select ".transcription-summary", text: /担当中/
-    assert_select ".transcription-summary", text: /未担当/
+    assert_select ".transcription-summary", text: /担当者募集中/
     # 担当ピッカー: メンバーへ assign する member ルートの button_to が出る
     assert_select "form[action=?]", assign_material_transcription_path(media, media.transcriptions.first)
   end

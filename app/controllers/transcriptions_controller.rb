@@ -49,7 +49,10 @@ class TranscriptionsController < ApplicationController
     return head :forbidden unless @transcription.assignable_by?(Current.user)
     assignee = params[:assignee_id].present? ? User.find(params[:assignee_id]) : nil
     @transcription.update_column(:assignee_id, assignee&.id)
-    Notification.emit(recipient: assignee, actor: Current.user, kind: "assignment", subject: @transcription) if assignee
+    if assignee
+      recipient = assignee == Current.user ? @material.user : assignee
+      Notification.emit(recipient: recipient, actor: Current.user, kind: "assignment", subject: @transcription)
+    end
     # 活動は「担当にされた人」を主語(actor)にする（タイムラインは「xxx が zzz の担当になりました」と出る）。
     # 解除(assignee=nil)は記録しない（弱いサインの取り下げまでは追わない）。
     Activity.record(actor: assignee, action: "transcription.assigned", subject: @material) if assignee

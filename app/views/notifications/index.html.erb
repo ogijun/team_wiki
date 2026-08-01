@@ -3,7 +3,7 @@
   <% @notifications.each do |notification| %>
     <li class="<%= "notification--unread" if notification.created_at > @seen_boundary %>">
       <%= avatar_tag(notification.actor, size: 32) %>
-      <span class="timeline__body"><strong><%= link_to display_name(notification.actor), notification.actor %></strong>が <%= notification_subject_link(notification) %>に<%= notification_icon(notification) %><%= notification_phrase(notification) %> <span class="muted"><%= local_time_ago(notification.created_at) %></span></span>
+      <span class="timeline__body"><%= notification_message(notification) %> <span class="muted"><%= local_time_ago(notification.created_at) %></span></span>
     </li>
   <% end %>
 </ul>

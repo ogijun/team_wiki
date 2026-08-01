@@ -114,7 +114,7 @@
 
   <% if parts.any? %>
     <div class="muted transcription-summary">
-      <%= c[:total] %> パート中 ・ 完了 <strong><%= c[:done] %></strong> ・ 担当中 <strong><%= c[:in_progress] %></strong> ・ 未担当 <strong><%= c[:unassigned] %></strong>
+      <%= c[:total] %> パート中 ・ 完了 <strong><%= c[:done] %></strong> ・ 担当中 <strong><%= c[:in_progress] %></strong> ・ 担当者募集中 <strong><%= c[:unassigned] %></strong>
     </div>
     <% parts.each do |t| %>
       <%= render "materials/transcription_part", material: @material, t: t, members: @members, numbered: parts.size > 1 %>

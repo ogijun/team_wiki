@@ -29,7 +29,7 @@ class Transcription < ApplicationRecord
   def status_label = STATUSES[status]
 
   # 表示状態は (assignee, status) から導出する（新カラムは持たない）。
-  ASSIGNMENT_STATE_LABELS = { done: "完了", in_progress: "担当中", unassigned: "未担当" }.freeze
+  ASSIGNMENT_STATE_LABELS = { done: "完了", in_progress: "担当中", unassigned: "担当者募集中" }.freeze
 
   def assignment_state
     return :done if status == "done"

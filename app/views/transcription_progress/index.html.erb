@@ -1,6 +1,10 @@
 <% content_for :title, "文字起こし進捗" %>
 <div class="page-header"><h1>文字起こし進捗</h1></div>
 <div class="page-lead">資料の文字起こしの進み具合。未着手のものから気軽に拾っていけます。</div>
+<div class="filters">
+  表示: <%= link_to "すべて", transcriptions_path %> |
+  <%= link_to "担当者募集中", transcriptions_path(recruiting: 1) %>
+</div>
 
 <% if @groups.empty? %>
   <div class="empty-state">
