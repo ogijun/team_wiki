@@ -104,6 +104,19 @@ class MarkdownRendererTest < ActiveSupport::TestCase
     assert_equal %w[class href], anchor.attribute_nodes.map(&:name).sort # href と class のみ・注入なし
   end
 
+  # commonmarker 2.9.0 の見出し自動アンカー（id + <a class="anchor">）を有効にすると、
+  # aria-label / data-heading-content に見出しテキストが未置換のまま入り、後続の gsub が
+  # その属性値の中の [[記事]] まで置換して HTML 構造を壊す。header_ids: nil で無効化してある。
+  test "a wikilink inside a heading does not break the heading markup" do
+    html = render("## [[ガンダム]]について")
+    heading = Nokogiri::HTML.fragment(html).at_css("h2")
+
+    assert heading, "見出しが描画される"
+    assert_empty heading.attribute_nodes, "見出しに id やアンカー属性は付かない"
+    assert_equal 1, heading.css("a").size, "リンクは wikilink の1本だけ"
+    assert_equal "ガンダム", heading.at_css("a").text
+  end
+
   test "renders nil and non-UTF-8 input without raising" do
     # nil.to_s は US-ASCII。Commonmarker は UTF-8 必須なので境界で変換される。
     assert_equal "", render(nil).strip
