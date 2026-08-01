@@ -17,7 +17,8 @@ module PdfCompressor
 
     File.unlink(out_path) if File.exist?(out_path)
     nil
-  rescue StandardError
+  rescue StandardError => error
+    Rails.logger.warn("PdfCompressor.compress failed: #{error.class}: #{error.message}")
     nil
   end
 end
