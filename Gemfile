@@ -102,12 +102,6 @@ group :test do
   gem "test-prof", require: false
 end
 
-group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "capybara"
-  gem "selenium-webdriver"
-end
-
 gem "litestream", "~> 0.14.0"
 
 gem "pdf-reader", "~> 2.15"

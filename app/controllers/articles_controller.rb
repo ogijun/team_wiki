@@ -24,11 +24,15 @@ class ArticlesController < ApplicationController
       @article.errors.add(:body, "を入力してください")
       return render(:new, status: :unprocessable_entity)
     end
-    @article.revise!(body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary])
+    @article = Article.create_with_revision!(
+      article_attributes.merge(created_by: Current.user),
+      body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary]
+    )
     Activity.record(actor: Current.user, action: "article.created", subject: @article)
     add_first_comment(@article, params[:first_comment])
     redirect_to @article, notice: "記事を作成しました。"
-  rescue ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid => error
+    @article = error.record if error.record.is_a?(Article)
     render :new, status: :unprocessable_entity
   end
 

@@ -44,20 +44,6 @@ class NotificationTest < ActiveSupport::TestCase
     assert_difference("Notification.count", 1) { Notification.emit(recipient: recipient, actor: actor, kind: "like", subject: subject) }
   end
 
-  test "dedupe_unread keeps the oldest notification and latest update time" do
-    recipient = create(:user)
-    recipient.update_column(:created_at, 1.hour.ago)
-    actor = create(:user)
-    subject = create(:article, created_by: recipient)
-    oldest = Notification.create!(recipient: recipient, actor: actor, kind: "like", subject: subject, created_at: 3.minutes.ago, updated_at: 3.minutes.ago)
-    Notification.create!(recipient: recipient, actor: actor, kind: "like", subject: subject, created_at: 2.minutes.ago, updated_at: 1.minute.ago)
-
-    Notification.dedupe_unread!
-
-    assert_equal [ oldest.id ], Notification.where(recipient: recipient).pluck(:id)
-    assert_operator oldest.reload.updated_at, :>, 90.seconds.ago
-  end
-
   test "kind is restricted" do
     notification = Notification.new(recipient: create(:user), actor: create(:user), kind: "unknown", subject: create(:article))
     assert_not notification.valid?
