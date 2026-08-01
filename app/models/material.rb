@@ -1,5 +1,6 @@
 class Material < ApplicationRecord
   include FuzzyDateAttributable
+  include Reactable
   include Taggable
 
   belongs_to :user
@@ -10,8 +11,6 @@ class Material < ApplicationRecord
   has_many :citations, dependent: :nullify
   has_many :citing_articles, -> { distinct }, through: :citations, source: :article
   has_many :comments, as: :commentable, dependent: :destroy
-  has_many :likes, as: :reactable, dependent: :destroy
-  has_many :notifications, as: :subject, dependent: :destroy
   has_many :activities, as: :subject, dependent: :nullify
 
   ALLOWED_CONTENT_TYPES = %w[
@@ -78,7 +77,6 @@ class Material < ApplicationRecord
   def file? = file.attached?
   def link? = url.present?
   def pdf? = file.attached? && file.content_type == "application/pdf"
-  def liked_by?(user) = user.present? && likes.exists?(reactor: user)
 
   def thumbnailable_file?
     file.attached? && THUMBNAIL_TYPES.include?(file.content_type)

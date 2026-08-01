@@ -1,4 +1,6 @@
 class Activity < ApplicationRecord
+  include Reactable
+
   ACTIONS = %w[
     article.created article.edited article.deleted
     material.added material.deleted
@@ -12,12 +14,9 @@ class Activity < ApplicationRecord
 
   belongs_to :user
   belongs_to :subject, polymorphic: true, optional: true
-  has_many :likes, as: :reactable, dependent: :destroy
-  has_many :notifications, as: :subject, dependent: :destroy
 
   validates :action, presence: true, inclusion: { in: ACTIONS }
 
-  def liked_by?(user) = user.present? && likes.exists?(reactor: user)
 
   # 作成系は成果物と同じ Like を共有し、編集等の行いは Activity 自身を対象にする。
   def like_target = (CREATION_ACTIONS.include?(action) && subject) ? subject : self
