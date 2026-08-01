@@ -636,6 +636,18 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[data-action=?]", "time-disclosure#open"
   end
 
+  test "the 初出 fields retain entered values for time-disclosure to reveal on edit" do
+    material = Material.create!(user: @user, title: "時刻あり", url: "https://x.test/dated",
+                                published_year: 1982, published_month: 3, published_day: 1,
+                                published_hour: 14, published_minute: 30)
+
+    get edit_material_url(material)
+
+    assert_response :success
+    assert_select "[data-controller='time-disclosure'] input[name=?][value=?]", "material[published_hour]", "14"
+    assert_select "[data-controller='time-disclosure'] input[name=?][value=?]", "material[published_minute]", "30"
+  end
+
   test "media material shows a transcription section" do
     m = Material.new(user: @user, title: "音声")
     m.file.attach(io: StringIO.new("x"), filename: "a.mp3", content_type: "audio/mpeg")
