@@ -18,17 +18,21 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    @article = Article.new(created_by: Current.user)
-    @article.assign_attributes(article_attributes)
+    attributes = article_attributes
     if article_params[:body].blank?
+      @article = Article.new(attributes.merge(created_by: Current.user))
       @article.errors.add(:body, "を入力してください")
       return render(:new, status: :unprocessable_entity)
     end
-    @article.revise!(body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary])
+    @article = Article.create_with_revision!(
+      attributes.merge(created_by: Current.user),
+      body: article_params[:body], author: Current.user, edit_summary: article_params[:edit_summary]
+    )
     Activity.record(actor: Current.user, action: "article.created", subject: @article)
     add_first_comment(@article, params[:first_comment])
     redirect_to @article, notice: "記事を作成しました。"
-  rescue ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid => error
+    @article = error.record if error.record.is_a?(Article)
     render :new, status: :unprocessable_entity
   end
 
@@ -40,7 +44,7 @@ class ArticlesController < ApplicationController
   def update
     # 楽観ロック: 編集画面を開いた時点の版をフォームから受け取り、save 時に比較する。
     @article.lock_version = article_params[:lock_version] if article_params[:lock_version].present?
-    @article.assign_attributes(article_attributes)
+    @article.assign_attributes(article_attributes(current_status: @article.status))
     if article_params[:body].blank?
       @article.errors.add(:body, "を入力してください")
       return rerender_edit
@@ -67,12 +71,12 @@ class ArticlesController < ApplicationController
   private
 
   # Article 実体の属性のみ（body/edit_summary は revise! へ渡す Revision 側）。
-  def article_attributes
+  def article_attributes(current_status: nil)
     {
       title: article_params[:title],
       tag_names: article_params[:tag_names],
       kind: article_params[:kind].presence,
-      status: article_params[:status].presence || @article.status || "stub",
+      status: article_params[:status].presence || current_status || "stub",
       start_year: article_params[:start_year], start_month: article_params[:start_month],
       start_day: article_params[:start_day], start_hour: article_params[:start_hour],
       start_minute: article_params[:start_minute],
