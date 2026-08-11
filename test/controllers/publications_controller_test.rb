@@ -91,13 +91,13 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
 
     get new_publication_url
     assert_response :success
-    assert_select "[data-time-disclosure-target='times'][hidden] input[name=?]", "publication[released_hour]"
-    assert_select "button[data-action=?]", "time-disclosure#open"
+    assert_select "[data-disclosure-target='rest'][hidden] input[name=?]", "publication[released_hour]"
+    assert_select "button[data-action=?]", "disclosure#toggle"
 
     get edit_publication_url(publication)
     assert_response :success
-    assert_select "[data-controller='time-disclosure'] input[name=?][value=?]", "publication[released_hour]", "14"
-    assert_select "[data-controller='time-disclosure'] input[name=?][value=?]", "publication[released_minute]", "30"
+    assert_select "[data-controller='disclosure'][data-disclosure-auto-reveal-if-set-value='true'] input[name=?][value=?]", "publication[released_hour]", "14"
+    assert_select "[data-controller='disclosure'][data-disclosure-auto-reveal-if-set-value='true'] input[name=?][value=?]", "publication[released_minute]", "30"
   end
 
   test "update with invalid input re-renders the form and records no activity" do
