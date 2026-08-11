@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // 操作: 前後ボタン／番号入力ジャンプ／←→キー（綴じ方向追従）／拡大縮小・等倍・フィット／
 //       拡大時はドラッグでパン・Ctrl+ホイールでズーム・ダブルクリックでフィット⇄等倍。リサイズで再フィット。
 export default class extends Controller {
-  static targets = ["dialog", "canvas", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir"]
+  static targets = ["dialog", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir"]
   static values = { url: String }
 
   MIN_SCALE = 0.15
@@ -21,6 +21,14 @@ export default class extends Controller {
     this.userResized = false // 隅のハンドルで手動リサイズしたか（以後 window リサイズで自動フィットしない）。
     this._lastStageSize = { w: 0, h: 0 } // sizeStage 由来の変更を ResizeObserver で無視するための記録。
     this.offset = { x: 0, y: 0 } // ツールバーをつかんで動かした移動量。
+    // pageNum ごとに canvas と描画タスクを持つ。canvas は常に現在ページ±1だけ保持し、
+    // ページ送りでは描画済み canvas を切り替えるだけにする。
+    this.canvasCache = new Map()
+    this.cacheGeneration = 0
+    this.renderToken = 0
+    // Turbo の復元では前回の canvas が生きた DOM のまま残る。ここで空にして、
+    // この接続のキャッシュだけがステージを所有するようにする。
+    this.stageTarget.replaceChildren()
     this.applyDirection()
     this.onResize = () => this.handleResize()
     window.addEventListener("resize", this.onResize)
@@ -32,7 +40,7 @@ export default class extends Controller {
   disconnect() {
     window.removeEventListener("resize", this.onResize)
     this.stageResizeObserver?.disconnect()
-    this.renderTask?.cancel()
+    this.clearCanvasCache()
     this.doc?.destroy()
     this.doc = null
   }
@@ -214,7 +222,7 @@ export default class extends Controller {
     this.syncViewerWidth()
     if (this.fitted) {
       this.scale = this.fitScaleToStage()
-      this.render()
+      this.render({ invalidateCache: true })
     } else {
       this.stageTarget.classList.toggle("is-pannable", this.scrollable())
     }
@@ -261,48 +269,130 @@ export default class extends Controller {
     this._lastStageSize = { w: this.stageTarget.clientWidth, h: this.stageTarget.clientHeight }
   }
 
-  async render() {
+  // 現在ページを表示し、描画済みなら canvas の表示切替だけで完了する。倍率変更時は
+  // 世代を切り替えて全キャッシュを無効化し、現在ページを描いてから隣接を追う。
+  async render({ invalidateCache = false } = {}) {
     if (!this.doc) return
-    const token = (this.token = (this.token || 0) + 1)
-    this.renderTask?.cancel()
+    const token = ++this.renderToken
+    if (invalidateCache) this.clearCanvasCache()
+    const generation = this.cacheGeneration
+    this.evictDistantCanvases()
 
-    const page = await this.doc.getPage(this.pageNum)
-    if (token !== this.token) return // 後続の操作に追い越されたら破棄
+    try {
+      const entry = await this.renderPage(this.pageNum, generation)
+      if (!entry || token !== this.renderToken || generation !== this.cacheGeneration) return
+      this.showCanvas(entry)
+      this.prefetchAdjacentPages(generation)
+    } catch (e) {
+      if (e?.name === "RenderingCancelledException") return
+      this.statusTarget.textContent = "ページを描画できませんでした"
+    }
+  }
 
-    this.baseViewport = page.getViewport({ scale: 1 })
-    const firstFit = this.scale == null
-    if (firstFit) { this.scale = this.fitScaleFor(this.baseViewport); this.fitted = true }
+  // pageNum 単位で PDF.js の RenderTask を管理する。範囲外へ出たページだけをキャンセルできるため、
+  // 3 枚の並行描画でも現在ページのタスクを取り違えない。
+  renderPage(pageNum, generation) {
+    const cached = this.canvasCache.get(pageNum)
+    if (cached?.generation === generation) return cached.promise
+
+    const canvas = document.createElement("canvas")
+    canvas.hidden = true
+    this.stageTarget.append(canvas)
+    const entry = { pageNum, generation, canvas, ready: false, task: null }
+    entry.promise = this.drawPage(entry)
+    this.canvasCache.set(pageNum, entry)
+    return entry.promise
+  }
+
+  async drawPage(entry) {
+    const page = await this.doc.getPage(entry.pageNum)
+    if (!this.isCurrentCacheEntry(entry)) return null
+
+    entry.baseViewport = page.getViewport({ scale: 1 })
+    if (this.scale == null) {
+      this.baseViewport = entry.baseViewport
+      this.scale = this.fitScaleFor(this.baseViewport)
+      this.fitted = true
+      this.sizeStage()
+    }
     this.scale = Math.min(Math.max(this.scale, this.MIN_SCALE), this.MAX_SCALE)
-    if (firstFit) this.sizeStage() // 初回にステージ枠（=フィット時のページ寸法）を確定して固定する
 
-    // 表示サイズは this.scale 基準でアスペクト比を厳密に維持（画面の縦横比に依存しない）。
+    // 各ページ自身の viewport で描く。ページごとに寸法が違う PDF でもキャッシュを共有しない。
     const display = page.getViewport({ scale: this.scale })
-    // 描画ビットマップは devicePixelRatio で鮮明にしつつ、最大辺を MAX_BITMAP に制限する。
     const dpr = window.devicePixelRatio || 1
     let renderScale = this.scale * dpr
     const maxDim = Math.max(display.width, display.height) * dpr
     if (maxDim > this.MAX_BITMAP) renderScale *= this.MAX_BITMAP / maxDim
     const bitmap = page.getViewport({ scale: renderScale })
+    const canvas = entry.canvas
+    canvas.width = bitmap.width
+    canvas.height = bitmap.height
+    canvas.style.width = `${display.width}px`
+    canvas.style.height = `${display.height}px`
 
-    const c = this.canvasTarget
-    c.width = bitmap.width
-    c.height = bitmap.height
-    c.style.width = `${display.width}px`
-    c.style.height = `${display.height}px`
-
-    this.renderTask = page.render({ canvasContext: c.getContext("2d"), viewport: bitmap })
+    entry.task = page.render({ canvasContext: canvas.getContext("2d"), viewport: bitmap })
     try {
-      await this.renderTask.promise
+      await entry.task.promise
     } catch (e) {
-      if (e?.name === "RenderingCancelledException") return
+      if (e?.name === "RenderingCancelledException") return null
       throw e
+    } finally {
+      entry.task = null
     }
-    if (token !== this.token) return
-    this.pageInputTarget.value = this.pageNum
+    if (!this.isCurrentCacheEntry(entry)) return null
+    entry.ready = true
+    return entry
+  }
+
+  isCurrentCacheEntry(entry) {
+    return this.cacheGeneration === entry.generation && this.canvasCache.get(entry.pageNum) === entry
+  }
+
+  showCanvas(entry) {
+    const changedPage = this.displayedPageNum !== entry.pageNum
+    for (const cached of this.canvasCache.values()) cached.canvas.hidden = cached !== entry
+    this.displayedPageNum = entry.pageNum
+    this.baseViewport = entry.baseViewport
+    // ページ寸法が混在する PDF では、めくった先のページにステージを追従させる。
+    // 手動リサイズ後はユーザーが決めた枠寸法を尊重する。未リサイズ時だけ、
+    // フィット表示またはページサイズ混在時に現在ページへステージを追従させる。
+    if (!this.userResized && (this.fitted || changedPage)) this.sizeStage()
+    this.statusTarget.textContent = ""
+    this.pageInputTarget.value = entry.pageNum
     this.pageInputTarget.max = this.doc.numPages
     this.pageTotalTarget.textContent = this.doc.numPages
     this.pctTarget.textContent = `${Math.round(this.scale * 100)}%`
     this.stageTarget.classList.toggle("is-pannable", this.scrollable())
+  }
+
+  prefetchAdjacentPages(generation) {
+    this.evictDistantCanvases()
+    // 読み進み方向を先に開始する（右開きは番号の小さい側が「次」）。
+    const advance = this.rtl ? this.pageNum - 1 : this.pageNum + 1
+    const back = this.rtl ? this.pageNum + 1 : this.pageNum - 1
+    for (const pageNum of [advance, back]) {
+      if (pageNum < 1 || pageNum > this.doc.numPages) continue
+      this.renderPage(pageNum, generation).catch(() => {}) // 先読み失敗は現在表示を妨げない
+    }
+  }
+
+  evictDistantCanvases() {
+    for (const [pageNum, entry] of this.canvasCache) {
+      if (Math.abs(pageNum - this.pageNum) <= 1) continue
+      entry.task?.cancel()
+      entry.canvas.remove()
+      this.canvasCache.delete(pageNum)
+    }
+  }
+
+  clearCanvasCache() {
+    this.cacheGeneration = (this.cacheGeneration || 0) + 1
+    for (const entry of this.canvasCache?.values() || []) {
+      entry.task?.cancel()
+      entry.canvas.remove()
+    }
+    this.canvasCache?.clear()
+    this.displayedPageNum = null
   }
 
   // 番号入力からそのページへジャンプ（範囲外はクランプ）。
@@ -324,9 +414,9 @@ export default class extends Controller {
     if (this.doc && this.pageNum < this.doc.numPages) { this.pageNum++; this.render() }
   }
 
-  zoomIn() { this.scale = (this.scale ?? 1) * 1.25; this.fitted = false; this.render() }
-  zoomOut() { this.scale = (this.scale ?? 1) / 1.25; this.fitted = false; this.render() }
-  actualSize() { this.scale = 1; this.fitted = false; this.render() } // 等倍 (1pt = 1px)
+  zoomIn() { this.scale = (this.scale ?? 1) * 1.25; this.fitted = false; this.render({ invalidateCache: true }) }
+  zoomOut() { this.scale = (this.scale ?? 1) / 1.25; this.fitted = false; this.render({ invalidateCache: true }) }
+  actualSize() { this.scale = 1; this.fitted = false; this.render({ invalidateCache: true }) } // 等倍 (1pt = 1px)
 
   // フィット = 画面に合わせて再フィット。手動リサイズ/移動の解除（リセット）も兼ねる。
   fit() {
@@ -335,7 +425,7 @@ export default class extends Controller {
     this.scale = this.fitScaleFor(this.baseViewport)
     this.fitted = true
     this.sizeStage()
-    this.render()
+    this.render({ invalidateCache: true })
   }
 
   // ダブルクリック: ほぼフィットなら等倍へ、それ以外はフィットへ。
@@ -343,7 +433,7 @@ export default class extends Controller {
     if (!this.baseViewport) return
     const fs = this.fitScaleFor(this.baseViewport)
     if (Math.abs(this.scale - fs) < 0.01) { this.scale = 1; this.fitted = false } else { this.scale = fs; this.fitted = true }
-    this.render()
+    this.render({ invalidateCache: true })
   }
 
   // ウィンドウのリサイズ/回転時、フィット表示中ならフィット倍率を取り直して追従する。
@@ -352,6 +442,6 @@ export default class extends Controller {
     if (this.userResized) return // 手動リサイズ後は window リサイズで勝手に変えない
     this.scale = this.fitScaleFor(this.baseViewport)
     this.sizeStage()
-    this.render()
+    this.render({ invalidateCache: true })
   }
 }
