@@ -75,9 +75,8 @@
               </span>
               <button type="button" class="pdf-viewer__btn pdf-viewer__close" data-action="pdf#close" title="閉じる" aria-label="閉じる"><%= icon("x") %></button>
             </div>
-            <div class="pdf-viewer__stage" data-pdf-target="stage">
-              <canvas data-pdf-target="canvas"></canvas>
-            </div>
+            <%# canvas は pdf_controller のページ別キャッシュが必要なときに生成する。 %>
+            <div class="pdf-viewer__stage" data-pdf-target="stage"></div>
             <div class="pdf-viewer__status muted" data-pdf-target="status"></div>
             <%# リサイズグリップはグレーのダイアログ右下角に置く（ドラッグでステージを変え、ダイアログが追従）。 %>
             <span class="pdf-viewer__resizer" aria-hidden="true" title="ドラッグでビューアの大きさを変える"></span>

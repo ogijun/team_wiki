@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // 操作: 前後ボタン／番号入力ジャンプ／←→キー（綴じ方向追従）／拡大縮小・等倍・フィット／
 //       拡大時はドラッグでパン・Ctrl+ホイールでズーム・ダブルクリックでフィット⇄等倍。リサイズで再フィット。
 export default class extends Controller {
-  static targets = ["dialog", "canvas", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir"]
+  static targets = ["dialog", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir"]
   static values = { url: String }
 
   MIN_SCALE = 0.15
@@ -26,7 +26,9 @@ export default class extends Controller {
     this.canvasCache = new Map()
     this.cacheGeneration = 0
     this.renderToken = 0
-    this.canvasTarget.remove() // 最初の空 canvas はキャッシュで置き換える
+    // Turbo の復元では前回の canvas が生きた DOM のまま残る。ここで空にして、
+    // この接続のキャッシュだけがステージを所有するようにする。
+    this.stageTarget.replaceChildren()
     this.applyDirection()
     this.onResize = () => this.handleResize()
     window.addEventListener("resize", this.onResize)
@@ -352,7 +354,9 @@ export default class extends Controller {
     this.displayedPageNum = entry.pageNum
     this.baseViewport = entry.baseViewport
     // ページ寸法が混在する PDF では、めくった先のページにステージを追従させる。
-    if (this.fitted || changedPage) this.sizeStage()
+    // 手動リサイズ後はユーザーが決めた枠寸法を尊重する。未リサイズ時だけ、
+    // フィット表示またはページサイズ混在時に現在ページへステージを追従させる。
+    if (!this.userResized && (this.fitted || changedPage)) this.sizeStage()
     this.statusTarget.textContent = ""
     this.pageInputTarget.value = entry.pageNum
     this.pageInputTarget.max = this.doc.numPages
