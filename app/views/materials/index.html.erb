@@ -8,13 +8,21 @@
 <% end %>
 
 <%= form_with url: materials_path, method: :get, class: "per-form", data: { turbo_action: "advance" } do %>
-  <% request.query_parameters.except("per", "page").each do |k, v| %>
+  <% request.query_parameters.except("per", "page", "q", "kind", "transcription_status").each do |k, v| %>
     <%= hidden_field_tag k, v %>
   <% end %>
+  <%= text_field_tag :q, params[:q], placeholder: "タイトルを検索" %>
+  <%= select_tag :kind, options_for_select([["すべての種別", ""]] + Material::KINDS.map { |key, label| [label, key] }, params[:kind]) %>
+  <%= select_tag :transcription_status, options_for_select([["すべての状態", ""], ["未着手", "todo"], ["作業中", "drafting"], ["完了", "done"]], params[:transcription_status]) %>
   表示件数:
   <%= select_tag :per, options_for_select([25, 50, 100], (params[:per].presence || 25).to_i),
                  class: "per-select", onchange: "this.form.requestSubmit()" %>
 <% end %>
+
+<% if params[:q].present? %><div class="filter-notice">キーワード <code><%= params[:q] %></code> で絞り込み中 — <%= link_to "解除", materials_path(request.query_parameters.except("q", "page")) %></div><% end %>
+<% if Material::KINDS.key?(params[:kind]) %><div class="filter-notice">種別: <%= Material::KINDS[params[:kind]] %> — <%= link_to "解除", materials_path(request.query_parameters.except("kind", "page")) %></div><% end %>
+<% if Material::TRANSCRIPTION_STATUS_SCOPES.key?(params[:transcription_status]) %><div class="filter-notice">文字起こし: <%= { "todo" => "未着手", "drafting" => "作業中", "done" => "完了" }[params[:transcription_status]] %> — <%= link_to "解除", materials_path(request.query_parameters.except("transcription_status", "page")) %></div><% end %>
+<% if @filters_applied %><div class="filter-notice"><%= link_to "すべて解除", materials_path(per: params[:per].presence) %></div><% end %>
 
 <% if @materials.any? %>
 <% if params[:tag].blank? %><%= render "library_summary" %><% end %>
@@ -57,8 +65,12 @@
 </div>
 <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
 <% else %>
+  <% if @filters_applied %>
+    <div class="empty-state">該当する資料がありません。フィルタを見直すか、<%= link_to "解除", materials_path(per: params[:per].presence) %>してください。</div>
+  <% else %>
   <div class="empty-state">
     資料（PDF・画像・動画・音声・URL）をここに集めます。お手持ちの本やサイト、動画など、出典になりそうなものを「資料を追加」から登録しておくと、記事から引用できます。
     <div class="empty-state__cta"><%= link_to "資料を追加", new_material_path, role: "button", class: "btn-sm" %></div>
   </div>
+  <% end %>
 <% end %>
