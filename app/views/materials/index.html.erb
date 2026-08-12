@@ -12,8 +12,8 @@
     <%= hidden_field_tag k, v %>
   <% end %>
   <%= text_field_tag :q, params[:q], placeholder: "タイトルを検索" %>
-  <%= select_tag :kind, options_for_select([["すべての種別", ""]] + Material::KINDS.map { |key, label| [label, key] }, params[:kind]) %>
-  <%= select_tag :transcription_status, options_for_select([["すべての状態", ""], ["未着手", "todo"], ["作業中", "drafting"], ["完了", "done"]], params[:transcription_status]) %>
+  <%= select_tag :kind, options_for_select([["すべての種別", ""]] + Material::KINDS.map { |key, label| [label, key] }, params[:kind]), onchange: "this.form.requestSubmit()" %>
+  <%= select_tag :transcription_status, options_for_select([["すべての状態", ""], ["未着手", "todo"], ["作業中", "drafting"], ["完了", "done"]], params[:transcription_status]), onchange: "this.form.requestSubmit()" %>
   表示件数:
   <%= select_tag :per, options_for_select([25, 50, 100], (params[:per].presence || 25).to_i),
                  class: "per-select", onchange: "this.form.requestSubmit()" %>
