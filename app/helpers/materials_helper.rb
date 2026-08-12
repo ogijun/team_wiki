@@ -30,7 +30,7 @@ module MaterialsHelper
 
   # 一覧などで使う書き起こし状況ラベル。未作成なら「未着手」、ありなら作業中/完了。
   def transcription_status_label(material)
-    { "todo" => "未着手", "drafting" => "作業中", "done" => "完了" }[material.transcription_status]
+    Material::TRANSCRIPTION_STATUS_LABELS[material.transcription_status]
   end
 
   # 資料詳細の進行ストリップ。資料のライフサイクル
