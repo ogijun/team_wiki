@@ -8,8 +8,17 @@ namespace :materials do
   # generate_web_file! は失敗しても raise せずログに残して次へ進む（外部CLI契約）。
   # 成功件数だけでは取りこぼしに気づけないので、実行後に未生成の残数も出す。
   desc "既存PDFの軽量版（web_file）を生成する（未生成のみ・冪等）"
+  # 1件が数分かかることもあり（Ghostscript）、無音だと生死が分からない。
+  # 接続が切れても追えるよう、標準出力は行ごとに流す（$stdout.sync）。
   task backfill_web_files: :environment do
-    generated = Material.backfill_web_files!
+    $stdout.sync = true
+    total = Material.with_attached_file.with_attached_web_file.count { |m| m.pdf? && !m.web_file.attached? }
+    puts "対象: #{total} 件"
+    done = 0
+    generated = Material.backfill_web_files! do |material, ok|
+      done += 1
+      puts "[#{done}/#{total}] Material##{material.id} #{ok ? "生成" : "失敗（ログ参照）"} #{material.title}"
+    end
     remaining = Material.with_attached_file.with_attached_web_file.count { |m| m.pdf? && !m.web_file.attached? }
     puts "#{generated} 件の PDF に軽量版を生成しました。"
     if remaining.positive?
