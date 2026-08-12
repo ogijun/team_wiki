@@ -2,6 +2,9 @@
 require "rubygems"
 require "bundler/setup"
 
-ARGV.unshift("--ensure-latest")
+# Rails の雛形は --ensure-latest を差し込むが、これは「gem が最新か」で exit 5 を返すため、
+# 上流が新バージョンを出しただけで CI が赤くなる（#195・#205 で実際に2度発生）。
+# 自分たちの変更と無関係な失敗は門番として機能しないので外す。
+# gem の更新追随は dependabot に任せる（.github/dependabot.yml）。
 
 load Gem.bin_path("brakeman", "brakeman")
