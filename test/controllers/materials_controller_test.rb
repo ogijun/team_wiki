@@ -89,6 +89,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".empty-state", text: /該当する資料がありません/
   end
 
+  test "index keeps the clear-all link when filtering by tag alone" do
+    material = Material.create!(user: @user, url: "https://example.com/tag-filter", title: "タグ資料")
+    material.update!(tag_names: "ruby")
+
+    get materials_url, params: { tag: "ruby" }
+    assert_select ".filter-notice a[href=?]", materials_path, text: "すべて解除"
+  end
+
   test "index table is wrapped in a horizontal-scroll container (mobile)" do
     Material.create!(user: @user, url: "https://x.test/scroll", title: "スクロール資料")
     get materials_url
