@@ -234,6 +234,18 @@ class Material < ApplicationRecord
           "OR EXISTS (SELECT 1 FROM transcriptions WHERE transcriptions.material_id = materials.id AND transcriptions.status != 'done')")
   }
 
+  # 一覧フィルタ用の文字起こし状態。既存の incomplete は互換性のため残し、
+  # こちらは Relation を IN サブクエリとして委譲して3状態を排他的にする。
+  scope :transcription_todo, -> { where.not(id: Transcription.select(:material_id)) }
+  scope :transcription_drafting, -> { where(id: Transcription.where.not(status: "done").select(:material_id)) }
+  scope :transcription_done, -> {
+    where(id: Transcription.select(:material_id))
+      .where.not(id: Transcription.where.not(status: "done").select(:material_id))
+  }
+  TRANSCRIPTION_STATUS_SCOPES = {
+    "todo" => :transcription_todo, "drafting" => :transcription_drafting, "done" => :transcription_done
+  }.freeze
+
   # 表示用カウント: 完了 / 担当中(担当あり・未完) / 未担当(担当なし・未完) と総数。
   # transcription_status / transcription_progress もこの1フォールから導出する（集計の単一窓口）。
   # 既にロード済みの配列があれば渡して再クエリを避ける（show は parts を持っている）。

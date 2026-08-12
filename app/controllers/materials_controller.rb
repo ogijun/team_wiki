@@ -14,6 +14,13 @@ class MaterialsController < ApplicationController
   def index
     scope = Material.includes(:tags, :transcriptions, user: { avatar_attachment: :blob }).with_attached_file
     scope = scope.joins(:tags).where(tags: { slug: params[:tag] }) if params[:tag].present?
+    scope = scope.where("materials.title LIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(params[:q])}%") if params[:q].present?
+    scope = scope.where(kind: params[:kind]) if Material::KINDS.key?(params[:kind])
+    if Material::TRANSCRIPTION_STATUS_SCOPES.key?(params[:transcription_status])
+      scope = scope.public_send(Material::TRANSCRIPTION_STATUS_SCOPES[params[:transcription_status]])
+    end
+    @filters_applied = params[:tag].present? || params[:q].present? || Material::KINDS.key?(params[:kind]) ||
+      Material::TRANSCRIPTION_STATUS_SCOPES.key?(params[:transcription_status])
 
     sort_key = SORTS.key?(params[:sort]) ? params[:sort] : "created_at"
     dir = params[:dir] == "asc" ? "asc" : "desc"

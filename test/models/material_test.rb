@@ -419,4 +419,16 @@ class MaterialTest < ActiveSupport::TestCase
     assert_includes ids, drafting.id
     assert_not_includes ids, done.id
   end
+
+  test "transcription filter scopes are exhaustive and mutually exclusive" do
+    todo = Material.create!(user: @user, url: "https://example.com/todo-scope", title: "未着手")
+    drafting = Material.create!(user: @user, url: "https://example.com/drafting-scope", title: "途中")
+    drafting.transcriptions.create!(author: @user, body: "x", position: 1, status: "drafting")
+    done = Material.create!(user: @user, url: "https://example.com/done-scope", title: "完了")
+    done.transcriptions.create!(author: @user, body: "x", position: 1, status: "done")
+
+    assert_equal [ todo.id ], Material.transcription_todo.where(id: [ todo, drafting, done ]).pluck(:id)
+    assert_equal [ drafting.id ], Material.transcription_drafting.where(id: [ todo, drafting, done ]).pluck(:id)
+    assert_equal [ done.id ], Material.transcription_done.where(id: [ todo, drafting, done ]).pluck(:id)
+  end
 end

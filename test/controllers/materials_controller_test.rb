@@ -69,6 +69,26 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "資料A"
   end
 
+  test "index combines title, kind, and transcription status filters" do
+    matched = Material.create!(user: @user, url: "https://example.com/filter-match", title: "対象資料", kind: "audio")
+    matched.transcriptions.create!(author: @user, body: "x", position: 1, status: "drafting")
+    Material.create!(user: @user, url: "https://example.com/filter-other", title: "対象外", kind: "video")
+
+    get materials_url, params: { q: "対象", kind: "audio", transcription_status: "drafting" }
+    assert_select "a", text: "対象資料"
+    assert_select "a", text: "対象外", count: 0
+    assert_select ".filter-notice", text: /キーワード/
+  end
+
+  test "index ignores unknown filter values and shows filtered empty state" do
+    material = Material.create!(user: @user, url: "https://example.com/filter-known", title: "通常資料")
+    get materials_url, params: { kind: "unknown", transcription_status: "unknown" }
+    assert_select "a[href=?]", material_path(material)
+
+    get materials_url, params: { q: "存在しないタイトル" }
+    assert_select ".empty-state", text: /該当する資料がありません/
+  end
+
   test "index table is wrapped in a horizontal-scroll container (mobile)" do
     Material.create!(user: @user, url: "https://x.test/scroll", title: "スクロール資料")
     get materials_url
