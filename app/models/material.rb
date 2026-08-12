@@ -245,6 +245,7 @@ class Material < ApplicationRecord
   TRANSCRIPTION_STATUS_SCOPES = {
     "todo" => :transcription_todo, "drafting" => :transcription_drafting, "done" => :transcription_done
   }.freeze
+  TRANSCRIPTION_STATUS_LABELS = { "todo" => "未着手", "drafting" => "作業中", "done" => "完了" }.freeze
 
   # 表示用カウント: 完了 / 担当中(担当あり・未完) / 未担当(担当なし・未完) と総数。
   # transcription_status / transcription_progress もこの1フォールから導出する（集計の単一窓口）。

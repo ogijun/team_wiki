@@ -13,16 +13,13 @@
   <% end %>
   <%= text_field_tag :q, params[:q], placeholder: "タイトルを検索" %>
   <%= select_tag :kind, options_for_select([["すべての種別", ""]] + Material::KINDS.map { |key, label| [label, key] }, params[:kind]), onchange: "this.form.requestSubmit()" %>
-  <%= select_tag :transcription_status, options_for_select([["すべての状態", ""], ["未着手", "todo"], ["作業中", "drafting"], ["完了", "done"]], params[:transcription_status]), onchange: "this.form.requestSubmit()" %>
+  <%= select_tag :transcription_status, options_for_select([["すべての状態", ""]] + Material::TRANSCRIPTION_STATUS_LABELS.map { |key, label| [label, key] }, params[:transcription_status]), onchange: "this.form.requestSubmit()" %>
   表示件数:
   <%= select_tag :per, options_for_select([25, 50, 100], (params[:per].presence || 25).to_i),
                  class: "per-select", onchange: "this.form.requestSubmit()" %>
 <% end %>
 
-<% if params[:q].present? %><div class="filter-notice">キーワード <code><%= params[:q] %></code> で絞り込み中 — <%= link_to "解除", materials_path(request.query_parameters.except("q", "page")) %></div><% end %>
-<% if Material::KINDS.key?(params[:kind]) %><div class="filter-notice">種別: <%= Material::KINDS[params[:kind]] %> — <%= link_to "解除", materials_path(request.query_parameters.except("kind", "page")) %></div><% end %>
-<% if Material::TRANSCRIPTION_STATUS_SCOPES.key?(params[:transcription_status]) %><div class="filter-notice">文字起こし: <%= { "todo" => "未着手", "drafting" => "作業中", "done" => "完了" }[params[:transcription_status]] %> — <%= link_to "解除", materials_path(request.query_parameters.except("transcription_status", "page")) %></div><% end %>
-<% if @filters_applied %><div class="filter-notice"><%= link_to "すべて解除", materials_path(per: params[:per].presence) %></div><% end %>
+<%= render "filter_notices" %>
 
 <% if @materials.any? %>
 <% if params[:tag].blank? %><%= render "library_summary" %><% end %>

@@ -1,0 +1,9 @@
+<% @material_filters.each do |filter| %>
+  <div class="filter-notice">
+    <%= filter.label %> <% if filter.value_tag %><%= content_tag(filter.value_tag, filter.value) %><% else %><%= filter.value %><% end %><%= " #{filter.suffix}" if filter.suffix %> —
+    <%= link_to "解除", materials_path(filter.clear_params) %>
+  </div>
+<% end %>
+<% if @filters_applied %>
+  <div class="filter-notice"><%= link_to "すべて解除", materials_path(per: params[:per].presence) %></div>
+<% end %>
