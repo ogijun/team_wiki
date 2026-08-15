@@ -166,12 +166,16 @@ class Material < ApplicationRecord
     updated
   end
 
+  # 1件ごとに結果をブロックへ渡す（表示の責任は呼び出し側）。件数が多いと数分〜数十分かかり、
+  # 終わるまで無音だと生死が分からないため。ブロック無しの挙動は従来どおり。
   def self.backfill_web_files!
     updated = 0
     with_attached_file.find_each do |material|
       next unless material.pdf? && !material.web_file.attached?
       material.generate_web_file!
-      updated += 1 if material.web_file.attached?
+      ok = material.web_file.attached?
+      updated += 1 if ok
+      yield(material, ok) if block_given?
     end
     updated
   end
