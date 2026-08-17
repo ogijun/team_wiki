@@ -104,7 +104,7 @@ end
 
 gem "litestream", "~> 0.14.0"
 
-gem "pdf-reader", "~> 2.15"
+gem "pdf-reader", "~> 2.16"
 
 gem "factory_bot_rails", "~> 6.5", groups: [ :development, :test ]
 
