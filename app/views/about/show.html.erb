@@ -8,7 +8,7 @@
 </div>
 
 <% if @setting.about.present? %>
-  <div class="page-body"><%= render_site_markdown(@setting.about)&.html %></div>
+  <%= render_site_markdown(@setting.about)&.html %>
 <% else %>
   <div class="muted">
     まだ説明が設定されていません。<% if Current.user&.admin? %><%= link_to "設定から記入できます。", edit_settings_path %><% end %>
