@@ -320,14 +320,15 @@ button.tag-chip:hover, button.tag-chip:focus {
 .ref a { text-decoration: none; }
 .ref-broken { color: #c00; }
 
-/* 出典 card */
-.citations {
+/* 出典・バックリンク card */
+.citations, .backlinks {
   margin: 2.5rem 0 0; padding: 1.3rem 1.5rem;
   background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px;
 }
-.citations h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
+.citations h2, .backlinks h2 { font-size: 1.05rem; margin: 0 0 0.7rem; }
 .citations ol { padding-left: 1.4rem; margin: 0; }
-.citations li { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.5rem; line-height: 1.7; }
+.backlinks ul { padding-left: 1.4rem; margin: 0; }
+.citations li, .backlinks li { font-size: 0.9rem; color: var(--ink-soft); margin-bottom: 0.5rem; line-height: 1.7; }
 
 /* Citation picker (editor toolbar popup) */
 .citation-btn { margin: 0 6px; background: transparent; border: 0; color: var(--ink); }
