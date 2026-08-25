@@ -20,9 +20,7 @@
     <%= link_to "履歴", article_revisions_path(@article), role: "button", class: "btn-sm secondary outline" %>
   </div>
   <%= render "shared/tag_suggestions", taggable: @article %>
-  <div class="page-body">
-    <%= @rendered.html %>
-  </div>
+  <%= @rendered.html %>
   <% if @rendered.references.any? %>
     <section class="citations">
       <h2>出典</h2>
