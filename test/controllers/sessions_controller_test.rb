@@ -109,4 +109,30 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   ensure
     Rails.configuration.x.discord.admin_role_ids = original
   end
+
+  test "stores avatar URLs only when they use HTTPS on an allowed Discord host" do
+    allowed = [
+      "https://cdn.discordapp.com/avatars/1/avatar.png",
+      "https://media.discordapp.net/avatars/1/avatar.png"
+    ]
+    rejected = [
+      "http://cdn.discordapp.com/avatars/1/avatar.png",
+      "javascript://cdn.discordapp.com/avatars/1/avatar.png",
+      "data:image/png;base64,abc",
+      "https://example.com/avatar.png"
+    ]
+
+    (allowed + rejected).each_with_index do |url, index|
+      uid = "avatar-url-#{index}"
+      mock_discord_auth(uid, name: "Avatar User", email: "avatar#{index}@example.com", image: url)
+
+      required = Rails.configuration.x.discord.required_role_ids.first
+      stub_membership(DiscordGuildMembership::Result.new(true, [ required ])) do
+        get "/auth/discord/callback"
+      end
+
+      avatar_url = User.find_by!(uid: uid).avatar_url
+      allowed.include?(url) ? assert_equal(url, avatar_url) : assert_nil(avatar_url)
+    end
+  end
 end
