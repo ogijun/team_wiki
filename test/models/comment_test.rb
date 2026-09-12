@@ -23,6 +23,18 @@ class CommentTest < ActiveSupport::TestCase
     end
   end
 
+  test "mentioned_user_ids extracts unique ids from mention tokens" do
+    comment = Comment.new(body: "@[古い名前](12) と @[別名](34)、もう一度 @[現在名](12)")
+
+    assert_equal [ 12, 34 ], comment.mentioned_user_ids
+  end
+
+  test "mentioned_user_ids ignores malformed tokens" do
+    comment = Comment.new(body: "@名前 @[名前](abc) @[改行\n名](12) @[閉じない](34")
+
+    assert_empty comment.mentioned_user_ids
+  end
+
   test "deletable only by the author or an admin" do
     admin = User.create!(email_address: "ad@example.com", name: "AD", provider: "discord", uid: "ad", role: "admin")
     other = User.create!(email_address: "ot@example.com", name: "OT", provider: "discord", uid: "ot")

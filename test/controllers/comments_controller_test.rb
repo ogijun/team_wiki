@@ -18,6 +18,20 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "comment", Notification.last.kind
   end
 
+  test "creating a comment notifies each mentioned member once and skips the author" do
+    mentioned = create(:user, name: "Mentioned")
+    body = "@[古い表示名](#{mentioned.id}) @[重複](#{mentioned.id}) @[自分](#{@user.id}) @[不明](999999)"
+
+    assert_difference -> { Notification.where(kind: "mention").count }, 1 do
+      post article_comments_url(@article), params: { comment: { body: body } }
+    end
+
+    notification = Notification.find_by!(kind: "mention")
+    assert_equal mentioned, notification.recipient
+    assert_equal @user, notification.actor
+    assert_equal @article.comments.last, notification.subject
+  end
+
   test "posts a comment on an article and records a comment.posted activity" do
     assert_difference [ "Comment.count", "Activity.where(action: 'comment.posted').count" ], 1 do
       post article_comments_url(@article), params: { comment: { body: "記事コメント" } }
