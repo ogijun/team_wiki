@@ -3,11 +3,16 @@
 class Comment < ApplicationRecord
   include Reactable
 
+  MENTION_PATTERN = /@\[[^\]\r\n]*\]\((\d+)\)/
+
   belongs_to :commentable, polymorphic: true, counter_cache: true
   belongs_to :author, class_name: "User"
 
   validates :body, presence: true
 
+  def mentioned_user_ids
+    body.to_s.scan(MENTION_PATTERN).flatten.map!(&:to_i).uniq
+  end
 
   # 削除できるのは投稿者本人か admin のみ（編集は不可）。
   def deletable_by?(user)

@@ -2,13 +2,15 @@ module NotificationsHelper
   PHRASES = {
     "like" => "いいねしました",
     "comment" => "コメントしました",
-    "assignment" => "文字起こしを割り当てました"
+    "assignment" => "文字起こしを割り当てました",
+    "mention" => "メンションしました"
   }.freeze
 
   ICONS = {
     "like" => "heart",
     "comment" => "message-circle",
-    "assignment" => "audio-lines"
+    "assignment" => "audio-lines",
+    "mention" => "message-circle"
   }.freeze
 
   def notification_phrase(notification)

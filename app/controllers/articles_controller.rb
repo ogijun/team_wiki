@@ -11,6 +11,7 @@ class ArticlesController < ApplicationController
     body = @article.current_revision&.body.to_s
     @rendered = MarkdownRenderer.for_wiki(body).render(body)
     @backlinks = @article.inbound_links.includes(:source_article)
+    @mention_members = User.for_picker.to_a
   end
 
   def new

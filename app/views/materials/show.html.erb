@@ -186,7 +186,7 @@
 </section>
 
 <%# ── ⑥ 議論 ── %>
-<%= render "comments/comments", commentable: @material %>
+<%= render "comments/comments", commentable: @material, mention_members: @members %>
 
 <div class="danger-zone">
   <span class="danger-zone__label">危険な操作</span>

@@ -172,6 +172,16 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".page-meta .contributors a[href=?]", user_path(bob)
   end
 
+  test "show preloads members for the comment mention picker" do
+    member = create(:user, name: "候補メンバー")
+    article = create(:article, created_by: @user)
+
+    get article_url(article)
+
+    assert_select "form[data-controller=mention][data-mention-members-value*=?]", "候補メンバー"
+    assert_select "textarea[data-mention-target=input]"
+  end
+
   test "show renders citations section linking to materials" do
     material = Material.create!(user: @user, url: "https://example.com/src", title: "出典資料")
     article = Article.create!(title: "引用あり", created_by: @user)
