@@ -62,8 +62,9 @@ class SessionsController < ApplicationController
 
   def safe_avatar_url(url)
     return nil if url.blank?
-    host = URI.parse(url).host
-    %w[cdn.discordapp.com media.discordapp.net].include?(host) ? url : nil
+    uri = URI.parse(url)
+    allowed_host = %w[cdn.discordapp.com media.discordapp.net].include?(uri.host)
+    uri.scheme == "https" && allowed_host ? url : nil
   rescue URI::InvalidURIError
     nil
   end
