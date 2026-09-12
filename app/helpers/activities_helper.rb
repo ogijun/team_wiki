@@ -53,7 +53,7 @@ module ActivitiesHelper
 
     # 対象が存命ならタイトル自体をリンクに（末尾に同じタイトルを再掲しないため）。
     # 削除済み（subject が無い）ならプレーンテキスト。
-    shown = activity.subject ? link_to(label, activity.subject) : label
+    shown = activity.subject ? subject_link(activity) : label
     safe_join([ prefix, "「", shown, "」", suffix ])
   end
 
@@ -66,6 +66,7 @@ module ActivitiesHelper
   }.freeze
   VERBS = { "created" => "作成", "edited" => "編集" }.freeze
   ACTION_LIST_HEAD = 2 # 同一操作まとめで常時表示する先頭件数
+  ACTIVITY_TITLE_LENGTH = 40
 
   # 同一ユーザが連続して並んだとき、先頭 keep 件を残し残りを1つの要約マーカーに畳む
   # （ホームのタイムライン用。1人の活動で feed が埋まるのを防ぐ）。返値は Group と Overflow の混在配列。
@@ -140,7 +141,11 @@ module ActivitiesHelper
   # 対象が存命ならタイトルをリンクに、削除済み（subject nil）なら素テキスト。
   def subject_link(activity)
     label = activity_label(activity)
-    activity.subject ? link_to(label, activity.subject) : label
+    return label unless activity.subject
+
+    truncated_label = truncate(label, length: ACTIVITY_TITLE_LENGTH, omission: "…")
+    options = { title: label } if truncated_label != label
+    link_to(truncated_label, activity.subject, options)
   end
 
   # タイムラインの表示名。対象が存命ならその現在の title/name を引く

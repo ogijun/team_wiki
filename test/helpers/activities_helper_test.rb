@@ -42,6 +42,18 @@ class ActivitiesHelperTest < ActionView::TestCase
     assert_equal 1, html.scan("リンク記事").size
   end
 
+  test "phrase truncates a long linked title and keeps the full title in a tooltip" do
+    title = "長いタイトル" * 10
+    article = Article.create!(title: title, created_by: @user)
+    a = Activity.new(user: @user, action: "article.edited", subject: article, subject_label: title)
+
+    html = activity_phrase(a)
+
+    assert_includes html, "#{title.first(ActivitiesHelper::ACTIVITY_TITLE_LENGTH - 1)}…"
+    assert_includes html, %(title="#{title}")
+    refute_includes html, %(>#{title}</a>)
+  end
+
   test "phrase for a deleted subject keeps the label as plain text" do
     a = Activity.new(user: @user, action: "article.deleted", subject: nil, subject_label: "消えた記事")
     html = activity_phrase(a)
