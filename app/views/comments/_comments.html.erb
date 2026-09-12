@@ -16,7 +16,7 @@
               <%= button_to "削除", comment_path(c), method: :delete, class: "btn-sm btn-danger comment__delete", form_class: "comment__delete-form", data: { turbo_confirm: "このコメントを削除しますか?" } %>
             <% end %>
           </div>
-          <div class="prewrap comment__body"><%= c.body %></div>
+          <div class="prewrap comment__body"><%= render_comment_body(c.body, mention_members) %></div>
         </li>
       <% end %>
     </ul>
@@ -24,8 +24,12 @@
     <div class="muted">まだコメントはありません。</div>
   <% end %>
 
-  <%= form_with model: [ commentable, Comment.new ], class: "comment-form" do |f| %>
-    <%= f.text_area :body, rows: 3, placeholder: "コメントを書く…" %>
+  <% members_json = mention_members.map { |member| { id: member.id, name: display_name(member) } }.to_json %>
+  <%= form_with model: [ commentable, Comment.new ], class: "comment-form mention-picker",
+        data: { controller: "mention", "mention-members-value": members_json } do |f| %>
+    <%= f.text_area :body, rows: 3, placeholder: "コメントを書く…",
+          data: { "mention-target": "input", action: "input->mention#search keydown->mention#keydown" } %>
+    <div class="mention-picker__menu" data-mention-target="menu" hidden></div>
     <%= f.submit "コメントする", class: "btn-sm" %>
   <% end %>
 </section>
