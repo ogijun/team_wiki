@@ -58,7 +58,7 @@ gem "pagy", "~> 9.3"
 gem "view_component", "~> 4.0"
 
 # Wiki content: GitHub-flavored Markdown rendering and revision diffs
-gem "commonmarker", "~> 2.0"
+gem "commonmarker", "~> 2.10"
 gem "diffy", "~> 3.4"
 
 group :development, :test do
