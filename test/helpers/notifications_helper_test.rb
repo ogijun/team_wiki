@@ -35,4 +35,16 @@ class NotificationsHelperTest < ActionView::TestCase
     assert_includes notification_message(notification), "あなたに"
     assert_includes notification_message(notification), "割り当てました"
   end
+
+  test "mention notification links to the comment target" do
+    actor = create(:user)
+    recipient = create(:user)
+    article = create(:article)
+    comment = create(:comment, commentable: article, author: actor)
+    notification = Notification.create!(recipient: recipient, actor: actor, kind: "mention", subject: comment)
+
+    message = notification_message(notification)
+    assert_includes message, "メンションしました"
+    assert_includes message, article.title
+  end
 end

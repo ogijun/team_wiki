@@ -42,7 +42,7 @@
       </ul>
     </section>
   <% end %>
-  <%= render "comments/comments", commentable: @article %>
+  <%= render "comments/comments", commentable: @article, mention_members: @mention_members %>
 
   <div class="danger-zone">
     <span class="danger-zone__label">危険な操作</span>
