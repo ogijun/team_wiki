@@ -13,6 +13,8 @@ class Material < ApplicationRecord
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :activities, as: :subject, dependent: :nullify
 
+  attr_accessor :placeholder_intent
+
   ALLOWED_CONTENT_TYPES = %w[
     application/pdf
     image/png image/jpeg image/gif image/webp
@@ -45,7 +47,8 @@ class Material < ApplicationRecord
     "Web・その他"  => %w[web other]
   }.freeze
 
-  validate :exactly_one_source
+  validate :at_most_one_source
+  validate :placeholder_intent_required, on: :create
   validate :acceptable_file, if: -> { file.attached? }
 
   fuzzy_date_attribute :published_at
@@ -77,6 +80,7 @@ class Material < ApplicationRecord
   def file? = file.attached?
   def link? = url.present?
   def pdf? = file.attached? && file.content_type == "application/pdf"
+  def placeholder? = !file.attached? && url.blank?
 
   def thumbnailable_file?
     file.attached? && THUMBNAIL_TYPES.include?(file.content_type)
@@ -103,6 +107,7 @@ class Material < ApplicationRecord
   # メディア種別を symbol で返す（表示の絵文字対応はビュー層に置く）。技術的形態＝サムネ/埋め込みの窓口。
   def media_kind
     return :link if link?
+    return :placeholder if placeholder?
     self.class.kind_for(file.content_type)
   end
 
@@ -296,9 +301,16 @@ class Material < ApplicationRecord
     file.filename.base.presence || file.filename.to_s
   end
 
-  def exactly_one_source
-    return if file.attached? ^ url.present?
+  def at_most_one_source
+    return unless file.attached? && url.present?
     errors.add(:base, "ファイルかURLのどちらか一方を指定してください")
+  end
+
+  def placeholder_intent_required
+    return unless placeholder?
+    return if ActiveModel::Type::Boolean.new.cast(placeholder_intent)
+
+    errors.add(:base, "実体がない資料として登録する場合はチェックしてください")
   end
 
   def acceptable_file
