@@ -8,12 +8,16 @@
 <% end %>
 
 <%= form_with url: materials_path, method: :get, class: "per-form", data: { turbo_action: "advance" } do %>
-  <% request.query_parameters.except("per", "page", "q", "kind", "transcription_status").each do |k, v| %>
+  <% request.query_parameters.except("per", "page", "q", "kind", "transcription_status", "placeholder").each do |k, v| %>
     <%= hidden_field_tag k, v %>
   <% end %>
   <%= text_field_tag :q, params[:q], placeholder: "タイトルを検索" %>
   <%= select_tag :kind, options_for_select([["すべての種別", ""]] + Material::KINDS.map { |key, label| [label, key] }, params[:kind]), onchange: "this.form.requestSubmit()" %>
   <%= select_tag :transcription_status, options_for_select([["すべての状態", ""]] + Material::TRANSCRIPTION_STATUS_LABELS.map { |key, label| [label, key] }, params[:transcription_status]), onchange: "this.form.requestSubmit()" %>
+  <%= label_tag :placeholder do %>
+    <%= check_box_tag :placeholder, "1", params[:placeholder] == "1", onchange: "this.form.requestSubmit()" %>
+    実体募集中
+  <% end %>
   表示件数:
   <%= select_tag :per, options_for_select([25, 50, 100], (params[:per].presence || 25).to_i),
                  class: "per-select", onchange: "this.form.requestSubmit()" %>
