@@ -28,7 +28,17 @@
 
 <%# ── ① 資料本体（プレビュー・実体）＋ 一級の出典元/初出 ── %>
 <section class="material-body">
-  <% if @material.link? %>
+  <% if @material.placeholder? %>
+    <div class="material-placeholder">
+      <h2>実体募集中</h2>
+      <p>この資料のファイルまたはURLをお持ちの方は追加してください。</p>
+      <%= form_with model: @material, class: "stacked-form" do |f| %>
+        <div class="field"><%= f.label :file, "ファイル" %><%= f.file_field :file %></div>
+        <div class="field"><%= f.label :url, "URL" %><%= f.url_field :url %></div>
+        <%= f.submit "実体を追加" %>
+      <% end %>
+    </div>
+  <% elsif @material.link? %>
     <% if (src = MaterialEmbed.embed_src(@material.url)) %>
       <div class="embed">
         <iframe src="<%= src %>" width="640" height="360" frameborder="0" allowfullscreen></iframe>

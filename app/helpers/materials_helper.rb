@@ -10,7 +10,7 @@ module MaterialsHelper
             class: "sort-link"
   end
 
-  MEDIA_ICONS = { link: "link", image: "image", video: "film", audio: "music", document: "file-text" }.freeze
+  MEDIA_ICONS = { link: "link", image: "image", video: "film", audio: "music", document: "file-text", placeholder: "package" }.freeze
   # Material#media_kind をアイコンに対応づける（表示の単一窓口・技術的形態）。
   def media_icon(material)
     icon(MEDIA_ICONS.fetch(material.media_kind))
