@@ -21,12 +21,12 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_difference [ "Publication.count", "Activity.count" ], 1 do
       post publications_url, params: { publication: {
         title: "新しい本", kind: "book", sales_status: "on_sale",
-        store_url: "https://example.com/item", released_year: "1995", released_month: "3"
+        store_url: "https://example.com/item", released: "1995/3"
       } }
     end
     pub = Publication.last
     assert_equal @user, pub.registered_by
-    assert_equal "month", pub.released_precision
+    assert_equal "1995-03", pub.released
     assert_redirected_to pub
     assert_equal "publication.registered", Activity.last.action
   end
@@ -60,7 +60,7 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show leads with a product card and puts delete in the danger zone" do
-    pub = create_publication(store_url: "https://example.com/item", released_year: "1995")
+    pub = create_publication(store_url: "https://example.com/item", released: "1995")
     get publication_url(pub)
     assert_response :success
     assert_select ".product-card"
@@ -85,19 +85,16 @@ class PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".field-badge--opt"
   end
 
-  test "発売日 fields share the hidden time input and retain its value on edit" do
-    publication = create_publication(released_year: 1995, released_month: 3, released_day: 1,
-                                     released_hour: 14, released_minute: 30)
+  test "発売日は1つの入力欄で時刻まで保持する" do
+    publication = create_publication(released: "1995-03-01T14:30")
 
     get new_publication_url
     assert_response :success
-    assert_select "[data-disclosure-target='rest'][hidden] input[name=?]", "publication[released_hour]"
-    assert_select "button[data-action=?]", "disclosure#toggle"
+    assert_select "input[name=?]", "publication[released]"
 
     get edit_publication_url(publication)
     assert_response :success
-    assert_select "[data-controller='disclosure'][data-disclosure-auto-reveal-if-set-value='true'] input[name=?][value=?]", "publication[released_hour]", "14"
-    assert_select "[data-controller='disclosure'][data-disclosure-auto-reveal-if-set-value='true'] input[name=?][value=?]", "publication[released_minute]", "30"
+    assert_select "input[name=?][value=?]", "publication[released]", "1995/3/1 14:30"
   end
 
   test "update with invalid input re-renders the form and records no activity" do

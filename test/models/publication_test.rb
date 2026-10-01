@@ -34,22 +34,20 @@ class PublicationTest < ActiveSupport::TestCase
     assert_predicate build(store_url: ""), :valid?, "空文字は nil 扱いで許容する"
   end
 
-  test "released fuzzy date is built from parts" do
-    pub = build(released_year: "1995", released_month: "3")
+  test "released stores a reduced-precision timestamp" do
+    pub = build(released: "1995-03")
     pub.save!
-    assert_equal "month", pub.released_precision
-    assert_equal 1995, pub.released_at.year
-    assert_equal 3, pub.released_at.month
+    assert_equal "1995-03", pub.released
   end
 
   test "invalid date parts become a validation error, not an exception" do
-    pub = build(released_year: "1995", released_month: "13")
+    pub = build(released: "1995-13")
     assert_not pub.valid?
   end
 
   test "chronicled returns only dated publications, ordered" do
-    later = Publication.create!(title: "後", kind: "book", registered_by: @user, released_year: "2000")
-    earlier = Publication.create!(title: "先", kind: "book", registered_by: @user, released_year: "1990")
+    later = Publication.create!(title: "後", kind: "book", registered_by: @user, released: "2000")
+    earlier = Publication.create!(title: "先", kind: "book", registered_by: @user, released: "1990")
     Publication.create!(title: "日付なし", kind: "book", registered_by: @user)
     assert_equal [ earlier, later ], Publication.chronicled.to_a
   end

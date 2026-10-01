@@ -1,5 +1,4 @@
 class Material < ApplicationRecord
-  include FuzzyDateAttributable
   include Reactable
   include Taggable
 
@@ -54,9 +53,8 @@ class Material < ApplicationRecord
   validate :placeholder_intent_required, on: :create
   validate :acceptable_file, if: -> { file.attached? }
 
-  fuzzy_date_attribute :published_at
-
-  validates :published_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
+  self.ignored_columns += %w[published_at published_precision]
+  validate { errors.add(:published, "の形式が正しくありません") unless FuzzyTimestamp.valid?(published) }
   validates :url, format: { with: %r{\Ahttps?://\S+\z},
                             message: "は http(s) で始まる URL を指定してください" },
                   if: -> { url.present? }
@@ -224,7 +222,7 @@ class Material < ApplicationRecord
 
   # 書誌情報がひとつでも入っているか（進行ストリップと書誌ゾーンの表示判定）。
   def bibliography_present?
-    author.present? || source.present? || published_at.present? ||
+    author.present? || source.present? || published.present? ||
       volume.present? || publisher.present? || pages.present? || isbn.present? || page_count.present?
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_01_000000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -58,12 +58,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
     t.datetime "created_at", null: false
     t.integer "created_by_id", null: false
     t.integer "current_revision_id"
+    t.string "ends"
     t.datetime "ends_at"
     t.string "ends_precision"
     t.string "kind"
     t.integer "likes_count", default: 0, null: false
     t.integer "lock_version", default: 0, null: false
     t.string "slug", null: false
+    t.string "starts"
     t.datetime "starts_at"
     t.string "starts_precision"
     t.string "status", default: "stub", null: false
@@ -73,6 +75,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
     t.index ["current_revision_id"], name: "index_articles_on_current_revision_id"
     t.index ["kind"], name: "index_articles_on_kind"
     t.index ["slug"], name: "index_articles_on_slug", unique: true
+    t.index ["starts"], name: "index_articles_on_starts"
     t.index ["starts_at"], name: "index_articles_on_starts_at"
     t.index ["status"], name: "index_articles_on_status"
     t.index ["title"], name: "index_articles_on_title", unique: true
@@ -135,6 +138,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
     t.string "ownership"
     t.integer "page_count"
     t.string "pages"
+    t.string "published"
     t.datetime "published_at"
     t.string "published_precision"
     t.string "publisher"
@@ -148,6 +152,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
     t.string "volume"
     t.index ["confidence"], name: "index_materials_on_confidence"
     t.index ["ownership"], name: "index_materials_on_ownership"
+    t.index ["published"], name: "index_materials_on_published"
     t.index ["published_at"], name: "index_materials_on_published_at"
     t.index ["rights"], name: "index_materials_on_rights"
     t.index ["slug"], name: "index_materials_on_slug", unique: true
@@ -172,6 +177,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
     t.string "kind", null: false
     t.integer "likes_count", default: 0, null: false
     t.integer "registered_by_id", null: false
+    t.string "released"
     t.datetime "released_at"
     t.string "released_precision"
     t.string "sales_status", default: "on_sale", null: false
@@ -179,6 +185,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["registered_by_id"], name: "index_publications_on_registered_by_id"
+    t.index ["released"], name: "index_publications_on_released"
     t.index ["released_at"], name: "index_publications_on_released_at"
   end
 

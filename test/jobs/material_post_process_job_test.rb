@@ -44,7 +44,7 @@ class MaterialPostProcessJobTest < ActiveJob::TestCase
   end
 
   test "perform is a safe no-op when no file is attached and nothing to autofill" do
-    link = Material.create!(user: user, url: "https://example.com/x", title: "リンク", published_year: 2020)
+    link = Material.create!(user: user, url: "https://example.com/x", title: "リンク", published: "2020")
     assert_nothing_raised { MaterialPostProcessJob.perform_now(link) }
   end
 
@@ -69,20 +69,18 @@ class MaterialPostProcessJobTest < ActiveJob::TestCase
     end
     link.reload
     assert_equal "動画タイトル", link.title
-    assert_equal Time.zone.local(2012, 10, 13), link.published_at
-    assert_equal "day", link.published_precision
+    assert_equal "2012-10-13", link.published
   end
 
   test "perform keeps a user-entered title and published date" do
-    link = Material.create!(user: user, url: "https://vimeo.com/838983799", title: "手動", published_year: 1991)
+    link = Material.create!(user: user, url: "https://vimeo.com/838983799", title: "手動", published: "1991")
 
     stub_singleton(VideoMetadata, :call, { title: "上書きしない", published_on: Date.new(2012, 10, 13) }) do
       MaterialPostProcessJob.perform_now(link)
     end
     link.reload
     assert_equal "手動", link.title
-    assert_equal 1991, link.published_at.year
-    assert_equal "year", link.published_precision
+    assert_equal "1991", link.published
   end
 
   test "perform leaves the url as title when nothing can be fetched" do

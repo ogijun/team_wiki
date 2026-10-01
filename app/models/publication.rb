@@ -1,7 +1,6 @@
 class Publication < ApplicationRecord
   after_commit -> { SearchIndexer.reindex(self) }, on: %i[create update]
   after_destroy_commit -> { SearchIndexer.remove(self) }
-  include FuzzyDateAttributable
   include Reactable
 
   KINDS = { "book" => "著書", "video" => "映像", "audio" => "音楽", "other" => "その他" }.freeze
@@ -20,13 +19,12 @@ class Publication < ApplicationRecord
   # スキャンした表紙が余裕で収まり、事故的な巨大アップロードは弾ける 10MB に置く。
   COVER_MAX_BYTES = 10.megabytes
 
-  # 列=released_at → アクセサ released_* / メソッド released を自動生成（accessor: は不要）。
-  fuzzy_date_attribute :released_at
+  self.ignored_columns += %w[released_at released_precision]
 
   validates :title, presence: true
   validates :kind, inclusion: { in: KINDS.keys }
   validates :sales_status, inclusion: { in: SALES_STATUSES.keys }
-  validates :released_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
+  validate { errors.add(:released, "の形式が正しくありません") unless FuzzyTimestamp.valid?(released) }
   # フォームの空欄は "" で来る。nil にして allow_nil を効かせる。
   normalizes :store_url, with: ->(v) { v.presence }
   validates :store_url, format: { with: %r{\Ahttps?://\S+\z}, message: "は http(s) で始まる URL を指定してください" },
@@ -34,7 +32,7 @@ class Publication < ApplicationRecord
   validate :acceptable_cover, if: -> { cover.attached? }
 
   # 発売日を持つものを時系列で（年表統合のソース）。
-  scope :chronicled, -> { where.not(released_at: nil).order(:released_at) }
+  scope :chronicled, -> { where.not(released: nil).order(:released) }
 
   def kind_label = KINDS[kind]
   def sales_status_label = SALES_STATUSES[sales_status]

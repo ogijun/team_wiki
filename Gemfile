@@ -60,6 +60,7 @@ gem "view_component", "~> 4.15"
 # Wiki content: GitHub-flavored Markdown rendering and revision diffs
 gem "commonmarker", "~> 2.10"
 gem "diffy", "~> 3.4"
+gem "fuzzy_timestamp", github: "ogijun/fuzzy_timestamp"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

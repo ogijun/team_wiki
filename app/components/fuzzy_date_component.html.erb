@@ -1,1 +1,1 @@
-<span class="when"><% if @icon %><%= helpers.icon("calendar") %> <% end %><%= @starts.label %><% if @ends %> 〜 <%= @ends.label %><% end %></span>
+<span class="when"><% if @icon %><%= helpers.icon("calendar") %> <% end %><time datetime="<%= @starts %>"><%= FuzzyTimestamp.label(@starts) %></time><% if @ends %> 〜 <time datetime="<%= @ends %>"><%= FuzzyTimestamp.label(@ends) %></time><% end %></span>

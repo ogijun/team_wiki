@@ -18,29 +18,28 @@ class ArticleTest < ActiveSupport::TestCase
   end
 
   test "invalid date parts make the record invalid instead of raising (500)" do
-    a = Article.new(title: "不正日付記事", created_by: @user, start_year: "2020", start_month: "99")
+    a = Article.new(title: "不正日付記事", created_by: @user, starts: "2020-99")
     assert_nothing_raised { a.valid? }
     assert_not_predicate a, :valid?
-    assert_nil a.starts_at
+    assert_equal "2020-99", a.starts
     assert_predicate a.errors, :any?
   end
 
   test "non-numeric date parts make the record invalid instead of raising" do
-    a = Article.new(title: "数値以外日付記事", created_by: @user, start_year: "abc")
+    a = Article.new(title: "数値以外日付記事", created_by: @user, starts: "abc")
     assert_nothing_raised { a.valid? }
     assert_not_predicate a, :valid?
   end
 
   test "clearing all date parts removes the fuzzy date" do
-    a = Article.create!(title: "日付クリア", created_by: @user, start_year: 1998)
+    a = Article.create!(title: "日付クリア", created_by: @user, starts: "1998")
     assert_predicate a.starts, :present?
-    a.update!(start_year: "", start_month: "", start_day: "", start_hour: "", start_minute: "")
-    assert_nil a.reload.starts_at
-    assert_nil a.starts_precision
+    a.update!(starts: nil)
+    assert_nil a.reload.starts
   end
 
   test "a save that does not touch date parts keeps the stored date" do
-    a = Article.create!(title: "日付保持", created_by: @user, start_year: 1998)
+    a = Article.create!(title: "日付保持", created_by: @user, starts: "1998")
     Article.find(a.id).update!(status: "done") # 仮想アクセサ未代入(=nil)の save
     assert_predicate a.reload.starts, :present?
   end
@@ -105,46 +104,37 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal "活動対象", act.subject_label # ラベルのスナップショットは残る
   end
 
-  test "starts reader wraps stored columns into FuzzyDate" do
-    a = Article.create!(title: "年表記事", created_by: @user,
-                        starts_at: Time.zone.local(1979, 1, 1), starts_precision: "year")
-    assert_equal "1979年", a.starts.label
+  test "stores a reduced-precision timestamp" do
+    a = Article.create!(title: "年表記事", created_by: @user, starts: "1979")
+    assert_equal "1979", a.starts
     assert_nil a.ends
   end
 
-  test "requires starts_at and starts_precision together" do
-    a = Article.new(title: "片方", created_by: @user, starts_at: Time.zone.local(1979))
-    assert_not a.valid?
-    assert_predicate a.errors[:starts_precision], :any?
-  end
-
-  test "rejects invalid precision" do
-    a = Article.new(title: "不正精度", created_by: @user,
-                    starts_at: Time.zone.local(1979), starts_precision: "decade")
+  test "rejects invalid timestamp strings" do
+    a = Article.new(title: "不正精度", created_by: @user, starts: "1979-decade")
     assert_not a.valid?
   end
 
   test "ends must not precede starts" do
     a = Article.new(title: "逆転", created_by: @user,
-                    starts_at: Time.zone.local(1980), starts_precision: "year",
-                    ends_at: Time.zone.local(1979), ends_precision: "year")
+                    starts: "1980", ends: "1979")
     assert_not a.valid?
-    assert_predicate a.errors[:ends_at], :any?
+    assert_predicate a.errors[:ends], :any?
   end
 
   test "ends requires starts" do
     a = Article.new(title: "終わりだけ", created_by: @user,
-                    ends_at: Time.zone.local(1979), ends_precision: "year")
+                    ends: "1979")
     assert_not a.valid?
-    assert_predicate a.errors[:starts_at], :any?
+    assert_predicate a.errors[:starts], :any?
   end
 
   test "chronicled scope returns dated articles oldest first" do
     Article.create!(title: "無日付", created_by: @user)
     newer = Article.create!(title: "1990", created_by: @user,
-                            starts_at: Time.zone.local(1990), starts_precision: "year")
+                            starts: "1990")
     older = Article.create!(title: "1980", created_by: @user,
-                            starts_at: Time.zone.local(1980), starts_precision: "year")
+                            starts: "1980")
     assert_equal [ older, newer ], Article.chronicled.to_a
   end
 

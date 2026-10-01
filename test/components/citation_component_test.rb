@@ -9,7 +9,7 @@ class CitationComponentTest < ViewComponent::TestCase
   test "full citation joins author, source, year, then linked title" do
     m = Material.create!(user: @user, title: "インタビュー", url: "https://x.test/a",
                          author: "サンプル著者", source: "サンプル誌",
-                         published_at: Time.zone.local(1998), published_precision: "year")
+                         published: "1998")
     html = render_inline(CitationComponent.new(material: m)).to_html
     assert_includes html, "サンプル著者『サンプル誌』(1998). "
     assert_match(/<a [^>]*>インタビュー<\/a>/, html)

@@ -217,6 +217,7 @@ button.tag-chip:hover, button.tag-chip:focus {
 /* ── フォーム ──────────────────────────────── */
 
 /* Stacked form: each field group owns its spacing; label sits tight to its control. */
+.fuzzy-date output { display: block; min-height: 1.4em; color: var(--muted); font-size: 0.85rem; }
 .stacked-form .field { margin-bottom: 1.6rem; }
 .stacked-form .field:last-child { margin-bottom: 0; }
 .stacked-form .field > label { margin-bottom: 0.4rem; }
