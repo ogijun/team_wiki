@@ -23,6 +23,9 @@ module TeamWiki
     #
     # 表示は日本時間に。保存は UTC のまま（active_record.default_timezone の既定）。
     config.time_zone = "Tokyo"
+    # FTS5 の仮想表は schema.rb で表現できないため、主DBだけ SQL 形式で dump する。
+    # queue / cache / cable は各 *_schema.rb のまま（database.yml の migrations_paths 参照）。
+    config.active_record.schema_format = :sql
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
