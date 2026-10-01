@@ -47,7 +47,7 @@ class MaterialsController < ApplicationController
     if save_material(@material)
       # 重い後処理（ファイル=メタ抽出/PDF linearize、URL=サイトAPI/og:title 補完）は
       # 外部 I/O を含むのでリクエストから外して非同期で行う。
-      MaterialPostProcessJob.perform_later(@material)
+      MaterialPostProcessJob.perform_later(@material) unless @material.placeholder?
       Activity.record(actor: Current.user, action: "material.added", subject: @material)
       redirect_to @material, notice: "資料を追加しました。"
     else
@@ -59,7 +59,9 @@ class MaterialsController < ApplicationController
   end
 
   def update
+    was_placeholder = @material.placeholder?
     if @material.update(material_params)
+      MaterialPostProcessJob.perform_later(@material) if was_placeholder && !@material.placeholder?
       redirect_to @material, notice: "資料を保存しました。"
     else
       render :edit, status: :unprocessable_entity
@@ -102,7 +104,8 @@ class MaterialsController < ApplicationController
                  :isbn, :pages, :page_count, :publisher, :volume,
                  :published_year, :published_month, :published_day, :published_hour, :published_minute ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。
-    permitted += [ :file, :url ] unless @material&.persisted?
+    permitted << :placeholder_intent unless @material&.persisted?
+    permitted += [ :file, :url ] unless @material&.persisted? && !@material.placeholder?
     # confidence（material 単位の信頼度）はフォームから撤去（将来はカラム毎の confirm へ）。
     params.require(:material).permit(*permitted)
   end

@@ -117,16 +117,36 @@ class MaterialTest < ActiveSupport::TestCase
     assert_predicate m, :valid?, m.errors.full_messages.join(", ")
   end
 
-  test "requires exactly one of file or url - neither is invalid" do
+  test "source-free material requires explicit placeholder intent on create" do
     m = Material.new(user: @user, title: "空")
     assert_not m.valid?
-    assert_includes m.errors[:base], "ファイルかURLのどちらか一方を指定してください"
+    assert_includes m.errors[:base], "実体がない資料として登録する場合はチェックしてください"
+
+    m.placeholder_intent = "1"
+    assert_predicate m, :valid?, m.errors.full_messages.join(", ")
+    assert_predicate m, :placeholder?
   end
 
   test "requires exactly one of file or url - both is invalid" do
     m = attach_png(Material.new(user: @user, url: "https://example.com/x"))
     assert_not m.valid?
     assert_includes m.errors[:base], "ファイルかURLのどちらか一方を指定してください"
+  end
+
+  test "placeholder is derived from the absence of file and url" do
+    placeholder = Material.create!(user: @user, title: "募集中", placeholder_intent: "1")
+    assert_predicate placeholder, :placeholder?
+
+    placeholder.update!(url: "https://example.com/found")
+    assert_not_predicate placeholder, :placeholder?
+  end
+
+  test "placeholder accepts transcription parts" do
+    placeholder = Material.create!(user: @user, title: "文字起こし対象", placeholder_intent: "1")
+
+    part = placeholder.transcriptions.create!(author: @user, body: "資料メモ", position: 1)
+
+    assert_equal placeholder, part.material
   end
 
   test "rejects disallowed content type" do

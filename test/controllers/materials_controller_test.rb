@@ -47,6 +47,46 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "create accepts a checked source-free placeholder and shows its callout" do
+    assert_difference("Material.count", 1) do
+      post materials_url, params: { material: { title: "未所持資料", placeholder_intent: "1" } }
+    end
+
+    material = Material.order(:id).last
+    assert_predicate material, :placeholder?
+    assert_redirected_to material_url(material)
+    follow_redirect!
+    assert_select ".material-placeholder", text: /実体募集中/
+    assert_select "form[action=?] input[name='material[file]']", material_path(material)
+    assert_select "form[action=?] input[name='material[url]']", material_path(material)
+  end
+
+  test "placeholder can receive a source once but an existing source stays immutable" do
+    material = Material.create!(user: @user, title: "未所持資料", placeholder_intent: "1")
+
+    patch material_url(material), params: { material: { url: "https://example.com/found" } }
+    assert_equal "https://example.com/found", material.reload.url
+    assert_not_predicate material, :placeholder?
+
+    patch material_url(material), params: { material: { url: "https://example.com/replacement" } }
+    assert_equal "https://example.com/found", material.reload.url
+  end
+
+  test "adding a PDF to a placeholder enqueues the existing post-process job" do
+    material = Material.create!(user: @user, title: "PDF待ち", placeholder_intent: "1")
+    tempfile = Tempfile.new([ "placeholder", ".pdf" ])
+    tempfile.write("%PDF-1.4")
+    tempfile.rewind
+    upload = Rack::Test::UploadedFile.new(tempfile.path, "application/pdf", original_filename: "found.pdf")
+
+    assert_enqueued_with(job: MaterialPostProcessJob, args: [ material ]) do
+      patch material_url(material), params: { material: { file: upload } }
+    end
+    assert_predicate material.reload, :pdf?
+  ensure
+    tempfile&.close!
+  end
+
   test "show displays page_count in the bibliography when present" do
     m = Material.create!(user: @user, url: "https://x.test/book", title: "本", page_count: 300)
     get material_url(m)
@@ -78,6 +118,16 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "対象資料"
     assert_select "a", text: "対象外", count: 0
     assert_select ".filter-notice", text: /キーワード/
+  end
+
+  test "index filters placeholders and renders a removable notice" do
+    placeholder = Material.create!(user: @user, title: "実体待ち", placeholder_intent: "1")
+    Material.create!(user: @user, title: "実体あり", url: "https://example.com/present")
+
+    get materials_url, params: { placeholder: "1" }
+    assert_select "a", text: placeholder.title
+    assert_select "a", text: "実体あり", count: 0
+    assert_select ".filter-notice", text: /実体募集中/
   end
 
   test "index ignores unknown filter values and shows filtered empty state" do

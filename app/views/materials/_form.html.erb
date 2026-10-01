@@ -2,15 +2,23 @@
   <%= render "shared/error_messages", record: material %>
 
   <%# ── 一級市民: 実体 / 分類 / 内容を1行で / 出典元 / 初出 ── %>
-  <% if material.new_record? %>
+  <% if material.new_record? || material.placeholder? %>
     <fieldset>
-      <legend>ファイル または URL のどちらか一方（登録後は変更できません）<%= required_badge %></legend>
+      <legend>ファイル または URL のどちらか一方<%= required_badge if material.new_record? %></legend>
       <div class="field"><%= f.label :file, "ファイル" %><%= f.file_field :file %></div>
       <div class="field">
         <%= f.label :url, "URL" %>
         <small class="field__hint">YouTube・ニコニコ動画・Vimeo・Dailymotion・Spotify はプレーヤーが埋め込み表示されます。その他のURL（記事ページ等）もリンクとして登録できます。</small>
         <%= f.url_field :url, value: material.url %>
       </div>
+      <% if material.new_record? %>
+        <div class="field">
+          <%= f.label :placeholder_intent do %>
+            <%= f.check_box :placeholder_intent %>
+            実体はまだない — あとで自分か誰かがファイル/URLを追加
+          <% end %>
+        </div>
+      <% end %>
     </fieldset>
   <% else %>
     <div class="muted">

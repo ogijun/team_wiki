@@ -19,6 +19,14 @@ class MaterialFilter
       valid: ->(params) { Material::TRANSCRIPTION_STATUS_SCOPES.key?(params["transcription_status"]) },
       apply: ->(scope, params) { scope.public_send(Material::TRANSCRIPTION_STATUS_SCOPES[params["transcription_status"]]) },
       notice: ->(params) { [ "文字起こし:", Material::TRANSCRIPTION_STATUS_LABELS[params["transcription_status"]], nil, nil ] }
+    },
+    "placeholder" => {
+      valid: ->(params) { params["placeholder"] == "1" },
+      apply: ->(scope, _params) {
+        scope.left_joins(:file_attachment)
+             .where(active_storage_attachments: { id: nil }, url: [ nil, "" ])
+      },
+      notice: ->(_params) { [ "実体募集中", nil, nil, nil ] }
     }
   }.freeze
 
