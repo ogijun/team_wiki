@@ -61,6 +61,17 @@ class SearchRunnerTest < ActiveSupport::TestCase
     assert_includes search("ガンダム -富野").map(&:owner), @title_hit
   end
 
+  test "短い通常語だけの検索でも3文字以上の除外語が効く" do
+    excluded = Article.create!(title: "富野とガンダム", created_by: @user)
+    excluded.revise!(body: "x", author: @user)
+    included = Article.create!(title: "富野の本", created_by: @user)
+    included.revise!(body: "y", author: @user)
+
+    owners = search("富野 -ガンダム").map(&:owner)
+    assert_not_includes owners, excluded
+    assert_includes owners, included
+  end
+
   test "表記ゆれ: ひらがな・全角で書いても当たる" do
     assert_includes search("がんだむ").map(&:owner), @title_hit
     en = Article.create!(title: "gundam", created_by: @user)
