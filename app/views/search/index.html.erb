@@ -1,33 +1,51 @@
 <h1>検索</h1>
 <%= form_with url: search_path, method: :get do |f| %>
-  <%= f.search_field :q, value: @q, placeholder: "検索…" %>
+  <%= f.search_field :q, value: @q, placeholder: "検索…  例: 富野 ガンダム / \"機動戦士ガンダム\" / 富野 -映画" %>
 <% end %>
 
 <% if @q.present? %>
-  <div class="muted search-note">いまはまだ全文検索が有効になっていないため、検索精度はよくありません。</div>
-
-  <% if @results.any? %>
+  <% if @hits.any? %>
     <ul class="search-results">
-      <% @results.each do |r| %>
+      <% @hits.each do |hit| %>
+        <% owner = hit.owner %>
+        <% via = hit.via %>
         <li>
-          <% if r.is_a?(Article) %>
-            <%= icon("newspaper") %> <%= link_to search_mark(r.title, @q), r %>
-            <% if (snippet = search_snippet(r.current_revision&.body, @q)) %>
-              <div class="search-snippet muted"><%= snippet %></div>
-            <% end %>
-          <% else %>
-            <%= media_icon(r) %> <%= link_to search_mark(r.title, @q), r %>
-            <% body = r.transcriptions.find { |t| t.body&.include?(@q) }&.body || r.transcriptions.first&.body %>
-            <% if (snippet = search_snippet(body, @q)) %>
-              <div class="search-snippet muted">文字起こし: <%= snippet %></div>
-            <% end %>
+          <% if owner.is_a?(Material) %><%= media_icon(owner) %>
+          <% elsif owner.is_a?(Publication) %><%= icon("package") %>
+          <% else %><%= icon("newspaper") %>
+          <% end %>
+          <%= link_to search_mark(owner.title, @q), owner %>
+          <%
+            if via.is_a?(Transcription)
+              snippet_source = via.body
+              where = via.label.present? ? "文字起こし #{via.label}" : "文字起こし"
+            elsif via.is_a?(Comment)
+              snippet_source = via.body
+              where = "コメント"
+            elsif via.is_a?(Article)
+              snippet_source = via.current_revision&.body
+              where = nil
+            elsif via.is_a?(Material)
+              snippet_source = [ via.source, via.author, via.publisher, via.volume, via.description ].compact_blank.join(" / ")
+              where = nil
+            else
+              snippet_source = nil
+              where = nil
+            end
+            term = (@query.terms + @query.phrases + @query.short_terms).first
+          %>
+          <% if where %><span class="search-where muted"><%= where %></span><% end %>
+          <% if term && (snippet = search_snippet(snippet_source, term)) %>
+            <div class="search-snippet muted"><%= snippet %></div>
           <% end %>
         </li>
       <% end %>
     </ul>
+    <%= sanitize(pagy_nav(@pagy), tags: %w[nav a],
+                                  attributes: %w[id class href role aria-label aria-disabled aria-current]) if @pagy.pages > 1 %>
   <% else %>
     <div class="empty-state">
-      「<%= @q %>」に一致する記事・資料は見つかりませんでした。別の言葉や、名前の一部でもお試しください。（全文検索は今後対応予定です）
+      「<%= @q %>」に一致するものは見つかりませんでした。別の言葉や、名前の一部でもお試しください。
     </div>
   <% end %>
 <% end %>

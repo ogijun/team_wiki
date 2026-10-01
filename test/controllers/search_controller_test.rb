@@ -43,16 +43,17 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /検索対象音声/
   end
 
-  test "mixes articles and materials sorted by updated_at desc" do
-    @hit.update!(updated_at: 2.hours.ago)
-    m = Material.create!(user: @user, url: "https://example.com/mix", title: "新しいRubyの資料")
-    m.update!(updated_at: 1.hour.ago)
-
+  test "mixes articles and materials in one list, title match ranked above body match" do
+    Material.create!(user: @user, url: "https://example.com/mix", title: "Rubyの資料")
     get search_url, params: { q: "Ruby" }
-    assert_select ".search-results", count: 1 # セクション分けせず単一リスト
+    assert_select ".search-results", count: 1
+    assert_select ".search-results a", text: "Ruby入門"
+    assert_select ".search-results a", text: "Rubyの資料"
+    body_only = Article.create!(title: "無題", created_by: @user)
+    body_only.revise!(body: "Ruby は本文だけ", author: @user)
+    get search_url, params: { q: "Ruby" }
     body = response.body
-    # タイトル内のマッチは <mark> で分断されるので、マーク境界を跨がない部分で順序を見る
-    assert_operator body.index("の資料"), :<, body.index("入門"), "新しい方が先に出る"
+    assert_operator body.index("入門"), :<, body.index("無題")
   end
 
   test "results show highlighted snippets around the match" do
@@ -74,13 +75,19 @@ class SearchControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "shows the full-text-not-enabled note when a query is present" do
+  test "no full-text-disabled note anymore" do
     get search_url, params: { q: "Ruby" }
-    assert_select "div.search-note"
+    assert_select "div.search-note", count: 0
   end
 
-  test "omits the note when no query" do
-    get search_url, params: { q: "" }
-    assert_select "div.search-note", count: 0
+  test "hit location is shown for transcription and comment hits" do
+    media = Material.new(user: @user, title: "位置表示")
+    media.file.attach(io: StringIO.new("x"), filename: "l.mp3", content_type: "audio/mpeg")
+    media.save!
+    Transcription.create!(material: media, author: @user, body: "パート内の固有語ヒット", label: "p.1-20", status: "drafting")
+    Comment.create!(commentable: @hit, author: @user, body: "コメント内の固有語ヒット")
+    get search_url, params: { q: "固有語ヒット" }
+    assert_select ".search-where", text: /文字起こし p\.1-20/
+    assert_select ".search-where", text: /コメント/
   end
 end
