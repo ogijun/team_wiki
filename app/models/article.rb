@@ -1,5 +1,4 @@
 class Article < ApplicationRecord
-  include FuzzyDateAttributable
   include Reactable
   include Taggable
 
@@ -25,15 +24,14 @@ class Article < ApplicationRecord
   validates :kind, inclusion: { in: KINDS.keys }, allow_nil: true
   validates :status, inclusion: { in: STATUSES.keys }
 
-  fuzzy_date_attribute :starts_at, accessor: :start
-  fuzzy_date_attribute :ends_at, accessor: :end
+  self.ignored_columns += %w[starts_at starts_precision ends_at ends_precision]
 
   before_validation :assign_slug, on: :create
 
-  scope :chronicled, -> { where.not(starts_at: nil).order(:starts_at) }
+  scope :chronicled, -> { where.not(starts: nil).order(:starts) }
 
-  validates :starts_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
-  validates :ends_precision, inclusion: { in: FuzzyDate::PRECISIONS }, allow_nil: true
+  validate { errors.add(:starts, "の形式が正しくありません") unless FuzzyTimestamp.valid?(starts) }
+  validate { errors.add(:ends, "の形式が正しくありません") unless FuzzyTimestamp.valid?(ends) }
 
   validate :date_range_consistent
 
@@ -71,7 +69,7 @@ class Article < ApplicationRecord
           self.current_revision = revision
         end
       end
-      # 更新は属性変更（FuzzyDate パーツ・タグ等の仮想属性含む）と current_revision を1回の save! で
+      # 更新は属性変更（精度可変日時・タグ等を含む）と current_revision を1回の save! で
       # 永続化し、validation/callback を1回に抑える。新規は上で確定済みなのでスキップ。
       save! unless creating
       sync_outgoing_links(body)
@@ -122,9 +120,9 @@ class Article < ApplicationRecord
   end
 
   def date_range_consistent
-    errors.add(:starts_at, "が必要です") if ends_at.present? && starts_at.blank?
-    if starts_at.present? && ends_at.present? && ends_at < starts_at
-      errors.add(:ends_at, "は開始以降にしてください")
+    errors.add(:starts, "が必要です") if ends.present? && starts.blank?
+    if starts.present? && ends.present? && ends < starts
+      errors.add(:ends, "は開始以降にしてください")
     end
   end
 

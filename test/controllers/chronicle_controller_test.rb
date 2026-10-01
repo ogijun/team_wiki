@@ -15,9 +15,9 @@ class ChronicleControllerTest < ActionDispatch::IntegrationTest
   test "index lists dated articles oldest first and excludes undated" do
     Article.create!(title: "無日付", created_by: @user)
     Article.create!(title: "1990年の出来事", created_by: @user,
-                    starts_at: Time.zone.local(1990), starts_precision: "year")
+                    starts: "1990")
     Article.create!(title: "1980年の出来事", created_by: @user,
-                    starts_at: Time.zone.local(1980), starts_precision: "year")
+                    starts: "1980")
     get chronicle_url
     assert_response :success
     assert_select "li", text: /1980年の出来事/
@@ -28,18 +28,15 @@ class ChronicleControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index shows fuzzy label and range" do
-    Article.create!(title: "戦争", created_by: @user,
-                    starts_at: Time.zone.local(1939, 9, 1), starts_precision: "day",
-                    ends_at: Time.zone.local(1945, 8, 1), ends_precision: "month")
+    Article.create!(title: "戦争", created_by: @user, starts: "1939-09-01", ends: "1945-08")
     get chronicle_url
     assert_select "li", text: /1939年9月1日 〜 1945年8月/
   end
 
   test "lists dated materials and articles with type icons and links" do
     Article.create!(title: "年表記事", created_by: @user,
-                    starts_at: Time.zone.local(1981), starts_precision: "year")
-    material = Material.create!(user: @user, title: "年表資料", url: "https://x.test/c",
-                               published_at: Time.utc(1979, 4, 1), published_precision: "month")
+                    starts: "1981")
+    material = Material.create!(user: @user, title: "年表資料", url: "https://x.test/c", published: "1979-04")
     get chronicle_url
     assert_response :success
     assert_select "a", text: /年表記事/
@@ -50,7 +47,7 @@ class ChronicleControllerTest < ActionDispatch::IntegrationTest
 
   test "shows publications with a buy link when purchasable" do
     Publication.create!(title: "年表に出る本", kind: "book", registered_by: @user,
-                        released_year: "1995", store_url: "https://example.com/item")
+                        released: "1995", store_url: "https://example.com/item")
     get chronicle_url
     assert_response :success
     assert_select "body", /年表に出る本/

@@ -200,17 +200,17 @@ class MaterialTest < ActiveSupport::TestCase
     assert_equal "サンプル著者", m.author
   end
 
-  test "published wraps FuzzyDate when present, nil otherwise" do
+  test "published stores a reduced-precision timestamp" do
     m = Material.new(user: @user, url: "https://x.test/a",
-                     published_at: Time.zone.local(1998), published_precision: "year")
-    assert_equal "1998年", m.published.label
+                     published: "1998")
+    assert_equal "1998", m.published
     assert_nil Material.new(user: @user, url: "https://x.test/b").published
   end
 
-  test "published_at and published_precision must be both present or both blank" do
-    bad = Material.new(user: @user, url: "https://x.test/a", published_at: Time.zone.local(1998))
+  test "published must be a valid reduced-precision timestamp" do
+    bad = Material.new(user: @user, url: "https://x.test/a", published: "1998-99")
     assert_not bad.valid?
-    assert_predicate bad.errors[:published_precision], :any?
+    assert_predicate bad.errors[:published], :any?
   end
 
   test "thumbnailable_file? is true for image, false for non-image and links" do

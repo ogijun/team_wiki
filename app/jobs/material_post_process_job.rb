@@ -37,7 +37,7 @@ class MaterialPostProcessJob < ApplicationJob
   # 補える項目が無ければ外部取得自体を省く。失敗は原本に影響させずログのみ。
   def autofill_link_metadata(material)
     needs_title = material.title.blank? || material.title == material.url
-    needs_date  = material.published_at.nil?
+    needs_date  = material.published.nil?
     return unless needs_title || needs_date
 
     video = VideoMetadata.call(material.url)
@@ -46,7 +46,7 @@ class MaterialPostProcessJob < ApplicationJob
       material.update_column(:title, title) if title.present?
     end
     if needs_date && (date = video&.dig(:published_on))
-      material.update_columns(published_at: date.in_time_zone, published_precision: "day")
+      material.update_columns(published: FuzzyTimestamp.from_date(date))
     end
   rescue StandardError => e
     Rails.logger.warn("autofill_link_metadata failed for Material##{material.id}: #{e.class}: #{e.message}")

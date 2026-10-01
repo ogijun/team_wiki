@@ -1,4 +1,4 @@
-# 年表の統一エントリ: 日付のある記事(chronicled)、発行日のある資料(published_at)、
+# 年表の統一エントリ: 日付のある記事(chronicled)、発行日のある資料(published)、
 # 発売日のある発売物(chronicled) を1つの時系列リストにマージして日付昇順で返す純関数。表示専用。
 module Chronicle
   module_function
@@ -10,13 +10,13 @@ module Chronicle
 
   def entries
     article_entries = Article.chronicled.map do |a|
-      Entry.new(sort_at: a.starts_at, starts: a.starts, ends: a.ends, title: a.title, record: a, kind: :article)
+      Entry.new(sort_at: a.starts, starts: a.starts, ends: a.ends, title: a.title, record: a, kind: :article)
     end
-    material_entries = Material.where.not(published_at: nil).map do |m|
-      Entry.new(sort_at: m.published_at, starts: m.published, ends: nil, title: m.title, record: m, kind: :material)
+    material_entries = Material.where.not(published: nil).map do |m|
+      Entry.new(sort_at: m.published, starts: m.published, ends: nil, title: m.title, record: m, kind: :material)
     end
     publication_entries = Publication.chronicled.map do |p|
-      Entry.new(sort_at: p.released_at, starts: p.released, ends: nil, title: p.title, record: p, kind: :publication)
+      Entry.new(sort_at: p.released, starts: p.released, ends: nil, title: p.title, record: p, kind: :publication)
     end
     # 日付昇順。同日は 記事→資料→発売物、さらにタイトルで決定的に並べる。
     (article_entries + material_entries + publication_entries)

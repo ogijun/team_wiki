@@ -21,7 +21,7 @@
             <%= link_to m.title, material_path(m), class: "tag-materials__title" %>
             <span class="tag-materials__meta">
               <%= avatar_link(m.user, size: 20) %>
-              <% if m.published %><span>・<%= m.published.slashes %></span><% end %>
+              <% if m.published %><span>・<%= m.published.tr("-T", "/ ") %></span><% end %>
               <% if (st = transcription_status_label(m)) %><span>・<%= st %></span><% end %>
             </span>
           </span>

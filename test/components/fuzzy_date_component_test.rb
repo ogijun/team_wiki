@@ -3,21 +3,18 @@ require "view_component/test_case"
 
 class FuzzyDateComponentTest < ViewComponent::TestCase
   test "renders a single fuzzy date label" do
-    fd = FuzzyDate.wrap(Time.zone.local(1979, 4, 7), "day")
-    html = render_inline(FuzzyDateComponent.new(starts: fd)).to_html
+    html = render_inline(FuzzyDateComponent.new(starts: "1979-04-07")).to_html
     assert_includes html, "1979年4月7日"
+    assert_includes html, 'datetime="1979-04-07"'
   end
 
   test "renders a range when ends is given" do
-    s = FuzzyDate.wrap(Time.zone.local(1979), "year")
-    e = FuzzyDate.wrap(Time.zone.local(1980), "year")
-    html = render_inline(FuzzyDateComponent.new(starts: s, ends: e)).to_html
-    assert_includes html, "1979年 〜 1980年"
+    fragment = render_inline(FuzzyDateComponent.new(starts: "1979", ends: "1980"))
+    assert_equal "1979年 〜 1980年", fragment.text.strip
   end
 
   test "icon: true prefixes a calendar" do
-    fd = FuzzyDate.wrap(Time.zone.local(1979), "year")
-    html = render_inline(FuzzyDateComponent.new(starts: fd, icon: true)).to_html
+    html = render_inline(FuzzyDateComponent.new(starts: "1979", icon: true)).to_html
     assert_includes html, "#calendar"
   end
 

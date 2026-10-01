@@ -106,7 +106,7 @@
   <%# 一級市民の分類・初出・出典元を本体近くに明示（書誌の奥に埋もれさせない）。分類は常に出す。 %>
   <div class="material-identity">
     <span class="material-identity__item"><span class="material-identity__label">分類</span><%= material_kind_label(@material) %></span>
-    <% if @material.published %><span class="material-identity__item"><span class="material-identity__label">初出</span><%= @material.published.label %></span><% end %>
+    <% if @material.published %><span class="material-identity__item"><span class="material-identity__label">初出</span><%= FuzzyTimestamp.label(@material.published) %></span><% end %>
     <% if @material.source.present? %><span class="material-identity__item"><span class="material-identity__label">出典元</span><%= @material.source %></span><% end %>
   </div>
 
