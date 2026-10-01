@@ -24,8 +24,6 @@ class Article < ApplicationRecord
   validates :kind, inclusion: { in: KINDS.keys }, allow_nil: true
   validates :status, inclusion: { in: STATUSES.keys }
 
-  self.ignored_columns += %w[starts_at starts_precision ends_at ends_precision]
-
   before_validation :assign_slug, on: :create
 
   scope :chronicled, -> { where.not(starts: nil).order(:starts) }
