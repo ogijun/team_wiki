@@ -54,8 +54,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "create with malicious out-of-range date returns 422, not 500, and persists nothing" do
     assert_no_difference("Article.count") do
-      post articles_url, params: { article: { title: "不正日付", body: "本文", tag_names: "",
-                                              start_year: "2020", start_month: "99" } }
+      post articles_url, params: { article: { title: "不正日付", body: "本文", tag_names: "", starts: "2020-99" } }
     end
     assert_response :unprocessable_entity
   end
@@ -71,9 +70,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show displays fuzzy date and range when present" do
-    article = Article.create!(title: "出来事", created_by: @user,
-                              starts_at: Time.zone.local(1939, 9, 1), starts_precision: "day",
-                              ends_at: Time.zone.local(1945, 8, 1), ends_precision: "month")
+    article = Article.create!(title: "出来事", created_by: @user, starts: "1939-09-01", ends: "1945-08")
     article.revise!(body: "本文", author: @user)
     get article_url(article)
     assert_response :success
@@ -129,25 +126,21 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   test "create stores fuzzy start with year precision" do
     post articles_url, params: { article: {
       title: "年だけ", body: "x",
-      start_year: "1979", start_month: "", start_day: "", start_hour: "", start_minute: ""
+      starts: "1979"
     } }
     a = Article.find_by(title: "年だけ")
-    assert_equal "year", a.starts_precision
-    assert_equal Time.zone.local(1979, 1, 1), a.starts_at
-    assert_nil a.ends_at
+    assert_equal "1979", a.starts
+    assert_nil a.ends
   end
 
   test "create stores fuzzy range with day and month precision" do
     post articles_url, params: { article: {
       title: "期間", body: "x",
-      start_year: "1939", start_month: "9", start_day: "1", start_hour: "", start_minute: "",
-      end_year: "1945", end_month: "8", end_day: "", end_hour: "", end_minute: ""
+      starts: "1939/9/1", ends: "1945/8"
     } }
     a = Article.find_by(title: "期間")
-    assert_equal "day", a.starts_precision
-    assert_equal Time.zone.local(1939, 9, 1), a.starts_at
-    assert_equal "month", a.ends_precision
-    assert_equal Time.zone.local(1945, 8, 1), a.ends_at
+    assert_equal "1939-09-01", a.starts
+    assert_equal "1945-08", a.ends
   end
 
   test "update can set fuzzy date" do
@@ -155,10 +148,9 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     article.revise!(body: "本文", author: @user)
     patch article_url(article), params: { article: {
       title: article.title, body: "本文",
-      start_year: "2000", start_month: "1", start_day: "", start_hour: "", start_minute: ""
+      starts: "2000/1"
     } }
-    assert_equal "month", article.reload.starts_precision
-    assert_equal Time.zone.local(2000, 1, 1), article.starts_at
+    assert_equal "2000-01", article.reload.starts
   end
 
   test "show displays contributor avatars linking to users" do

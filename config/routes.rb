@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   resources :tags, only: %i[index show create destroy]
   resources :activities, only: :index
   get "chronicle", to: "chronicle#index"
+  get "fuzzy_date", to: "fuzzy_dates#show", as: :fuzzy_date
   get "about", to: "about#show"
   get "members", to: "members#index"
   resources :users, only: %i[show index]

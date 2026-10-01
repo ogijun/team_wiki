@@ -154,7 +154,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index date and status cells use nowrap classes to keep rows short" do
-    Material.create!(user: @user, url: "https://x.test/short", title: "短行資料", published_year: 2020)
+    Material.create!(user: @user, url: "https://x.test/short", title: "短行資料", published: "2020")
     get materials_url
     assert_select "td.col-when"   # 投稿日時/発行日（折返し制御）
     assert_select "td.col-status" # 文字起こし
@@ -191,8 +191,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index shows uploader as an avatar link with a name tooltip, plus 投稿日時 and 初出 columns" do
-    m = Material.create!(user: @user, url: "https://example.com/p", title: "資料P",
-                         published_year: 2020, published_month: 3)
+    m = Material.create!(user: @user, url: "https://example.com/p", title: "資料P", published: "2020-03")
     get materials_url
     assert_response :success
     assert_select "a.sort-link", text: /By/
@@ -312,8 +311,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
 
   test "detail elevates 文字起こし above 書誌, surfaces 出典元/初出, shows a タグ zone" do
     m = Material.create!(user: @user, url: "https://x.test/zone", title: "ゾーン資料",
-                         source: "サンプル誌", author: "サンプル著者",
-                         published_year: 1981, published_month: 3)
+                         source: "サンプル誌", author: "サンプル著者", published: "1981-03")
     get material_url(m)
     assert_response :success
     body = response.body
@@ -593,13 +591,12 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
   test "create persists bibliographic fields and year-only published date" do
     post materials_url, params: { material: {
       url: "https://x.test/a", source: "サンプル誌", author: "サンプル著者",
-      published_year: "1998", published_month: "", published_day: ""
+      published: "1998", published_month: "", published_day: ""
     } }
     m = Material.order(:created_at).last
     assert_equal "サンプル誌", m.source
     assert_equal "サンプル著者", m.author
-    assert_equal "year", m.published_precision
-    assert_equal 1998, m.published_at.year
+    assert_equal "1998", m.published
   end
 
   test "create persists rights but ignores confidence (form input retired)" do
@@ -663,7 +660,7 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     get new_material_url
     assert_response :success
     assert_select "[name=?]", "material[confidence]", count: 0
-    assert_select "label[for=?]", "material_published_year", text: "初出"
+    assert_select "label[for=?]", "material_published", text: "初出"
   end
 
   test "new form offers a 分類 select with 自動で判定 and grouped + top-level options, and lists Spotify in the URL hint" do
@@ -707,23 +704,21 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "material[tag_names]"                                  # 中段に可視で存在
   end
 
-  test "the 初出 time inputs are hidden by default behind a +時刻 toggle" do
+  test "the 初出 date uses one text input with a live preview" do
     get new_material_url
     assert_response :success
-    assert_select "[data-disclosure-target='rest'][hidden] input[name=?]", "material[published_hour]"
-    assert_select "button[data-action=?]", "disclosure#toggle"
+    assert_select "[data-controller='fuzzy-date'] input[name=?]", "material[published]"
+    assert_select "output[data-fuzzy-date-target='preview']"
   end
 
-  test "the 初出 fields retain entered values for disclosure to reveal on edit" do
+  test "the 初出 field retains a minute-precision value on edit" do
     material = Material.create!(user: @user, title: "時刻あり", url: "https://x.test/dated",
-                                published_year: 1982, published_month: 3, published_day: 1,
-                                published_hour: 14, published_minute: 30)
+                                published: "1982-03-01T14:30")
 
     get edit_material_url(material)
 
     assert_response :success
-    assert_select "[data-controller='disclosure'][data-disclosure-auto-reveal-if-set-value='true'] input[name=?][value=?]", "material[published_hour]", "14"
-    assert_select "[data-controller='disclosure'][data-disclosure-auto-reveal-if-set-value='true'] input[name=?][value=?]", "material[published_minute]", "30"
+    assert_select "input[name=?][value=?]", "material[published]", "1982/3/1 14:30"
   end
 
   test "media material shows a transcription section" do
@@ -775,15 +770,12 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     assert_raises(NameError) { StubArticleForMaterial } # サービスは削除済み
   end
 
-  test "published_at can be entered down to the minute" do
+  test "published can be entered down to the minute" do
     post materials_url, params: { material: {
       title: "時刻あり資料", url: "https://x.test/time",
-      published_year: "1982", published_month: "3", published_day: "1",
-      published_hour: "14", published_minute: "30"
+      published: "1982/3/1 14:30"
     } }
     m = Material.find_by!(title: "時刻あり資料")
-    assert_equal "time", m.published_precision      # 時刻まで入れたら time 精度（FuzzyDate）
-    assert_equal 14, m.published_at.hour
-    assert_equal 30, m.published_at.min
+    assert_equal "1982-03-01T14:30", m.published
   end
 end

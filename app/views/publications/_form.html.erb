@@ -25,7 +25,7 @@
     <%= f.select :kind, Publication::KINDS.map { |value, label| [ label, value ] } %>
   </div>
 
-  <%= render "shared/fuzzy_date_fields", f: f, accessor: :released, fuzzy: publication.released, label: "発売日", hint: "わかる粒度だけでOK（年だけ・年月だけでも可）。年表にも使われます。" %>
+  <%= render "shared/fuzzy_date_fields", f: f, attribute: :released, value: publication.released, label: "発売日", hint: "1979・1979/4・1979/4/7 14:30 のように、わかる粒度だけ入力。空なら不明。" %>
 
   <div class="field">
     <%= f.label :sales_status, "販売状況" %><%= required_badge %>

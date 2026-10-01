@@ -8,7 +8,7 @@ class MaterialsController < ApplicationController
     "type"       => "(materials.url IS NULL)", # 種別＝リンク/ファイルでグルーピング（URL文字列順ではない）
     "uploader"   => "users.name",
     "created_at" => "materials.created_at",
-    "published"  => "materials.published_at"
+    "published"  => "materials.published"
   }.freeze
 
   def index
@@ -102,11 +102,13 @@ class MaterialsController < ApplicationController
     permitted = [ :title, :description, :kind,
                  :source, :author, :rights, :ownership, :tag_names,
                  :isbn, :pages, :page_count, :publisher, :volume,
-                 :published_year, :published_month, :published_day, :published_hour, :published_minute ]
+                 :published ]
     # 根幹（ファイル/URL）は登録時のみ。post 後は不変＝引用の出典を安定させる。
     permitted << :placeholder_intent unless @material&.persisted?
     permitted += [ :file, :url ] unless @material&.persisted? && !@material.placeholder?
     # confidence（material 単位の信頼度）はフォームから撤去（将来はカラム毎の confirm へ）。
-    params.require(:material).permit(*permitted)
+    attributes = params.require(:material).permit(*permitted)
+    attributes[:published] = FuzzyTimestamp.parse(attributes[:published], now: Time.current) if attributes.key?(:published)
+    attributes
   end
 end

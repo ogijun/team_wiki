@@ -5,29 +5,12 @@
 
   <fieldset data-controller="chronicle-date">
     <legend>日時（年表に表示）<%= optional_badge %></legend>
-
-    <div class="date-row">
-      <span data-chronicle-date-target="startLabel" hidden>開始:</span>
-      <%= f.number_field :start_year, value: fuzzy_part(article.starts, :year), placeholder: "年" %>
-      <%= f.number_field :start_month, in: 1..12, value: fuzzy_part(article.starts, :month), placeholder: "月" %>
-      <%= f.number_field :start_day, in: 1..31, value: fuzzy_part(article.starts, :day), placeholder: "日" %>
-      <span data-chronicle-date-target="startTime" hidden>
-        <%= f.number_field :start_hour, in: 0..23, value: fuzzy_part(article.starts, :hour), placeholder: "時", data: { chronicle_date_target: "startHour" } %>:<%= f.number_field :start_minute, in: 0..59, value: fuzzy_part(article.starts, :minute), placeholder: "分" %>
-      </span>
-      <a href="#" data-chronicle-date-target="startTimeLink" data-action="chronicle-date#addStartTime">時間を追加</a>
-    </div>
+    <%= render "shared/fuzzy_date_fields", f: f, attribute: :starts, value: article.starts, label: "開始", hint: "1979・1979/4・1979/4/7 14:30 のように入力。空なら不明。" %>
 
     <a href="#" data-chronicle-date-target="endLink" data-action="chronicle-date#addEnd">期間を指定</a>
 
-    <div class="date-row" data-chronicle-date-target="end" hidden>
-      終了:
-      <%= f.number_field :end_year, value: fuzzy_part(article.ends, :year), placeholder: "年", data: { chronicle_date_target: "endYear" } %>
-      <%= f.number_field :end_month, in: 1..12, value: fuzzy_part(article.ends, :month), placeholder: "月" %>
-      <%= f.number_field :end_day, in: 1..31, value: fuzzy_part(article.ends, :day), placeholder: "日" %>
-      <span data-chronicle-date-target="endTime" hidden>
-        <%= f.number_field :end_hour, in: 0..23, value: fuzzy_part(article.ends, :hour), placeholder: "時", data: { chronicle_date_target: "endHour" } %>:<%= f.number_field :end_minute, in: 0..59, value: fuzzy_part(article.ends, :minute), placeholder: "分" %>
-      </span>
-      <a href="#" data-chronicle-date-target="endTimeLink" data-action="chronicle-date#addEndTime">時間を追加</a>
+    <div data-chronicle-date-target="end" hidden>
+      <%= render "shared/fuzzy_date_fields", f: f, attribute: :ends, value: article.ends, label: "終了", hint: "期間の終わり。開始以降を入力してください。" %>
       <button type="button" class="date-clear" data-action="chronicle-date#removeEnd" aria-label="終了を消す" title="終了を消す">×</button>
     </div>
   </fieldset>

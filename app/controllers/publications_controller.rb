@@ -3,7 +3,7 @@ class PublicationsController < ApplicationController
 
   def index
     # 一覧は書影サムネを出すので blob を先読みする（N+1 回避）。
-    @publications = Publication.with_attached_cover.order(released_at: :desc, created_at: :desc)
+    @publications = Publication.with_attached_cover.order(released: :desc, created_at: :desc)
   end
 
   def show
@@ -51,8 +51,8 @@ class PublicationsController < ApplicationController
   end
 
   def publication_params
-    params.require(:publication).permit(:title, :kind, :sales_status, :store_url, :cover,
-                                        :released_year, :released_month, :released_day,
-                                        :released_hour, :released_minute)
+    attributes = params.require(:publication).permit(:title, :kind, :sales_status, :store_url, :cover, :released)
+    attributes[:released] = FuzzyTimestamp.parse(attributes[:released], now: Time.current) if attributes.key?(:released)
+    attributes
   end
 end

@@ -78,12 +78,8 @@ class ArticlesController < ApplicationController
       tag_names: article_params[:tag_names],
       kind: article_params[:kind].presence,
       status: article_params[:status].presence || current_status || "stub",
-      start_year: article_params[:start_year], start_month: article_params[:start_month],
-      start_day: article_params[:start_day], start_hour: article_params[:start_hour],
-      start_minute: article_params[:start_minute],
-      end_year: article_params[:end_year], end_month: article_params[:end_month],
-      end_day: article_params[:end_day], end_hour: article_params[:end_hour],
-      end_minute: article_params[:end_minute]
+      starts: FuzzyTimestamp.parse(article_params[:starts], now: Time.current),
+      ends: FuzzyTimestamp.parse(article_params[:ends], now: Time.current)
     }
   end
 
@@ -99,8 +95,6 @@ class ArticlesController < ApplicationController
 
   def article_params
     params.require(:article).permit(:title, :body, :tag_names, :edit_summary, :kind, :status,
-                                    :lock_version,
-                                    :start_year, :start_month, :start_day, :start_hour, :start_minute,
-                                    :end_year, :end_month, :end_day, :end_hour, :end_minute)
+                                    :lock_version, :starts, :ends)
   end
 end
