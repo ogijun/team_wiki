@@ -29,7 +29,8 @@ module SearchRunner
       where << "(#{LIKE_COLUMNS.map { |column| "#{column} LIKE ?" }.join(' OR ')})"
       binds.concat([ like(term) ] * LIKE_COLUMNS.size)
     end
-    query.short_excludes.each do |term|
+    like_excludes = query.short_excludes + (query.fts? ? [] : query.excludes)
+    like_excludes.each do |term|
       where << "NOT (#{LIKE_COLUMNS.map { |column| "#{column} LIKE ?" }.join(' OR ')})"
       binds.concat([ like(term) ] * LIKE_COLUMNS.size)
     end
