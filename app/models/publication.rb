@@ -1,4 +1,6 @@
 class Publication < ApplicationRecord
+  after_commit -> { SearchIndexer.reindex(self) }, on: %i[create update]
+  after_destroy_commit -> { SearchIndexer.remove(self) }
   include FuzzyDateAttributable
   include Reactable
 

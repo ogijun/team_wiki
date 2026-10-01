@@ -13,6 +13,9 @@ class Material < ApplicationRecord
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :activities, as: :subject, dependent: :nullify
 
+  after_commit -> { SearchIndexer.reindex(self) }, on: %i[create update]
+  after_destroy_commit -> { SearchIndexer.remove(self) }
+
   attr_accessor :placeholder_intent
 
   ALLOWED_CONTENT_TYPES = %w[

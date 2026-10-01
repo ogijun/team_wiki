@@ -14,6 +14,7 @@ class Article < ApplicationRecord
   has_many :citations, dependent: :destroy
   has_many :cited_materials, -> { distinct }, through: :citations, source: :material
   has_many :comments, as: :commentable, dependent: :destroy
+  after_destroy_commit -> { SearchIndexer.remove(self) }
   # 削除後もタイムラインは subject_label のスナップショットで表示する（参照だけ外す）。
   has_many :activities, as: :subject, dependent: :nullify
 
@@ -76,6 +77,7 @@ class Article < ApplicationRecord
       sync_outgoing_links(body)
       sync_citations(body)
       backfill_inbound_links
+      SearchIndexer.reindex(self)
       current_revision
     end
   end

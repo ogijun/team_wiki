@@ -1,6 +1,8 @@
 # 記事・資料に紐づく複数コメント（polymorphic）。プレーンテキスト本文。
 # 旧「メモ」を置き換え、新規作成時の初回コメントもこれで表す。
 class Comment < ApplicationRecord
+  after_commit -> { SearchIndexer.reindex(self) }, on: %i[create update]
+  after_destroy_commit -> { SearchIndexer.remove(self) }
   include Reactable
 
   MENTION_PATTERN = /@\[[^\]\r\n]*\]\((\d+)\)/

@@ -1,4 +1,6 @@
 class Transcription < ApplicationRecord
+  after_commit -> { SearchIndexer.reindex(self) }, on: %i[create update]
+  after_destroy_commit -> { SearchIndexer.remove(self) }
   include Reactable
 
   STATUSES = { "drafting" => "作業中", "done" => "完了" }.freeze
