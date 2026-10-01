@@ -58,4 +58,31 @@ class ExpandFuzzyTimestampsTest < ActiveSupport::TestCase
     connection&.execute("PRAGMA foreign_keys = ON")
     [ Article, Material, Publication ].each(&:reset_column_information)
   end
+
+  test "down clears the legacy pair when the reduced timestamp was cleared after up" do
+    migration = ExpandFuzzyTimestamps.new
+    connection = ActiveRecord::Base.connection
+    migration.down
+    connection.execute("PRAGMA foreign_keys = OFF")
+    connection.execute(<<~SQL)
+      INSERT INTO articles
+        (id, title, slug, created_by_id, starts_at, starts_precision, status, comments_count, likes_count, lock_version, created_at, updated_at)
+      VALUES
+        (999998, 'cleared migration test', 'cleared-migration-test', 999998, '1979-04-07 00:00:00', 'day', 'stub', 0, 0, 0,
+         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    SQL
+
+    migration.up
+    connection.execute("UPDATE articles SET starts = NULL WHERE id = 999998")
+    migration.down
+
+    row = connection.select_one("SELECT starts_at, starts_precision FROM articles WHERE id = 999998")
+    assert_nil row.fetch("starts_at")
+    assert_nil row.fetch("starts_precision")
+  ensure
+    connection&.execute("DELETE FROM articles WHERE id = 999998")
+    migration&.up unless connection&.column_exists?(:articles, :starts)
+    connection&.execute("PRAGMA foreign_keys = ON")
+    [ Article, Material, Publication ].each(&:reset_column_information)
+  end
 end

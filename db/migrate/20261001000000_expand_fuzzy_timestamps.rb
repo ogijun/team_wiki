@@ -86,6 +86,7 @@ class ExpandFuzzyTimestamps < ActiveRecord::Migration[8.1]
   def restore_table(table, columns)
     model = record_class(table)
     columns.each do |at, precision, source|
+      model.where(source => nil).update_all(at => nil, precision => nil)
       model.where.not(source => nil).find_each do |row|
         time, old_precision = legacy_from(row.public_send(source))
         row.update_columns(at => time, precision => old_precision)
