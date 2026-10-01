@@ -19,8 +19,6 @@ class Publication < ApplicationRecord
   # スキャンした表紙が余裕で収まり、事故的な巨大アップロードは弾ける 10MB に置く。
   COVER_MAX_BYTES = 10.megabytes
 
-  self.ignored_columns += %w[released_at released_precision]
-
   validates :title, presence: true
   validates :kind, inclusion: { in: KINDS.keys }
   validates :sales_status, inclusion: { in: SALES_STATUSES.keys }
