@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_080655) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_17_000001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -320,4 +320,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_080655) do
   add_foreign_key "transcriptions", "users", column: "assignee_id"
   add_foreign_key "transcriptions", "users", column: "author_id"
   add_foreign_key "uploads", "users"
+
+  # Virtual tables defined in this database.
+  # Note that virtual tables may not work with other database engines. Be careful if changing database.
+  create_virtual_table "search_entries", "fts5", ["kind UNINDEXED", "record_id UNINDEXED", "owner_kind UNINDEXED", "owner_id UNINDEXED", "title", "body", "tags", "tokenize = 'trigram case_sensitive 0'"]
 end
