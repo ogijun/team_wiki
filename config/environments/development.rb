@@ -3,9 +3,8 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # Allow local reverse-proxy hostnames (puma-dev "*.test", and "*.lvh.me").
-  # Name-agnostic so any app name works: https://<anything>.test / http://<anything>.lvh.me
-  config.hosts << /.*\.test\z/
+  # "*.test" は gem portico が config.hosts に足す (config/portico.yml)。
+  # "*.lvh.me" はそれとは別の入口用に残す: http://<anything>.lvh.me
   config.hosts << /.*\.lvh\.me\z/
 
   # Make code changes take effect immediately without server restart.
