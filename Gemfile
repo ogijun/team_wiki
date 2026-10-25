@@ -101,6 +101,11 @@ end
 group :test do
   # 遅いテストと factory 呼び出し回数の可視化（TEST_PROF_REPORT / FPROF=1 等で起動）。
   gem "test-prof", require: false
+
+  # システムテスト (test/system): ブラウザで主要な導線を通す。
+  # ユニットテストだけでは画面が真っ白でも CI が緑になるため。
+  gem "capybara"
+  gem "selenium-webdriver"
 end
 
 gem "litestream", "~> 0.14.0"
