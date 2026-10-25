@@ -4,6 +4,13 @@ GIT
   specs:
     fuzzy_timestamp (0.1.1)
 
+GIT
+  remote: https://github.com/ogijun/portico.git
+  revision: 94b85941d60e86ce47d2ab52de01d25bc29b31a4
+  specs:
+    portico (0.1.0)
+      puma (>= 8.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -571,6 +578,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection
   pagy (~> 9.3)
   pdf-reader (~> 2.16)
+  portico!
   propshaft
   puma (>= 5.0)
   rack-mini-profiler
@@ -718,6 +726,7 @@ CHECKSUMS
   parallel (2.1.0) sha256=b35258865c2e31134c5ecb708beaaf6772adf9d5efae28e93e99260877b09356
   parser (3.3.11.1) sha256=d17ace7aabe3e72c3cc94043714be27cc6f852f104d81aa284c2281aecc65d54
   pdf-reader (2.16.0) sha256=bf1b5564c085264d8279bde3cf1467778b75841494d20c0fe7da3dad475f3732
+  portico (0.1.0)
   pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
   prettyprint (0.2.1) sha256=d555d57ea6d7cf001d4774b693546a6bd88bec1e778ddffb5c60b68ceec4b7d4
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85

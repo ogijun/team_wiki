@@ -96,6 +96,10 @@ group :development do
   # ページ左上に表示時間と SQL を常時出す。体感の議論を数字にするため。
   # （railtie でミドルウェアを差し込むので require: false にしない）
   gem "rack-mini-profiler"
+
+  # ローカルで https://tominocle-pre.test を開くための入口 (puma-dev の置き換え)。
+  # ホスト名は config/portico.yml。Caddy の入口は dotfiles の portico.nix
+  gem "portico", github: "ogijun/portico"
 end
 
 group :test do
