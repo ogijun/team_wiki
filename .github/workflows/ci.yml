@@ -116,5 +116,48 @@ jobs:
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare test
 
-  # NOTE: system-test ジョブはシステムテスト（test/system）が無いため削除。
-  # 追加したら scaffold のジョブを戻す。
+  # ブラウザで主要な導線 (ログイン / 記事の作成・編集) を通す。
+  # ユニットテストだけでは、画面やエディタ (toast-ui) が壊れていても緑になるため。
+  # Chrome と chromedriver は ubuntu-latest のランナーに入っている。
+  system-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Restore apt package cache (libvips, qpdf, ghostscript)
+        uses: actions/cache@v6
+        with:
+          path: ~/apt-debs
+          key: apt-debs-${{ runner.os }}-libvips-qpdf-ghostscript-v1
+
+      - name: Install packages
+        run: |
+          sudo mkdir -p /var/cache/apt/archives
+          if compgen -G "$HOME/apt-debs/*.deb" > /dev/null; then
+            echo "Using cached .deb packages"
+            sudo cp "$HOME"/apt-debs/*.deb /var/cache/apt/archives/ || true
+          fi
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libvips qpdf ghostscript
+          mkdir -p "$HOME/apt-debs"
+          cp /var/cache/apt/archives/*.deb "$HOME/apt-debs/" 2>/dev/null || true
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Run system tests
+        env:
+          RAILS_ENV: test
+        run: bin/rails db:test:prepare test:system
+
+      - name: Keep screenshots from failed system tests
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: screenshots
+          path: ${{ github.workspace }}/tmp/screenshots
+          if-no-files-found: ignore
