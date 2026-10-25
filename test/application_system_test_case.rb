@@ -27,7 +27,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def fill_in_editor(text)
     editor = find(".toastui-editor-ww-container [contenteditable=true]")
     editor.click
-    editor.send_keys([ :command, "a" ], :backspace) unless editor.text.empty?
+    # 全選択は Mac が ⌘A、CI (Linux) が Ctrl+A。
+    select_all = RUBY_PLATFORM.include?("darwin") ? :command : :control
+    editor.send_keys([ select_all, "a" ], :backspace) unless editor.text.empty?
     editor.send_keys(text)
   end
 end
