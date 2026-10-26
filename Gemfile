@@ -55,7 +55,7 @@ gem "aws-sdk-s3", "~> 1.235", require: false
 gem "pagy", "~> 9.3"
 
 # Reusable, unit-testable view components
-gem "view_component", "~> 4.15"
+gem "view_component", "~> 4.19"
 
 # Wiki content: GitHub-flavored Markdown rendering and revision diffs
 gem "commonmarker", "~> 2.10"
