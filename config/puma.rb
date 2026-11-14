@@ -34,6 +34,10 @@ port ENV.fetch("PORT", 3000)
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
+# development だけ: 空きポートで起動して https://<名前>.test に登録する (gem portico)。
+# 本番の bundle には portico が入らないので、この行は何もしない。
+plugin :portico if Gem.loaded_specs.key?("portico")
+
 # Run the Solid Queue supervisor inside of Puma for single-server deployments.
 plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 
