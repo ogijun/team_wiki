@@ -1,0 +1,72 @@
+# Dependabot の minor/patch グループ PR を、CI が緑になったら squash merge する。
+#
+# 安全上の前提（公開リポジトリ）:
+# - workflow_run はデフォルトブランチ上のこのファイルで動く。PR のコードは checkout しない
+# - pull_request_target は使わない。secrets も使わない（GITHUB_TOKEN のみ）
+# - PR 由来の値（ブランチ名など）は env 経由で渡し、式としてスクリプトに埋め込まない
+#
+# 制約:
+# - main は strict な branch protection。main に追いついていない PR は merge できないが、
+#   そのときはジョブを赤にせずログに理由を残すだけにする（Dependabot の rebase を待つ）
+# - GITHUB_TOKEN による merge の push は main の CI を起動しない（GitHub の仕様）。許容する
+name: Dependabot auto-merge
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/') &&
+      contains(github.event.workflow_run.head_branch, 'minor-and-patch')
+    steps:
+      - name: Merge the PR if it is still the one CI ran on
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ -z "$PR_NUMBER" ]; then
+            echo "workflow_run に PR が紐付いていない。何もしない"
+            exit 0
+          fi
+
+          if ! pr=$(gh pr view "$PR_NUMBER" --json state,author,headRefOid); then
+            echo "::warning::PR #$PR_NUMBER の情報を取得できなかった"
+            exit 0
+          fi
+          state=$(jq -r .state <<<"$pr")
+          author=$(jq -r .author.login <<<"$pr")
+          head=$(jq -r .headRefOid <<<"$pr")
+
+          if [ "$state" != "OPEN" ]; then
+            echo "PR #$PR_NUMBER は $state。何もしない"
+            exit 0
+          fi
+          # gh は bot の login を "app/dependabot" で返す
+          if [ "$author" != "app/dependabot" ] && [ "$author" != "dependabot[bot]" ]; then
+            echo "::warning::PR #$PR_NUMBER の作成者が dependabot ではない ($author)。merge しない"
+            exit 0
+          fi
+          if [ "$head" != "$HEAD_SHA" ]; then
+            echo "PR #$PR_NUMBER の head ($head) が CI の対象 ($HEAD_SHA) と違う。新しい CI を待つ"
+            exit 0
+          fi
+
+          if gh pr merge "$PR_NUMBER" --squash --match-head-commit "$HEAD_SHA"; then
+            echo "PR #$PR_NUMBER を squash merge した"
+          else
+            echo "::warning::PR #$PR_NUMBER を merge できなかった（main に追いついていない等）。Dependabot の rebase 後の CI で再試行される"
+          fi

@@ -5,6 +5,11 @@ updates:
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
+  # minor / patch は1本の PR にまとめ、CI が緑なら dependabot-automerge.yml が merge する。
+  # メジャーはグループに入れず、今までどおり1本ずつ人が判断する。
+  groups:
+    minor-and-patch:
+      update-types: ["minor", "patch"]
   ignore:
     # kamal は同じホストに同居する別アプリと kamal-proxy を共有しているため、
     # proxy のバージョン整合が要る。自動 bump させず、proxy 更新と歩調を合わせて手動で上げる。
@@ -19,3 +24,6 @@ updates:
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
+  groups:
+    minor-and-patch:
+      update-types: ["minor", "patch"]
