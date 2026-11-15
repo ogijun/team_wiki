@@ -108,7 +108,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "litestream", "~> 0.14.0"
+gem "litestream", "~> 0.16.1"
 
 gem "pdf-reader", "~> 2.16"
 
