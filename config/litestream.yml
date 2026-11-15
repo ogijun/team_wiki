@@ -10,11 +10,12 @@
 # 値を要求するため LITESTREAM_REPLICA_REGION（慣例で auto）を渡す。
 dbs:
   - path: storage/production.sqlite3
-    replicas:
-      - type: s3
-        bucket: $LITESTREAM_REPLICA_BUCKET
-        path: storage/production.sqlite3
-        endpoint: $LITESTREAM_REPLICA_ENDPOINT
-        region: $LITESTREAM_REPLICA_REGION
-        access-key-id: $LITESTREAM_ACCESS_KEY_ID
-        secret-access-key: $LITESTREAM_SECRET_ACCESS_KEY
+    # Litestream 0.5 は DB ごとに単一の replica を持つ。複数 replica は非対応。
+    replica:
+      type: s3
+      bucket: $LITESTREAM_REPLICA_BUCKET
+      path: storage/production.sqlite3
+      endpoint: $LITESTREAM_REPLICA_ENDPOINT
+      region: $LITESTREAM_REPLICA_REGION
+      access-key-id: $LITESTREAM_ACCESS_KEY_ID
+      secret-access-key: $LITESTREAM_SECRET_ACCESS_KEY
