@@ -108,10 +108,10 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "litestream", "~> 0.14.0"
+gem "litestream", "~> 0.16.1"
 
 gem "pdf-reader", "~> 2.16"
 
 gem "factory_bot_rails", "~> 6.5", groups: [ :development, :test ]
 
-gem "rubocop-migration", "~> 0.7.1", group: :development, require: false
+gem "rubocop-migration", "~> 0.9.0", group: :development, require: false
