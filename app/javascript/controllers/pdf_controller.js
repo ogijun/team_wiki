@@ -75,11 +75,37 @@ export default class extends Controller {
   // ←→ キーでのページ送り。左開きは →=次, 右開きは ←=次（読み進み方向に一致）。
   // 番号入力欄にフォーカス中はキーを横取りしない（入力のカーソル移動を優先）。
   key(event) {
+    if (event.defaultPrevented) return
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return
     if (event.target instanceof HTMLInputElement) return
     event.preventDefault()
     const advance = this.rtl ? event.key === "ArrowLeft" : event.key === "ArrowRight"
     advance ? this.next() : this.prev()
+  }
+
+  // 拡大したページへフォーカスを置いたときは、矢印キーをページ送りではなくパンに使う。
+  // PageUp/PageDown はステージの高さ単位で大きく移動する。イベントを dialog へ伝播させないことで、
+  // 横パンと綴じ方向つきページ送りが同時に発火するのを防ぐ。
+  stageKey(event) {
+    if (!this.scrollable()) return
+    const line = 48
+    const page = Math.max(line, Math.round(this.stageTarget.clientHeight * 0.8))
+    let dx = 0, dy = 0
+
+    switch (event.key) {
+      case "ArrowLeft": dx = -line; break
+      case "ArrowRight": dx = line; break
+      case "ArrowUp": dy = -line; break
+      case "ArrowDown": dy = line; break
+      case "PageUp": dy = -page; break
+      case "PageDown": dy = page; break
+      default: return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+    this.stageTarget.scrollLeft += dx
+    this.stageTarget.scrollTop += dy
   }
 
   close() {
