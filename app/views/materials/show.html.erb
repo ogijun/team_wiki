@@ -90,7 +90,7 @@
             <%# canvas は pdf_controller のページ別キャッシュが必要なときに生成する。 %>
             <div class="pdf-viewer__stage" data-pdf-target="stage" data-action="keydown->pdf#stageKey"
                  tabindex="0" aria-label="PDFページ。拡大時は矢印キーで上下左右に移動できます"></div>
-            <div class="sr-only" data-pdf-target="accessibleText" role="document" aria-live="polite" tabindex="0"></div>
+            <div class="sr-only" data-pdf-target="accessibleText" role="document" tabindex="0"></div>
             <div class="pdf-viewer__status muted" data-pdf-target="status"></div>
             <div class="pdf-viewer__fallback">
               <%= link_to "PDFを別タブで開く", pdf_material_path(@material), target: "_blank", rel: "noopener" %>

@@ -219,7 +219,8 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
       assert_select "dialog.lightbox:not([open])[aria-labelledby=?]", "pdf-viewer-title-#{pdf.id}" do
         assert_select ".pdf-viewer" # オーバーレイは閉じた状態
         assert_select "h2#pdf-viewer-title-#{pdf.id}.sr-only", text: "doc.pdf"
-        assert_select "[data-pdf-target=accessibleText][role=document][aria-live=polite]"
+        assert_select "[data-pdf-target=accessibleText][role=document][tabindex='0']"
+        assert_select "[data-pdf-target=accessibleText][aria-live]", count: 0
         assert_select "a[href=?][target=_blank]", pdf_material_path(pdf), text: "PDFを別タブで開く"
         assert_select "a[href=?][download]", rails_blob_path(pdf.file), text: "PDFをダウンロード"
       end
