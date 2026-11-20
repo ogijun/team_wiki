@@ -62,8 +62,10 @@
       <%# ファイル名クリックでオーバーレイのページビューア（PDF.js は初回オープン時に遅延ロード）。DLは隣のアイコンから %>
       <div data-controller="pdf" data-pdf-url-value="<%= pdf_material_path(@material) %>">
         <div class="placeholder">ファイル名をクリックするとページビューアで読めます（ページ単位で部分読み込み）</div>
-        <dialog class="lightbox lightbox--pdf" data-pdf-target="dialog" data-action="click->pdf#backdropClose keydown->pdf#key">
+        <dialog class="lightbox lightbox--pdf" data-pdf-target="dialog" data-action="click->pdf#backdropClose keydown->pdf#key"
+                aria-labelledby="pdf-viewer-title-<%= @material.id %>">
           <div class="pdf-viewer">
+            <h2 id="pdf-viewer-title-<%= @material.id %>" class="sr-only"><%= @material.file.filename %></h2>
             <div class="pdf-viewer__bar">
               <%# 中央固定はせず、各操作を重ならずに並べる（狭い画面では折り返す）。掴んで移動も兼ねる。 %>
               <button type="button" class="pdf-viewer__btn" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え" aria-label="綴じ方向を切り替え"><%= icon("book-open") %></button>
@@ -88,7 +90,12 @@
             <%# canvas は pdf_controller のページ別キャッシュが必要なときに生成する。 %>
             <div class="pdf-viewer__stage" data-pdf-target="stage" data-action="keydown->pdf#stageKey"
                  tabindex="0" aria-label="PDFページ。拡大時は矢印キーで上下左右に移動できます"></div>
+            <div class="sr-only" data-pdf-target="accessibleText" role="document" aria-live="polite" tabindex="0"></div>
             <div class="pdf-viewer__status muted" data-pdf-target="status"></div>
+            <div class="pdf-viewer__fallback">
+              <%= link_to "PDFを別タブで開く", pdf_material_path(@material), target: "_blank", rel: "noopener" %>
+              <%= link_to "PDFをダウンロード", rails_blob_path(@material.file), download: @material.file.filename.to_s %>
+            </div>
             <%# リサイズグリップはグレーのダイアログ右下角に置く（ドラッグでステージを変え、ダイアログが追従）。 %>
             <span class="pdf-viewer__resizer" aria-hidden="true" title="ドラッグでビューアの大きさを変える"></span>
           </div>

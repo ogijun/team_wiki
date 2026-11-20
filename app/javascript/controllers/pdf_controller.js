@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // 操作: 前後ボタン／番号入力ジャンプ／←→キー（綴じ方向追従）／拡大縮小・等倍・フィット／
 //       拡大時はドラッグでパン・Ctrl+ホイールでズーム・ダブルクリックでフィット⇄等倍。リサイズで再フィット。
 export default class extends Controller {
-  static targets = ["dialog", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir"]
+  static targets = ["dialog", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir", "accessibleText"]
   static values = { url: String }
 
   MIN_SCALE = 0.15
@@ -366,6 +366,12 @@ export default class extends Controller {
       entry.task = null
     }
     if (!this.isCurrentCacheEntry(entry)) return null
+    try {
+      const textContent = await page.getTextContent()
+      entry.accessibleText = textContent.items.map((item) => item.str).filter(Boolean).join(" ")
+    } catch {
+      entry.accessibleText = ""
+    }
     entry.ready = true
     return entry
   }
@@ -388,6 +394,10 @@ export default class extends Controller {
     this.pageInputTarget.max = this.doc.numPages
     this.pageTotalTarget.textContent = this.doc.numPages
     this.pctTarget.textContent = `${Math.round(this.scale * 100)}%`
+    const pageLabel = `PDF本文 ${entry.pageNum} / ${this.doc.numPages} ページ。`
+    this.accessibleTextTarget.textContent = entry.accessibleText ?
+      `${pageLabel}${entry.accessibleText}` :
+      `${pageLabel}このページには読み上げ可能なテキストがありません。別タブ表示またはダウンロードをご利用ください。`
     this.stageTarget.classList.toggle("is-pannable", this.scrollable())
   }
 
