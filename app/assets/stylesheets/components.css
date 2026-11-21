@@ -526,6 +526,8 @@ button.tag-chip:hover, button.tag-chip:focus {
   background: none; border: 0; border-radius: 7px; cursor: pointer; color: var(--ink-soft);
 }
 .pdf-viewer__btn:hover { background: rgba(255, 255, 255, 0.5); color: var(--accent); }
+.pdf-viewer__btn[aria-disabled="true"] { opacity: 0.45; cursor: default; }
+.pdf-viewer__btn[aria-disabled="true"]:hover { background: none; color: var(--ink-soft); }
 .pdf-viewer__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .pdf-viewer__btn .icon { width: 1.15rem; height: 1.15rem; }
 /* 綴じ方向: 右開きのときは本アイコンを左右反転して状態を示す。 */
