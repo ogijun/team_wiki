@@ -156,8 +156,8 @@ export default class extends Controller {
 
   updateNavigation(unavailable = false) {
     const disabled = unavailable || !this.doc
-    this.prevTarget.disabled = disabled || this.pageNum <= 1
-    this.nextTarget.disabled = disabled || this.pageNum >= this.doc?.numPages
+    this.prevTarget.setAttribute("aria-disabled", disabled || this.pageNum <= 1 ? "true" : "false")
+    this.nextTarget.setAttribute("aria-disabled", disabled || this.pageNum >= this.doc?.numPages ? "true" : "false")
     this.pageInputTarget.disabled = disabled
   }
 
