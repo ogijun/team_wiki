@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // 操作: 前後ボタン／番号入力ジャンプ／←→キー（綴じ方向追従）／拡大縮小・等倍・フィット／
 //       拡大時はドラッグでパン・Ctrl+ホイールでズーム・ダブルクリックでフィット⇄等倍。リサイズで再フィット。
 export default class extends Controller {
-  static targets = ["dialog", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir", "accessibleText"]
+  static targets = ["dialog", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir", "dirLabel", "accessibleText"]
   static values = { url: String }
 
   MIN_SCALE = 0.15
@@ -69,6 +69,8 @@ export default class extends Controller {
     const label = this.rtl ? "綴じ方向: 右開き（クリックで左開き）" : "綴じ方向: 左開き（クリックで右開き）"
     this.dirTarget.title = label
     this.dirTarget.setAttribute("aria-label", label)
+    this.dirTarget.setAttribute("aria-pressed", this.rtl ? "true" : "false")
+    this.dirLabelTarget.textContent = this.rtl ? "右開き" : "左開き"
     this.dirTarget.classList.toggle("is-rtl", this.rtl)
   }
 
