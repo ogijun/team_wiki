@@ -580,6 +580,31 @@ button.tag-chip:hover, button.tag-chip:focus {
 .pdf-viewer__stage.is-pannable { cursor: grab; }
 .pdf-viewer__stage.is-panning { cursor: grabbing; }
 
+/* 狭幅・タッチでは移動可能な小窓ではなく、画面内に収まる固定レイアウトにする。
+   主要操作は px 指定の44pxターゲットを保ち、200%文字拡大でも操作列自体は溢れさせない。 */
+@media (max-width: 640px), (pointer: coarse) {
+  .lightbox--pdf {
+    width: calc(100vw - 8px); max-width: calc(100vw - 8px); max-height: calc(100dvh - 8px);
+  }
+  .pdf-viewer { padding: 4px; max-height: calc(100dvh - 8px); }
+  .pdf-viewer__bar {
+    display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px;
+    gap: 4px; margin-bottom: 4px; cursor: default; touch-action: auto;
+  }
+  .pdf-viewer__bar > [data-pdf-target="dir"] { grid-column: 1; grid-row: 1; }
+  .pdf-viewer__nav { grid-column: 2; grid-row: 1; justify-self: center; }
+  .pdf-viewer__zoom { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+  .pdf-viewer__close { grid-column: 3; grid-row: 1; margin-left: 0; }
+  .pdf-viewer__btn { width: 44px; height: 44px; }
+  .pdf-viewer__pct { min-width: 52px; min-height: 44px; padding: 0 4px; }
+  .pdf-viewer .pdf-viewer__pageinput { width: 44px; height: 44px; line-height: 44px; padding: 0 4px; }
+  .pdf-viewer__page { gap: 3px; padding: 0 3px; }
+  .pdf-viewer__stage {
+    min-width: 0; min-height: 120px; max-width: calc(100vw - 16px); max-height: calc(100dvh - 190px);
+  }
+  .pdf-viewer__resizer { display: none; }
+}
+
 /* ── ホーム・統計・検索・年表 ──────────────── */
 
 /* Home dashboard */

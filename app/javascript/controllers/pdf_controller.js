@@ -187,6 +187,7 @@ export default class extends Controller {
     let dragging = false
     let startX = 0, startY = 0, baseX = 0, baseY = 0
     bar.addEventListener("pointerdown", (e) => {
+      if (window.matchMedia("(max-width: 640px), (pointer: coarse)").matches) return
       if (e.button !== 0 || e.target.closest("button, input, a, .pdf-viewer__pct")) return
       dragging = true
       startX = e.clientX; startY = e.clientY
@@ -268,8 +269,19 @@ export default class extends Controller {
 
   // ページ全体がビューポート（おおよそ 90vw × 78vh）に収まる倍率。
   fitScaleFor(viewport1) {
-    const maxW = window.innerWidth * 0.90
-    const maxH = window.innerHeight * 0.78
+    const narrow = window.matchMedia("(max-width: 640px), (pointer: coarse)").matches
+    if (!narrow) {
+      return Math.min(window.innerWidth * 0.90 / viewport1.width, window.innerHeight * 0.78 / viewport1.height)
+    }
+
+    const viewer = this.stageTarget.closest(".pdf-viewer")
+    const barHeight = viewer?.querySelector(".pdf-viewer__bar")?.getBoundingClientRect().height || 0
+    const statusHeight = viewer?.querySelector(".pdf-viewer__status")?.getBoundingClientRect().height || 0
+    const fallbackHeight = viewer?.querySelector(".pdf-viewer__fallback")?.getBoundingClientRect().height || 0
+    const style = viewer ? getComputedStyle(viewer) : null
+    const padding = style ? parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) : 0
+    const maxW = Math.max(120, window.innerWidth - 24)
+    const maxH = Math.max(120, window.innerHeight - barHeight - statusHeight - fallbackHeight - padding - 24)
     return Math.min(maxW / viewport1.width, maxH / viewport1.height)
   }
 
