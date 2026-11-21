@@ -68,7 +68,7 @@
             <h2 id="pdf-viewer-title-<%= @material.id %>" class="sr-only"><%= @material.file.filename %></h2>
             <div class="pdf-viewer__bar">
               <%# 中央固定はせず、各操作を重ならずに並べる（狭い画面では折り返す）。掴んで移動も兼ねる。 %>
-              <button type="button" class="pdf-viewer__btn pdf-viewer__dir" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え" aria-label="綴じ方向を切り替え" aria-pressed="false"><%= icon("book-open") %><span data-pdf-target="dirLabel">左開き</span></button>
+              <button type="button" class="pdf-viewer__btn pdf-viewer__dir" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え" aria-label="右開きで読む" aria-pressed="false"><%= icon("book-open") %><span data-pdf-target="dirLabel">左開き</span></button>
               <span class="pdf-viewer__group pdf-viewer__nav" data-pdf-target="nav">
                 <button type="button" class="pdf-viewer__btn" data-pdf-target="prev" data-action="pdf#prev" title="前のページ" aria-label="前のページ" aria-disabled="true"><%= icon("chevron-left") %></button>
                 <span class="pdf-viewer__page">
@@ -90,10 +90,14 @@
             <details class="pdf-viewer__help">
               <summary>操作説明</summary>
               <ul>
-                <li><strong>前のページ・次のページ:</strong> ページをめくります</li>
-                <li><strong>全体を表示:</strong> ページ全体が収まる倍率に戻します</li>
+                <li><strong>前のページ / 次のページ:</strong> ページをめくります</li>
+                <li><strong>全体を表示（フィット）:</strong> ページ全体が収まる倍率に戻します</li>
                 <li><strong>閉じる:</strong> PDFビューアを閉じます</li>
                 <li>拡大後はページをドラッグして移動できます</li>
+                <li><kbd>←</kbd> / <kbd>→</kbd>: ページを移動します（綴じ方向に追従）</li>
+                <li>拡大時の矢印キー / <kbd>PageUp</kbd> / <kbd>PageDown</kbd>: ページ内を移動します</li>
+                <li><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + ホイール: 拡大・縮小します</li>
+                <li>ダブルクリック: フィットと等倍を切り替えます</li>
               </ul>
             </details>
             <%# canvas は pdf_controller のページ別キャッシュが必要なときに生成する。 %>

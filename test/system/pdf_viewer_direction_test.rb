@@ -20,19 +20,26 @@ class PdfViewerDirectionTest < ApplicationSystemTestCase
 
     direction = find("button[data-action='pdf#toggleDirection']")
     assert_equal "false", direction["aria-pressed"]
+    assert_equal "右開きで読む", direction["aria-label"]
     assert_text "左開き"
 
     direction.click
 
     assert_equal "true", direction["aria-pressed"]
+    assert_equal "右開きで読む", direction["aria-label"]
     assert_text "右開き"
 
     find("details.pdf-viewer__help summary").click
     within "details.pdf-viewer__help" do
-      assert_text "前のページ・次のページ"
-      assert_text "全体を表示"
+      assert_text "前のページ / 次のページ"
+      assert_text "全体を表示（フィット）"
       assert_text "閉じる"
       assert_text "ドラッグして移動"
+      assert_text "綴じ方向に追従"
+      assert_text "PageUp / PageDown"
+      assert_text "Ctrl / ⌘ + ホイール"
+      assert_text "ダブルクリック"
+      assert_text "等倍"
     end
   end
 

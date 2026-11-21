@@ -66,10 +66,10 @@ export default class extends Controller {
 
   applyDirection() {
     this.navTarget.classList.toggle("pdf-viewer__nav--rtl", this.rtl)
-    // アイコンボタン化したので、現在の綴じ方向は title/aria-label と本(アイコン)の左右反転で示す。
+    // 現在の綴じ方向は可視ラベル・aria-pressed と本アイコンの左右反転で示す。
+    // aria-label は「右開きという選択肢」に固定し、押下状態との二重読み上げを避ける。
     const label = this.rtl ? "綴じ方向: 右開き（クリックで左開き）" : "綴じ方向: 左開き（クリックで右開き）"
     this.dirTarget.title = label
-    this.dirTarget.setAttribute("aria-label", label)
     this.dirTarget.setAttribute("aria-pressed", this.rtl ? "true" : "false")
     this.dirLabelTarget.textContent = this.rtl ? "右開き" : "左開き"
     this.dirTarget.classList.toggle("is-rtl", this.rtl)
