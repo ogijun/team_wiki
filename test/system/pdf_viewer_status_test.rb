@@ -24,11 +24,11 @@ class PdfViewerStatusTest < ApplicationSystemTestCase
 
     click_button "次のページ"
 
+    assert_selector "[data-pdf-target=announcement]", text: "PDF本文 2 / 2 ページ", visible: :all
     page_input = find("input[aria-label='ページ番号へ移動']:not(:disabled)")
     assert_equal "2", page_input.value
     assert_button "前のページ", disabled: false
     assert_button "次のページ", disabled: true
-    assert_selector "[data-pdf-target=announcement]", text: "PDF本文 2 / 2 ページ", visible: :all
   end
 
   test "announces a load failure and exposes retry and download actions" do
