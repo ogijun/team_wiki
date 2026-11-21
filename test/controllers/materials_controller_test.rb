@@ -216,7 +216,14 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     get material_url(pdf)
     assert_select "[data-controller=pdf][data-pdf-url-value=?]", pdf_material_path(pdf) do
       assert_select ".placeholder"                            # 既定はプレースホルダ表示
-      assert_select "dialog.lightbox:not([open]) .pdf-viewer" # オーバーレイは閉じた状態
+      assert_select "dialog.lightbox:not([open])[aria-labelledby=?]", "pdf-viewer-title-#{pdf.id}" do
+        assert_select ".pdf-viewer" # オーバーレイは閉じた状態
+        assert_select "h2#pdf-viewer-title-#{pdf.id}.sr-only", text: "doc.pdf"
+        assert_select "[data-pdf-target=accessibleText][role=document][tabindex='0']"
+        assert_select "[data-pdf-target=accessibleText][aria-live]", count: 0
+        assert_select "a[href=?][target=_blank]", pdf_material_path(pdf), text: "PDFを別タブで開く"
+        assert_select "a[href=?][download]", rails_blob_path(pdf.file), text: "PDFをダウンロード"
+      end
       assert_select "input.pdf-viewer__pageinput[data-action=?]", "change->pdf#jump" # 番号入力でページジャンプ
       assert_select ".pdf-viewer > .pdf-viewer__resizer"                             # ダイアログ右下にリサイズグリップ
       assert_select "a[data-action='pdf#open']", text: /doc\.pdf/

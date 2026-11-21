@@ -66,6 +66,7 @@ a[role="button"].outline:focus-visible, a.button.outline:focus-visible, button.o
 .filter-notice { margin: 0.5rem 0; }                            /* 「#タグ で絞り込み中」通知行 */
 .search-note { margin: 0.5rem 0; }
 .pdf-viewer__status { margin: 0.3rem 0 0; }
+.pdf-viewer__fallback { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; margin-top: 0.35rem; font-size: 0.8rem; }
 /* 引用タグ行: <p> 内に置けなかった button_to(<form>) を含むため div 化。要素を横並びに保つ。 */
 .cite-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.6rem 0 0.2rem; }
 
