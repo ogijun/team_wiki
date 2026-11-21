@@ -243,8 +243,8 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     # 前後/拡大縮小/フィット/閉じる は アイコン＋title(ツールチップ) のボタン
     assert_select ".pdf-viewer__bar button[data-action='pdf#prev'][title=?] svg use[href*=chevron-left]", "前のページ"
     assert_select ".pdf-viewer__bar button[data-action='pdf#next'][title=?] svg use[href*=chevron-right]", "次のページ"
-    assert_select ".pdf-viewer__bar button[data-pdf-target=prev][disabled]"
-    assert_select ".pdf-viewer__bar button[data-pdf-target=next][disabled]"
+    assert_select ".pdf-viewer__bar button[data-pdf-target=prev][aria-disabled=true]:not([disabled])"
+    assert_select ".pdf-viewer__bar button[data-pdf-target=next][aria-disabled=true]:not([disabled])"
     assert_select ".pdf-viewer__bar button[data-action='pdf#zoomOut'][title=?] svg use[href*=zoom-out]", "縮小"
     assert_select ".pdf-viewer__bar button[data-action='pdf#zoomIn'][title=?] svg use[href*=zoom-in]", "拡大"
     assert_select ".pdf-viewer__bar button[data-action='pdf#fit'][title] svg use[href*=maximize]"

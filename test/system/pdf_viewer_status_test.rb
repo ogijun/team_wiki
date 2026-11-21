@@ -18,17 +18,18 @@ class PdfViewerStatusTest < ApplicationSystemTestCase
     click_on "status.pdf"
 
     assert_selector "dialog[aria-busy='false'] .pdf-viewer__stage canvas"
-    assert_button "前のページ", disabled: true
-    assert_button "次のページ", disabled: false
+    assert_selector "button[data-action='pdf#prev'][aria-disabled='true']"
+    assert_selector "button[data-action='pdf#next'][aria-disabled='false']"
     assert_selector "[data-pdf-target=announcement]", text: "PDF本文 1 / 2 ページ", visible: :all
 
-    click_button "次のページ"
+    next_button = find("button[data-action='pdf#next']")
+    next_button.click
 
     assert_selector "[data-pdf-target=announcement]", text: "PDF本文 2 / 2 ページ", visible: :all
     page_input = find("input[aria-label='ページ番号へ移動']:not(:disabled)")
     assert_equal "2", page_input.value
-    assert_button "前のページ", disabled: false
-    assert_button "次のページ", disabled: true
+    assert_selector "button[data-action='pdf#prev'][aria-disabled='false']"
+    assert_selector "button[data-action='pdf#next'][aria-disabled='true']:focus"
   end
 
   test "announces a load failure and exposes retry and download actions" do
@@ -43,8 +44,9 @@ class PdfViewerStatusTest < ApplicationSystemTestCase
       text: "プレビューを読み込めませんでした", visible: :all
     assert_button "再試行", visible: true
     assert_link "PDFをダウンロード", href: rails_blob_path(@material.file)
-    assert_button "前のページ", disabled: true
-    assert_button "次のページ", disabled: true
+    assert_selector "button[data-action='pdf#prev'][aria-disabled='true']"
+    assert_selector "button[data-action='pdf#next'][aria-disabled='true']"
+    assert_selector "input[aria-label='ページ番号へ移動'][disabled]"
   end
 
   private

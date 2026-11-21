@@ -70,14 +70,14 @@
               <%# 中央固定はせず、各操作を重ならずに並べる（狭い画面では折り返す）。掴んで移動も兼ねる。 %>
               <button type="button" class="pdf-viewer__btn" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え" aria-label="綴じ方向を切り替え"><%= icon("book-open") %></button>
               <span class="pdf-viewer__group pdf-viewer__nav" data-pdf-target="nav">
-                <button type="button" class="pdf-viewer__btn" data-pdf-target="prev" data-action="pdf#prev" title="前のページ" aria-label="前のページ" disabled><%= icon("chevron-left") %></button>
+                <button type="button" class="pdf-viewer__btn" data-pdf-target="prev" data-action="pdf#prev" title="前のページ" aria-label="前のページ" aria-disabled="true"><%= icon("chevron-left") %></button>
                 <span class="pdf-viewer__page">
                   <input type="number" min="1" class="pdf-viewer__pageinput" data-pdf-target="pageInput"
                          data-action="change->pdf#jump" aria-label="ページ番号へ移動">
                   <span class="pdf-viewer__pagesep">/</span>
                   <span data-pdf-target="pageTotal">…</span>
                 </span>
-                <button type="button" class="pdf-viewer__btn" data-pdf-target="next" data-action="pdf#next" title="次のページ" aria-label="次のページ" disabled><%= icon("chevron-right") %></button>
+                <button type="button" class="pdf-viewer__btn" data-pdf-target="next" data-action="pdf#next" title="次のページ" aria-label="次のページ" aria-disabled="true"><%= icon("chevron-right") %></button>
               </span>
               <span class="pdf-viewer__group pdf-viewer__zoom">
                 <button type="button" class="pdf-viewer__btn" data-action="pdf#zoomOut" title="縮小" aria-label="縮小"><%= icon("zoom-out") %></button>
