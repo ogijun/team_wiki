@@ -221,6 +221,9 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
         assert_select "h2#pdf-viewer-title-#{pdf.id}.sr-only", text: "doc.pdf"
         assert_select "[data-pdf-target=accessibleText][role=document][tabindex='0']"
         assert_select "[data-pdf-target=accessibleText][aria-live]", count: 0
+        assert_select "[data-pdf-target=status][role=status][aria-live=polite]"
+        assert_select "[data-pdf-target=announcement][role=status][aria-live=polite]"
+        assert_select "button[data-pdf-target=retry][data-action='pdf#retry'][hidden]", text: "再試行"
         assert_select "a[href=?][target=_blank]", pdf_material_path(pdf), text: "PDFを別タブで開く"
         assert_select "a[href=?][download]", rails_blob_path(pdf.file), text: "PDFをダウンロード"
       end
@@ -240,6 +243,8 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     # 前後/拡大縮小/フィット/閉じる は アイコン＋title(ツールチップ) のボタン
     assert_select ".pdf-viewer__bar button[data-action='pdf#prev'][title=?] svg use[href*=chevron-left]", "前のページ"
     assert_select ".pdf-viewer__bar button[data-action='pdf#next'][title=?] svg use[href*=chevron-right]", "次のページ"
+    assert_select ".pdf-viewer__bar button[data-pdf-target=prev][disabled]"
+    assert_select ".pdf-viewer__bar button[data-pdf-target=next][disabled]"
     assert_select ".pdf-viewer__bar button[data-action='pdf#zoomOut'][title=?] svg use[href*=zoom-out]", "縮小"
     assert_select ".pdf-viewer__bar button[data-action='pdf#zoomIn'][title=?] svg use[href*=zoom-in]", "拡大"
     assert_select ".pdf-viewer__bar button[data-action='pdf#fit'][title] svg use[href*=maximize]"

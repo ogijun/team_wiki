@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // 操作: 前後ボタン／番号入力ジャンプ／←→キー（綴じ方向追従）／拡大縮小・等倍・フィット／
 //       拡大時はドラッグでパン・Ctrl+ホイールでズーム・ダブルクリックでフィット⇄等倍。リサイズで再フィット。
 export default class extends Controller {
-  static targets = ["dialog", "pageInput", "pageTotal", "status", "pct", "stage", "nav", "dir", "accessibleText"]
+  static targets = ["dialog", "pageInput", "pageTotal", "status", "announcement", "retry", "pct", "stage", "nav", "dir", "prev", "next", "accessibleText"]
   static values = { url: String }
 
   MIN_SCALE = 0.15
@@ -29,6 +29,7 @@ export default class extends Controller {
     // Turbo の復元では前回の canvas が生きた DOM のまま残る。ここで空にして、
     // この接続のキャッシュだけがステージを所有するようにする。
     this.stageTarget.replaceChildren()
+    this.updateNavigation(true)
     this.applyDirection()
     this.onResize = () => this.handleResize()
     window.addEventListener("resize", this.onResize)
@@ -121,6 +122,9 @@ export default class extends Controller {
     if (this.doc) return
     this.pageNum = 1
     this.scale = null // null = 初回描画でフィット倍率を算出
+    this.setBusy(true)
+    this.updateNavigation(true)
+    this.retryTarget.hidden = true
     this.statusTarget.textContent = "読み込み中…"
     try {
       const pdfjs = await import("pdfjs-dist")
@@ -133,8 +137,28 @@ export default class extends Controller {
       this.statusTarget.textContent = ""
       await this.render()
     } catch {
+      this.doc?.destroy()
+      this.doc = null
       this.statusTarget.textContent = "プレビューを読み込めませんでした（ダウンロードしてご覧ください）"
+      this.retryTarget.hidden = false
+      this.setBusy(false)
+      this.updateNavigation(true)
     }
+  }
+
+  retry() {
+    this.load()
+  }
+
+  setBusy(busy) {
+    this.dialogTarget.setAttribute("aria-busy", busy ? "true" : "false")
+  }
+
+  updateNavigation(unavailable = false) {
+    const disabled = unavailable || !this.doc
+    this.prevTarget.disabled = disabled || this.pageNum <= 1
+    this.nextTarget.disabled = disabled || this.pageNum >= this.doc?.numPages
+    this.pageInputTarget.disabled = disabled
   }
 
   // 拡大時のドラッグでパン・Ctrl+ホイールでズーム・ダブルクリックでフィット⇄等倍。
@@ -300,6 +324,8 @@ export default class extends Controller {
   async render({ invalidateCache = false } = {}) {
     if (!this.doc) return
     const token = ++this.renderToken
+    this.setBusy(true)
+    this.updateNavigation()
     if (invalidateCache) this.clearCanvasCache()
     const generation = this.cacheGeneration
     this.evictDistantCanvases()
@@ -312,6 +338,10 @@ export default class extends Controller {
     } catch (e) {
       if (e?.name === "RenderingCancelledException") return
       this.statusTarget.textContent = "ページを描画できませんでした"
+      if (token === this.renderToken) {
+        this.setBusy(false)
+        this.updateNavigation()
+      }
     }
   }
 
@@ -395,10 +425,13 @@ export default class extends Controller {
     this.pageTotalTarget.textContent = this.doc.numPages
     this.pctTarget.textContent = `${Math.round(this.scale * 100)}%`
     const pageLabel = `PDF本文 ${entry.pageNum} / ${this.doc.numPages} ページ。`
+    this.announcementTarget.textContent = pageLabel
     this.accessibleTextTarget.textContent = entry.accessibleText ?
       `${pageLabel}${entry.accessibleText}` :
       `${pageLabel}このページには読み上げ可能なテキストがありません。別タブ表示またはダウンロードをご利用ください。`
     this.stageTarget.classList.toggle("is-pannable", this.scrollable())
+    this.setBusy(false)
+    this.updateNavigation()
   }
 
   prefetchAdjacentPages(generation) {
@@ -439,15 +472,16 @@ export default class extends Controller {
     n = Math.min(Math.max(n, 1), this.doc.numPages)
     if (n === this.pageNum) { this.pageInputTarget.value = n; return }
     this.pageNum = n
+    this.updateNavigation()
     this.render()
   }
 
   prev() {
-    if (this.doc && this.pageNum > 1) { this.pageNum--; this.render() }
+    if (this.doc && this.pageNum > 1) { this.pageNum--; this.updateNavigation(); this.render() }
   }
 
   next() {
-    if (this.doc && this.pageNum < this.doc.numPages) { this.pageNum++; this.render() }
+    if (this.doc && this.pageNum < this.doc.numPages) { this.pageNum++; this.updateNavigation(); this.render() }
   }
 
   zoomIn() { this.scale = (this.scale ?? 1) * 1.25; this.fitted = false; this.render({ invalidateCache: true }) }
