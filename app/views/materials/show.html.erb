@@ -63,21 +63,21 @@
       <div data-controller="pdf" data-pdf-url-value="<%= pdf_material_path(@material) %>">
         <div class="placeholder">ファイル名をクリックするとページビューアで読めます（ページ単位で部分読み込み）</div>
         <dialog class="lightbox lightbox--pdf" data-pdf-target="dialog" data-action="click->pdf#backdropClose keydown->pdf#key"
-                aria-labelledby="pdf-viewer-title-<%= @material.id %>">
+                aria-labelledby="pdf-viewer-title-<%= @material.id %>" aria-busy="false">
           <div class="pdf-viewer">
             <h2 id="pdf-viewer-title-<%= @material.id %>" class="sr-only"><%= @material.file.filename %></h2>
             <div class="pdf-viewer__bar">
               <%# 中央固定はせず、各操作を重ならずに並べる（狭い画面では折り返す）。掴んで移動も兼ねる。 %>
               <button type="button" class="pdf-viewer__btn" data-pdf-target="dir" data-action="pdf#toggleDirection" title="綴じ方向（次ページの向き）を切り替え" aria-label="綴じ方向を切り替え"><%= icon("book-open") %></button>
               <span class="pdf-viewer__group pdf-viewer__nav" data-pdf-target="nav">
-                <button type="button" class="pdf-viewer__btn" data-action="pdf#prev" title="前のページ" aria-label="前のページ"><%= icon("chevron-left") %></button>
+                <button type="button" class="pdf-viewer__btn" data-pdf-target="prev" data-action="pdf#prev" title="前のページ" aria-label="前のページ" aria-disabled="true"><%= icon("chevron-left") %></button>
                 <span class="pdf-viewer__page">
                   <input type="number" min="1" class="pdf-viewer__pageinput" data-pdf-target="pageInput"
                          data-action="change->pdf#jump" aria-label="ページ番号へ移動">
                   <span class="pdf-viewer__pagesep">/</span>
                   <span data-pdf-target="pageTotal">…</span>
                 </span>
-                <button type="button" class="pdf-viewer__btn" data-action="pdf#next" title="次のページ" aria-label="次のページ"><%= icon("chevron-right") %></button>
+                <button type="button" class="pdf-viewer__btn" data-pdf-target="next" data-action="pdf#next" title="次のページ" aria-label="次のページ" aria-disabled="true"><%= icon("chevron-right") %></button>
               </span>
               <span class="pdf-viewer__group pdf-viewer__zoom">
                 <button type="button" class="pdf-viewer__btn" data-action="pdf#zoomOut" title="縮小" aria-label="縮小"><%= icon("zoom-out") %></button>
@@ -91,8 +91,10 @@
             <div class="pdf-viewer__stage" data-pdf-target="stage" data-action="keydown->pdf#stageKey"
                  tabindex="0" aria-label="PDFページ。拡大時は矢印キーで上下左右に移動できます"></div>
             <div class="sr-only" data-pdf-target="accessibleText" role="document" tabindex="0"></div>
-            <div class="pdf-viewer__status muted" data-pdf-target="status"></div>
+            <div class="sr-only" data-pdf-target="announcement" role="status" aria-live="polite"></div>
+            <div class="pdf-viewer__status muted" data-pdf-target="status" role="status" aria-live="polite"></div>
             <div class="pdf-viewer__fallback">
+              <button type="button" class="btn-sm secondary outline" data-pdf-target="retry" data-action="pdf#retry" hidden>再試行</button>
               <%= link_to "PDFを別タブで開く", pdf_material_path(@material), target: "_blank", rel: "noopener" %>
               <%= link_to "PDFをダウンロード", rails_blob_path(@material.file), download: @material.file.filename.to_s %>
             </div>
