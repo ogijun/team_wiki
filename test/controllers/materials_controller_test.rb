@@ -252,7 +252,20 @@ class MaterialsControllerTest < ActionDispatch::IntegrationTest
     # 等倍(100%)は % 表示自体をクリック式ボタンに統合
     assert_select "button.pdf-viewer__pct[data-action='pdf#actualSize'][title]"
     # 綴じ方向はアイコンボタン（状態は title/aria-label と JS で表現）
-    assert_select ".pdf-viewer__bar button[data-pdf-target='dir'][data-action='pdf#toggleDirection'] svg use[href*=book-open]"
+    assert_select ".pdf-viewer__bar button[data-pdf-target='dir'][data-action='pdf#toggleDirection'][aria-pressed=false][aria-label=?]", "右開きで読む" do
+      assert_select "svg use[href*=book-open]"
+      assert_select "[data-pdf-target=dirLabel]", text: "左開き"
+    end
+    assert_select "details.pdf-viewer__help" do
+      assert_select "summary", text: "操作説明"
+      assert_select "li", text: /前のページ \/ 次のページ/
+      assert_select "li", text: /全体を表示（フィット）/
+      assert_select "li", text: /閉じる/
+      assert_select "li", text: /綴じ方向に追従/
+      assert_select "li", text: /PageUp \/ PageDown/
+      assert_select "li", text: /Ctrl \/ ⌘ \+ ホイール/
+      assert_select "li", text: /ダブルクリック.*等倍/
+    end
   end
 
   test "image material mirrors the overlay viewer + download-icon composition" do
