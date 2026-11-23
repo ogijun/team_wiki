@@ -595,7 +595,7 @@ button.tag-chip:hover, button.tag-chip:focus {
   }
   .pdf-viewer { padding: 4px; max-height: calc(100dvh - 8px); }
   .pdf-viewer__bar {
-    display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px;
+    display: grid; grid-template-columns: auto minmax(0, 1fr) 44px;
     gap: 4px; margin-bottom: 4px; cursor: default; touch-action: auto;
   }
   .pdf-viewer__bar > [data-pdf-target="dir"] { grid-column: 1; grid-row: 1; }
@@ -603,6 +603,7 @@ button.tag-chip:hover, button.tag-chip:focus {
   .pdf-viewer__zoom { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
   .pdf-viewer__close { grid-column: 3; grid-row: 1; margin-left: 0; }
   .pdf-viewer__btn { width: 44px; height: 44px; }
+  .pdf-viewer__dir { width: auto; min-width: 44px; padding: 0 8px; }
   .pdf-viewer__pct { min-width: 52px; min-height: 44px; padding: 0 4px; }
   .pdf-viewer .pdf-viewer__pageinput { width: 44px; height: 44px; line-height: 44px; padding: 0 4px; }
   .pdf-viewer__page { gap: 3px; padding: 0 3px; }

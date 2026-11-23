@@ -16,7 +16,7 @@ class PdfViewerDirectionTest < ApplicationSystemTestCase
     sign_in_through_ui(@user)
     visit material_path(@material)
     click_on "direction.pdf"
-    assert_selector "dialog[open] .pdf-viewer__stage canvas"
+    assert_selector "dialog[open] .pdf-viewer__stage canvas", wait: 10
 
     direction = find("button[data-action='pdf#toggleDirection']")
     assert_equal "false", direction["aria-pressed"]
@@ -43,7 +43,46 @@ class PdfViewerDirectionTest < ApplicationSystemTestCase
     end
   end
 
+  test "keeps the visible binding direction clear at 375px width" do
+    emulate_touch_viewport(375, 667)
+    sign_in_through_ui(@user)
+    visit material_path(@material)
+    click_on "direction.pdf"
+    assert_selector "dialog[open] .pdf-viewer__stage canvas", wait: 10
+
+    direction = find("button[data-action='pdf#toggleDirection']")
+    nav = find("[data-pdf-target='nav']")
+    direction_rect = element_rect(direction)
+    nav_rect = element_rect(nav)
+
+    assert_equal "左開き", direction.find("[data-pdf-target='dirLabel']").text
+    assert_operator direction.native.property("scrollWidth"), :<=, direction.native.property("clientWidth")
+    assert_operator direction_rect.fetch("right"), :<=, nav_rect.fetch("x")
+    assert_operator direction_rect.fetch("x"), :>=, 0
+    assert_operator direction_rect.fetch("right"), :<=, page.evaluate_script("window.innerWidth")
+  end
+
   private
+
+  def emulate_touch_viewport(width, height)
+    page.driver.browser.execute_cdp(
+      "Emulation.setDeviceMetricsOverride",
+      width: width, height: height, deviceScaleFactor: 1, mobile: true
+    )
+    page.driver.browser.execute_cdp(
+      "Emulation.setTouchEmulationEnabled",
+      enabled: true, maxTouchPoints: 5
+    )
+  end
+
+  def element_rect(element)
+    page.evaluate_script(<<~JS, element)
+      (() => {
+        const rect = arguments[0].getBoundingClientRect()
+        return { x: rect.x, right: rect.right }
+      })()
+    JS
+  end
 
   def one_page_pdf
     objects = [
